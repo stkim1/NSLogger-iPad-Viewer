@@ -41,6 +41,10 @@ extern UIFont *sDisplayFont;
 	UIView					*_messageView;		// a view which draws content of message
 	UITableView				*_hostTableView;	// a tableview hosting this cell
 	LoggerMessageData		*_messageData;		// *NOT RETAINED* : this comes from CoreData
+
+#ifdef TEST_CELL_INDEXPATH
+	NSIndexPath				*_indexPath;
+#endif
 }
 @property (nonatomic, assign) UITableView				*hostTableView;
 @property (nonatomic, readonly) LoggerMessageData		*messageData;
@@ -52,4 +56,9 @@ extern UIFont *sDisplayFont;
 -(void)drawMessageView:(CGRect)aRect;
 -(void)setupForIndexpath:(NSIndexPath *)anIndexPath
 			 messageData:(LoggerMessageData *)aMessageData;
+
+#ifdef TEST_CELL_INDEXPATH
+-(void)willDisplayForIndexPath:(NSIndexPath *)anIndexPath
+				   messageData:(LoggerMessageData *)aMessageData;
+#endif
 @end

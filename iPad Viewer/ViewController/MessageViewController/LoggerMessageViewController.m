@@ -147,7 +147,7 @@
     if ([[self.messageFetchResultController sections] count] > 0)
 	{
         id <NSFetchedResultsSectionInfo> sectionInfo = \
-		[[self.messageFetchResultController sections] objectAtIndex:0];
+			[[self.messageFetchResultController sections] objectAtIndex:0];
         numberOfRows = [sectionInfo numberOfObjects];
     }
 	
@@ -159,8 +159,8 @@
 - (UITableViewCell *)tableView:(UITableView *)aTableView
 		 cellForRowAtIndexPath:(NSIndexPath *)anIndexPath
 {
-
-	LoggerMessageData *msg = [self.messageFetchResultController objectAtIndexPath:anIndexPath];
+	LoggerMessageData *msg = \
+		[self.messageFetchResultController objectAtIndexPath:anIndexPath];
 
 	LoggerMessageCell *cell = nil;
 
@@ -229,6 +229,18 @@
 	return cell;
 }
 
+#ifdef TEST_CELL_INDEXPATH
+- (void)tableView:(UITableView *)aTableView
+  willDisplayCell:(UITableViewCell *)aCell
+forRowAtIndexPath:(NSIndexPath *)anIndexPath
+{
+	LoggerMessageData *msg = \
+		[self.messageFetchResultController objectAtIndexPath:anIndexPath];
+
+	[(LoggerMessageCell *)aCell willDisplayForIndexPath:anIndexPath messageData:msg];
+}
+#endif
+
 //------------------------------------------------------------------------------
 #pragma mark - UITableViewDelegate Delegate Methods
 //------------------------------------------------------------------------------
@@ -252,12 +264,11 @@ heightForFooterInSection:(NSInteger)aSection
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - NSFetchedResultController
+#pragma mark - NSFetchedResultController Delegate
 //------------------------------------------------------------------------------
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller;
 {
-	//NSLog(@"fetched result controller will do something");
 	[self.tableView beginUpdates];
 }
 
@@ -267,7 +278,6 @@ heightForFooterInSection:(NSInteger)aSection
 	 forChangeType:(NSFetchedResultsChangeType)aType
 	  newIndexPath:(NSIndexPath *)aNewIndexPath
 {
-	//NSLog(@"controller:didChangeObject:");
 	UITableView *tableView = self.tableView;
 	
 	switch(aType) {
@@ -299,7 +309,6 @@ heightForFooterInSection:(NSInteger)aSection
 		   atIndex:(NSUInteger)sectionIndex
 	 forChangeType:(NSFetchedResultsChangeType)type
 {
-	NSLog(@"controller:didChangeSection:");
 }
 
 #if 0
@@ -312,7 +321,6 @@ sectionIndexTitleForSectionName:(NSString *)sectionName
 
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
 {
-	//NSLog(@"fetched result controller did finish something");
 	[self.tableView endUpdates];
 }
 

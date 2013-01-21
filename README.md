@@ -3,7 +3,7 @@ NSLogger-iPad-Viewer
 
 NSLogger viewer app on iPad
 
-Derived from [Florent Pillet's NSLogger](https://github.com/fpillet/NSLogger), NSLogger iPad Viewer lets you collect an application's logging to an iPad.
+Derived from [Florent Pillet's NSLogger](https://github.com/fpillet/NSLogger), NSLogger iPad Viewer lets you collect an application's log to an iPad.
 
 
 Documents
@@ -18,4 +18,4 @@ Author
 [iPad Viewer](https://github.com/stkim1/NSLogger-iPad-Viewer), Sung-Taek, Kim
 
 _VER. 0.1.1_<br/>
-_Update : Jan. 20, 2013_
+_Updated : Jan. 21, 2013_

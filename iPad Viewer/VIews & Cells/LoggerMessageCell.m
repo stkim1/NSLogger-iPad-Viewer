@@ -114,9 +114,7 @@ UIFont *sDisplayFont = nil;
 	
 	if (_messageData.contentsType == kMessageString)
 	{
-		
-		MTLog(@"draw text messages");
-		
+
 		// in case the message text is empty, use the function name as message text
 		// this is typically used to record a waypoint in the code flow
 		NSString *s = _messageData.messageText;
@@ -208,7 +206,22 @@ UIFont *sDisplayFont = nil;
 			 messageData:(LoggerMessageData *)aMessageData
 {
 	_messageData = aMessageData;
-	[self.textLabel setText:_messageData.threadID];
+#ifdef TEST_CELL_INDEXPATH
+	[_indexPath release],_indexPath = nil;
+	_indexPath = [anIndexPath retain];
+#endif
 }
+
+#ifdef TEST_CELL_INDEXPATH
+-(void)willDisplayForIndexPath:(NSIndexPath *)anIndexPath
+				   messageData:(LoggerMessageData *)aMessageData
+{
+	if([_indexPath section] != [anIndexPath section] ||\
+	   [_indexPath row] != [anIndexPath row])
+	{
+		MTLog(@"we have different indexpath");
+	}
+}
+#endif
 
 @end
