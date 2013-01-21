@@ -206,6 +206,8 @@ UIFont *sDisplayFont = nil;
 			 messageData:(LoggerMessageData *)aMessageData
 {
 	_messageData = aMessageData;
+
+	[self setNeedsDisplay];
 #ifdef TEST_CELL_INDEXPATH
 	[_indexPath release],_indexPath = nil;
 	_indexPath = [anIndexPath retain];

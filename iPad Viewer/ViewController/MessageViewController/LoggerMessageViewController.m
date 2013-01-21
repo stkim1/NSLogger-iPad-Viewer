@@ -151,7 +151,7 @@
         numberOfRows = [sectionInfo numberOfObjects];
     }
 	
-	MTLog(@"numberOfRowsInSection %d",numberOfRows);
+	//MTLog(@"numberOfRowsInSection %d",numberOfRows);
 	
     return numberOfRows;
 }
@@ -181,6 +181,7 @@
 						autorelease];
 
 				cell.hostTableView = self.tableView;
+				cell.selectionStyle = UITableViewCellSelectionStyleNone;
 			}
 
 			break;
@@ -200,6 +201,7 @@
 						autorelease];
 				
 				cell.hostTableView = self.tableView;
+				cell.selectionStyle = UITableViewCellSelectionStyleNone;
 			}
 
 			break;
@@ -218,6 +220,7 @@
 						autorelease];
 
 				cell.hostTableView = self.tableView;
+				cell.selectionStyle = UITableViewCellSelectionStyleNone;
 			}
 			
 			break;
