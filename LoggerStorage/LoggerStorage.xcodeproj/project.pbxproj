@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		047ACBE6168053BF00CDF84C /* LoggerClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 047ACBE4168053BF00CDF84C /* LoggerClient.m */; };
-		047ACBE7168053BF00CDF84C /* LoggerClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 047ACBE4168053BF00CDF84C /* LoggerClient.m */; };
 		047ACBEE1680568500CDF84C /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 047ACBED1680568500CDF84C /* CFNetwork.framework */; };
 		047ACBF01680568A00CDF84C /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 047ACBEF1680568A00CDF84C /* SystemConfiguration.framework */; };
 		04916073167D8FFC00EFD74D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04916072167D8FFC00EFD74D /* UIKit.framework */; };
@@ -27,17 +25,16 @@
 		04916099167D8FFC00EFD74D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04916074167D8FFC00EFD74D /* Foundation.framework */; };
 		049160A1167D8FFC00EFD74D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0491609F167D8FFC00EFD74D /* InfoPlist.strings */; };
 		049160A4167D8FFC00EFD74D /* LoggerStorageTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 049160A3167D8FFC00EFD74D /* LoggerStorageTests.m */; };
-		049160B0167D906A00EFD74D /* LoggerDataStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 049160AF167D906A00EFD74D /* LoggerDataStorage.m */; };
-		049160B1167D906A00EFD74D /* LoggerDataStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 049160AF167D906A00EFD74D /* LoggerDataStorage.m */; };
 		049160D8167DDB3E00EFD74D /* buddy_jesus.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 049160D7167DDB3E00EFD74D /* buddy_jesus.jpg */; };
 		049160D9167DDB3E00EFD74D /* buddy_jesus.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 049160D7167DDB3E00EFD74D /* buddy_jesus.jpg */; };
-		049160DC167DDE1400EFD74D /* NSFileManager+DirectoryLocations.m in Sources */ = {isa = PBXBuildFile; fileRef = 049160DB167DDE1400EFD74D /* NSFileManager+DirectoryLocations.m */; };
-		049160DD167DDE1400EFD74D /* NSFileManager+DirectoryLocations.m in Sources */ = {isa = PBXBuildFile; fileRef = 049160DB167DDE1400EFD74D /* NSFileManager+DirectoryLocations.m */; };
-		04A041EF168E768400136CEF /* LoggerDataOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A041EA168E768400136CEF /* LoggerDataOperation.m */; };
-		04A041F0168E768400136CEF /* LoggerDataRead.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A041EC168E768400136CEF /* LoggerDataRead.m */; };
-		04A041F1168E768400136CEF /* LoggerDataWrite.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A041EE168E768400136CEF /* LoggerDataWrite.m */; };
-		04A041F4168E7E4C00136CEF /* LoggerDataDelete.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A041F3168E7E4B00136CEF /* LoggerDataDelete.m */; };
-		04CEBD78169BD4F80060BE56 /* LoggerDataEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 04CEBD77169BD4F80060BE56 /* LoggerDataEntry.m */; };
+		04DA12FC16AE8BD9004FDB60 /* buddy_jesus.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 04DA12F716AE8BD9004FDB60 /* buddy_jesus.jpg */; };
+		04DA12FD16AE8BD9004FDB60 /* LoggerClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 04DA12F916AE8BD9004FDB60 /* LoggerClient.m */; };
+		04DA130C16AE8BEC004FDB60 /* LoggerDataDelete.m in Sources */ = {isa = PBXBuildFile; fileRef = 04DA130116AE8BEC004FDB60 /* LoggerDataDelete.m */; };
+		04DA130D16AE8BEC004FDB60 /* LoggerDataOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 04DA130316AE8BEC004FDB60 /* LoggerDataOperation.m */; };
+		04DA130E16AE8BEC004FDB60 /* LoggerDataRead.m in Sources */ = {isa = PBXBuildFile; fileRef = 04DA130516AE8BEC004FDB60 /* LoggerDataRead.m */; };
+		04DA130F16AE8BEC004FDB60 /* LoggerDataWrite.m in Sources */ = {isa = PBXBuildFile; fileRef = 04DA130716AE8BEC004FDB60 /* LoggerDataWrite.m */; };
+		04DA131016AE8BEC004FDB60 /* LoggerDataEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 04DA130916AE8BEC004FDB60 /* LoggerDataEntry.m */; };
+		04DA131116AE8BEC004FDB60 /* LoggerDataStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 04DA130B16AE8BEC004FDB60 /* LoggerDataStorage.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,9 +48,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		047ACBE3168053BF00CDF84C /* LoggerCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerCommon.h; sourceTree = SOURCE_ROOT; };
-		047ACBE4168053BF00CDF84C /* LoggerClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerClient.m; sourceTree = SOURCE_ROOT; };
-		047ACBE5168053BF00CDF84C /* LoggerClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerClient.h; sourceTree = SOURCE_ROOT; };
 		047ACBED1680568500CDF84C /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		047ACBEF1680568A00CDF84C /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		0491606E167D8FFC00EFD74D /* LoggerStorage.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LoggerStorage.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -78,22 +72,24 @@
 		049160A0167D8FFC00EFD74D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		049160A2167D8FFC00EFD74D /* LoggerStorageTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoggerStorageTests.h; sourceTree = "<group>"; };
 		049160A3167D8FFC00EFD74D /* LoggerStorageTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoggerStorageTests.m; sourceTree = "<group>"; };
-		049160AE167D906A00EFD74D /* LoggerDataStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerDataStorage.h; sourceTree = "<group>"; };
-		049160AF167D906A00EFD74D /* LoggerDataStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerDataStorage.m; sourceTree = "<group>"; };
-		049160CA167DA4E200EFD74D /* NullStringChecker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NullStringChecker.h; sourceTree = "<group>"; };
 		049160D7167DDB3E00EFD74D /* buddy_jesus.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = buddy_jesus.jpg; sourceTree = SOURCE_ROOT; };
-		049160DA167DDE1400EFD74D /* NSFileManager+DirectoryLocations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+DirectoryLocations.h"; sourceTree = "<group>"; };
-		049160DB167DDE1400EFD74D /* NSFileManager+DirectoryLocations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+DirectoryLocations.m"; sourceTree = "<group>"; };
-		04A041E9168E768400136CEF /* LoggerDataOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerDataOperation.h; sourceTree = "<group>"; };
-		04A041EA168E768400136CEF /* LoggerDataOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerDataOperation.m; sourceTree = "<group>"; };
-		04A041EB168E768400136CEF /* LoggerDataRead.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerDataRead.h; sourceTree = "<group>"; };
-		04A041EC168E768400136CEF /* LoggerDataRead.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerDataRead.m; sourceTree = "<group>"; };
-		04A041ED168E768400136CEF /* LoggerDataWrite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerDataWrite.h; sourceTree = "<group>"; };
-		04A041EE168E768400136CEF /* LoggerDataWrite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerDataWrite.m; sourceTree = "<group>"; };
-		04A041F2168E7E4B00136CEF /* LoggerDataDelete.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerDataDelete.h; sourceTree = "<group>"; };
-		04A041F3168E7E4B00136CEF /* LoggerDataDelete.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerDataDelete.m; sourceTree = "<group>"; };
-		04CEBD76169BD4F80060BE56 /* LoggerDataEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerDataEntry.h; sourceTree = "<group>"; };
-		04CEBD77169BD4F80060BE56 /* LoggerDataEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerDataEntry.m; sourceTree = "<group>"; };
+		04DA12F716AE8BD9004FDB60 /* buddy_jesus.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = buddy_jesus.jpg; sourceTree = "<group>"; };
+		04DA12F816AE8BD9004FDB60 /* LoggerClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerClient.h; sourceTree = "<group>"; };
+		04DA12F916AE8BD9004FDB60 /* LoggerClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerClient.m; sourceTree = "<group>"; };
+		04DA12FA16AE8BD9004FDB60 /* LoggerCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerCommon.h; sourceTree = "<group>"; };
+		04DA12FB16AE8BD9004FDB60 /* NullStringChecker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NullStringChecker.h; sourceTree = "<group>"; };
+		04DA130016AE8BEC004FDB60 /* LoggerDataDelete.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerDataDelete.h; sourceTree = "<group>"; };
+		04DA130116AE8BEC004FDB60 /* LoggerDataDelete.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerDataDelete.m; sourceTree = "<group>"; };
+		04DA130216AE8BEC004FDB60 /* LoggerDataOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerDataOperation.h; sourceTree = "<group>"; };
+		04DA130316AE8BEC004FDB60 /* LoggerDataOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerDataOperation.m; sourceTree = "<group>"; };
+		04DA130416AE8BEC004FDB60 /* LoggerDataRead.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerDataRead.h; sourceTree = "<group>"; };
+		04DA130516AE8BEC004FDB60 /* LoggerDataRead.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerDataRead.m; sourceTree = "<group>"; };
+		04DA130616AE8BEC004FDB60 /* LoggerDataWrite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerDataWrite.h; sourceTree = "<group>"; };
+		04DA130716AE8BEC004FDB60 /* LoggerDataWrite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerDataWrite.m; sourceTree = "<group>"; };
+		04DA130816AE8BEC004FDB60 /* LoggerDataEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerDataEntry.h; sourceTree = "<group>"; };
+		04DA130916AE8BEC004FDB60 /* LoggerDataEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerDataEntry.m; sourceTree = "<group>"; };
+		04DA130A16AE8BEC004FDB60 /* LoggerDataStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerDataStorage.h; sourceTree = "<group>"; };
+		04DA130B16AE8BEC004FDB60 /* LoggerDataStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerDataStorage.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,7 +121,12 @@
 		04916063167D8FFC00EFD74D = {
 			isa = PBXGroup;
 			children = (
-				049160AD167D905100EFD74D /* LoggerDiskStorage */,
+				04DA12F716AE8BD9004FDB60 /* buddy_jesus.jpg */,
+				04DA12F816AE8BD9004FDB60 /* LoggerClient.h */,
+				04DA12F916AE8BD9004FDB60 /* LoggerClient.m */,
+				04DA12FA16AE8BD9004FDB60 /* LoggerCommon.h */,
+				04DA12FB16AE8BD9004FDB60 /* NullStringChecker.h */,
+				04DA12FE16AE8BEC004FDB60 /* LoggerDataStorage */,
 				04916078167D8FFC00EFD74D /* LoggerStorage */,
 				0491609C167D8FFC00EFD74D /* LoggerStorageTests */,
 				04916071167D8FFC00EFD74D /* Frameworks */,
@@ -202,35 +203,29 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		049160AD167D905100EFD74D /* LoggerDiskStorage */ = {
+		04DA12FE16AE8BEC004FDB60 /* LoggerDataStorage */ = {
 			isa = PBXGroup;
 			children = (
-				047ACBE3168053BF00CDF84C /* LoggerCommon.h */,
-				047ACBE4168053BF00CDF84C /* LoggerClient.m */,
-				047ACBE5168053BF00CDF84C /* LoggerClient.h */,
-				049160DA167DDE1400EFD74D /* NSFileManager+DirectoryLocations.h */,
-				049160DB167DDE1400EFD74D /* NSFileManager+DirectoryLocations.m */,
-				049160CA167DA4E200EFD74D /* NullStringChecker.h */,
-				049160AE167D906A00EFD74D /* LoggerDataStorage.h */,
-				049160AF167D906A00EFD74D /* LoggerDataStorage.m */,
-				04CEBD76169BD4F80060BE56 /* LoggerDataEntry.h */,
-				04CEBD77169BD4F80060BE56 /* LoggerDataEntry.m */,
-				04A041E8168E768400136CEF /* DataOperation */,
+				04DA12FF16AE8BEC004FDB60 /* DataOperation */,
+				04DA130816AE8BEC004FDB60 /* LoggerDataEntry.h */,
+				04DA130916AE8BEC004FDB60 /* LoggerDataEntry.m */,
+				04DA130A16AE8BEC004FDB60 /* LoggerDataStorage.h */,
+				04DA130B16AE8BEC004FDB60 /* LoggerDataStorage.m */,
 			);
-			path = LoggerDiskStorage;
+			path = LoggerDataStorage;
 			sourceTree = "<group>";
 		};
-		04A041E8168E768400136CEF /* DataOperation */ = {
+		04DA12FF16AE8BEC004FDB60 /* DataOperation */ = {
 			isa = PBXGroup;
 			children = (
-				04A041E9168E768400136CEF /* LoggerDataOperation.h */,
-				04A041EA168E768400136CEF /* LoggerDataOperation.m */,
-				04A041EB168E768400136CEF /* LoggerDataRead.h */,
-				04A041EC168E768400136CEF /* LoggerDataRead.m */,
-				04A041ED168E768400136CEF /* LoggerDataWrite.h */,
-				04A041EE168E768400136CEF /* LoggerDataWrite.m */,
-				04A041F2168E7E4B00136CEF /* LoggerDataDelete.h */,
-				04A041F3168E7E4B00136CEF /* LoggerDataDelete.m */,
+				04DA130016AE8BEC004FDB60 /* LoggerDataDelete.h */,
+				04DA130116AE8BEC004FDB60 /* LoggerDataDelete.m */,
+				04DA130216AE8BEC004FDB60 /* LoggerDataOperation.h */,
+				04DA130316AE8BEC004FDB60 /* LoggerDataOperation.m */,
+				04DA130416AE8BEC004FDB60 /* LoggerDataRead.h */,
+				04DA130516AE8BEC004FDB60 /* LoggerDataRead.m */,
+				04DA130616AE8BEC004FDB60 /* LoggerDataWrite.h */,
+				04DA130716AE8BEC004FDB60 /* LoggerDataWrite.m */,
 			);
 			path = DataOperation;
 			sourceTree = "<group>";
@@ -312,6 +307,7 @@
 				04916089167D8FFC00EFD74D /* Default-568h@2x.png in Resources */,
 				0491608F167D8FFC00EFD74D /* ViewController.xib in Resources */,
 				049160D8167DDB3E00EFD74D /* buddy_jesus.jpg in Resources */,
+				04DA12FC16AE8BD9004FDB60 /* buddy_jesus.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -350,14 +346,13 @@
 				0491607F167D8FFC00EFD74D /* main.m in Sources */,
 				04916083167D8FFC00EFD74D /* AppDelegate.m in Sources */,
 				0491608C167D8FFC00EFD74D /* ViewController.m in Sources */,
-				049160B0167D906A00EFD74D /* LoggerDataStorage.m in Sources */,
-				049160DC167DDE1400EFD74D /* NSFileManager+DirectoryLocations.m in Sources */,
-				047ACBE6168053BF00CDF84C /* LoggerClient.m in Sources */,
-				04A041EF168E768400136CEF /* LoggerDataOperation.m in Sources */,
-				04A041F0168E768400136CEF /* LoggerDataRead.m in Sources */,
-				04A041F1168E768400136CEF /* LoggerDataWrite.m in Sources */,
-				04A041F4168E7E4C00136CEF /* LoggerDataDelete.m in Sources */,
-				04CEBD78169BD4F80060BE56 /* LoggerDataEntry.m in Sources */,
+				04DA12FD16AE8BD9004FDB60 /* LoggerClient.m in Sources */,
+				04DA130C16AE8BEC004FDB60 /* LoggerDataDelete.m in Sources */,
+				04DA130D16AE8BEC004FDB60 /* LoggerDataOperation.m in Sources */,
+				04DA130E16AE8BEC004FDB60 /* LoggerDataRead.m in Sources */,
+				04DA130F16AE8BEC004FDB60 /* LoggerDataWrite.m in Sources */,
+				04DA131016AE8BEC004FDB60 /* LoggerDataEntry.m in Sources */,
+				04DA131116AE8BEC004FDB60 /* LoggerDataStorage.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -366,9 +361,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				049160A4167D8FFC00EFD74D /* LoggerStorageTests.m in Sources */,
-				049160B1167D906A00EFD74D /* LoggerDataStorage.m in Sources */,
-				049160DD167DDE1400EFD74D /* NSFileManager+DirectoryLocations.m in Sources */,
-				047ACBE7168053BF00CDF84C /* LoggerClient.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

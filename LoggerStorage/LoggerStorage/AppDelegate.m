@@ -10,7 +10,6 @@
 
 #import "ViewController.h"
 #import "LoggerDataStorage.h"
-#import "NSFileManager+DirectoryLocations.h"
 #import "LoggerClient.h"
 #import <mach/mach_time.h>
 

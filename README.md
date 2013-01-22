@@ -12,10 +12,5 @@ DETAILED DOCUMENTS, EXAMPLES, AND DEMOS TO BE ADDED SOON(™)
 
 
 
-Author
--
-[NSLogger](https://github.com/fpillet/NSLogger), Florent Pillet<br/>
-[iPad Viewer](https://github.com/stkim1/NSLogger-iPad-Viewer), Sung-Taek, Kim
-
 _VER. 0.1.1_<br/>
 _Updated : Jan. 21, 2013_

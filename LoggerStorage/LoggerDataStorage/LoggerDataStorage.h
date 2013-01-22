@@ -4,15 +4,15 @@
  *
  * Copyright (c) 2012-2013 Sung-Taek, Kim <stkim1@colorfulglue.com> All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
  * Redistributions of  source code  must retain  the above  copyright notice,
  * this list of  conditions and the following  disclaimer. Redistributions in
  * binary  form must  reproduce  the  above copyright  notice,  this list  of
  * conditions and the following disclaimer  in the documentation and/or other
- * materials  provided with  the distribution.  Neither the  name of  Florent
- * Pillet nor the names of its contributors may be used to endorse or promote
+ * materials  provided with  the distribution.  Neither the  name of  Sung-Ta
+ * ek kim nor the names of its contributors may be used to endorse or promote
  * products  derived  from  this  software  without  specific  prior  written
  * permission.  THIS  SOFTWARE  IS  PROVIDED BY  THE  COPYRIGHT  HOLDERS  AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
@@ -28,15 +28,12 @@
  *
  */
 
-#import "LoggerDataOperation.h"
 
-@interface LoggerDataWrite : LoggerDataOperation
-// once you set the data, path, and callback,
-// you can never change them in the lifetime of an instance
--(id)initWithData:(NSData *)aData
-		 basepath:(NSString *)aBasepath
-		 filePath:(NSString *)aFilepath
-dirPartOfFilepath:(NSString *)aDirPartOfFilepath
-   callback_queue:(dispatch_queue_t)a_callback_queue
-		 callback:(callback_t)a_callback_block;
+#import <Foundation/Foundation.h>
+#import "LoggerClient.h"
+
+@interface LoggerDataStorage : NSObject
+-(void)writeData:(NSData *)aData toPath:(NSString *)aFilepath;
+-(void)readDataFromPath:(NSString *)aPath forResult:(void (^)(NSData *aData))aResultHandler;
+-(void)deleteWholePath:(NSString *)aPath;
 @end
