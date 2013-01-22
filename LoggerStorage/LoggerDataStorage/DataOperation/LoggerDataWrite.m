@@ -2,6 +2,7 @@
  *
  * BSD license follows (http://www.opensource.org/licenses/bsd-license.php)
  *
+ * Based on source code copyright (c) 1983, 1992, 1993 by The Regents of the University of California,
  * Copyright (c) 2012-2013 Sung-Taek, Kim <stkim1@colorfulglue.com> All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -81,6 +82,10 @@ check_dir_stat(const char *path)
 	return retval;
 }
 
+/*
+ origin of code : https://github.com/freebsd/freebsd/blob/master/bin/mkdir/mkdir.c
+ this is how mkdir(2) -p operates.
+ */
 int
 make_mul_level_dir(char *path)
 {
