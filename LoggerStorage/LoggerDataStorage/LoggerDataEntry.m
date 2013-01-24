@@ -116,6 +116,8 @@ NSLog(@"fpath_path %s(%p)[%zd]",_fpath_dir_part,_fpath_dir_part,strlen(_fpath_di
 	[super dealloc];
 }
 
+// This function come from ephemient of stackoverflow
+//http://stackoverflow.com/questions/1575278/function-to-split-a-filepath-into-path-and-file/1575314#1575314
 void
 _split_dir_only(char** p, const char *pf)
 {
@@ -124,6 +126,5 @@ _split_dir_only(char** p, const char *pf)
     if (pf != slash) slash++;
     *p = strndup(pf, slash - pf);
 }
-
 
 @end

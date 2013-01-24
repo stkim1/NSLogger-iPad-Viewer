@@ -30,6 +30,7 @@
 
 #import "LoggerDataManager.h"
 #import "NSManagedObjectContext+FetchAdditions.h"
+#import "NSFileManager+DirectoryLocations.h"
 #import "SynthesizeSingleton.h"
 
 #import "LoggerMessageData.h"

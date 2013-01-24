@@ -31,10 +31,6 @@
 
 #import "LoggerDataOperation.h"
 
-@interface LoggerDataOperation()
-static void _split_dir_only(char**, const char*);
-@end
-
 @implementation LoggerDataOperation
 @synthesize path = _path;
 @synthesize callback = _callback;

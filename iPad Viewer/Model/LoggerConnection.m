@@ -190,11 +190,10 @@ char sConnectionAssociatedObjectKey = 1;
 		}
 		 *
 		 */
-		
-		
+
 		/*
 		 stkim1_jan.19,2013
-		 I found that this is a perfect place to calculate data to be cached
+		 I find this is a perfect spot to pre-calculate data to cache
 		 such as cell height, image size, text representation
 		 */
 		
