@@ -30,9 +30,9 @@
 
 #import "LoggerMessageData.h"
 
-
 @implementation LoggerMessageData
 
+@dynamic clientHash;
 @dynamic contentsType;
 @dynamic filename;
 @dynamic functionName;
@@ -40,6 +40,7 @@
 @dynamic landscapeHeight;
 @dynamic level;
 @dynamic portraitHeight;
+@dynamic runCount;
 @dynamic sequence;
 @dynamic tag;
 @dynamic threadID;

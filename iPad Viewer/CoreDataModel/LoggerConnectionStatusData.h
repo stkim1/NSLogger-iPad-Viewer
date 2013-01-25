@@ -28,29 +28,20 @@
  *
  */
 
+
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
-#include "LoggerConstModel.h"
 
-@interface LoggerMessageData : NSManagedObject
+@class LoggerClientData;
 
+@interface LoggerConnectionStatusData : NSManagedObject
+
+@property (nonatomic, retain) NSString * clientAddress;
 @property (nonatomic) int32_t clientHash;
-@property (nonatomic) int16_t contentsType;
-@property (nonatomic, retain) NSString * filename;
-@property (nonatomic, retain) NSString * functionName;
-@property (nonatomic, retain) NSString * imageSize;
-@property (nonatomic) float landscapeHeight;
-@property (nonatomic) int16_t level;
-@property (nonatomic) float portraitHeight;
+@property (nonatomic) int64_t endTime;
 @property (nonatomic) int32_t runCount;
-@property (nonatomic) int32_t sequence;
-@property (nonatomic, retain) NSString * tag;
-@property (nonatomic, retain) NSString * threadID;
-@property (nonatomic) int64_t timestamp;
-@property (nonatomic) int16_t type;
-@property (nonatomic) int32_t lineNumber;
-@property (nonatomic, retain) NSString * messageText;
-@property (nonatomic, retain) NSString * messageType;
-@property (nonatomic, retain) NSString * textRepresentation;
+@property (nonatomic) int64_t startTime;
+@property (nonatomic, retain) NSString * transportInfo;
+@property (nonatomic, retain) LoggerClientData *clientInfo;
 
 @end

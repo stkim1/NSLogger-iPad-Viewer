@@ -28,6 +28,7 @@
  *
  */
 
+
 #import "LoggerDataManager.h"
 #import "NSManagedObjectContext+FetchAdditions.h"
 #import "NSFileManager+DirectoryLocations.h"
@@ -35,7 +36,10 @@
 
 #import "LoggerMessageData.h"
 #import "LoggerNativeMessage.h"
+#import "LoggerClientData.h"
+#import "LoggerConnectionStatusData.h"
 #include "time_converter.h"
+#import <mach/mach_time.h>
 
 @interface LoggerDataManager()
 @property (nonatomic, readonly) NSManagedObjectModel *managedObjectModel;
@@ -346,6 +350,87 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 didReceiveMessages:(NSArray *)theMessages
 			 range:(NSRange)rangeInMessagesList
 {
+
+}
+
+// handle disconnection
+- (void)remoteDisconnected:(LoggerConnection *)theConnection
+{
+}
+
+//------------------------------------------------------------------------------
+#pragma mark - logger transport delegate
+//------------------------------------------------------------------------------
+- (void)transport:(LoggerTransport *)theTransport
+didEstablishConnection:(LoggerConnection *)theConnection
+{
+	dispatch_async(_messageProcessQueue, ^{
+		@autoreleasepool
+		{
+			@try
+			{
+				// run count is 0 based. when there is client info exist,
+				// you can increase runcount by client's runcount
+				int32_t lastestRunCount = 0;
+				
+				LoggerClientData *client = \
+					[[self messageProcessContext]
+					 fetchSingleObjectForEntityName:@"LoggerClientData"
+					 withPredicate:
+						[NSString stringWithFormat:@"clientHash == %ld",[theConnection clientHash]]
+					 ];
+
+				if (client == nil)
+				{
+					client =\
+						[NSEntityDescription
+						 insertNewObjectForEntityForName:@"LoggerClientData"
+						 inManagedObjectContext:[self messageProcessContext]];
+					
+					[client setClientHash:			[theConnection clientHash]];
+					[client setClientName:			[theConnection clientName]];
+					[client setClientVersion:		[theConnection clientVersion]];
+					[client setClientOSName:		[theConnection clientOSName]];
+					[client setClientDevice:		[theConnection clientDevice]];
+					[client setClientUDID:			[theConnection clientUDID]];
+				}
+				else
+				{
+					int32_t lastestRunCount = [client runCount];
+					lastestRunCount++;
+				}
+
+				[client setRunCount:lastestRunCount];
+
+				#warning make sure reconnectionCount is not a victim of race condition
+				[theConnection setReconnectionCount:lastestRunCount];
+
+				LoggerConnectionStatusData *status = \
+					[NSEntityDescription
+					 insertNewObjectForEntityForName:@"LoggerConnectionStatusData"
+					 inManagedObjectContext:[self messageProcessContext]];
+
+				[status setClientHash:		[theConnection clientHash]];
+				[status setRunCount:		lastestRunCount];
+				[status setClientAddress:	[theConnection clientAddressDescription]];
+				[status setTransportInfo:	[theTransport transportInfoString]];
+				[status setStartTime:		mach_absolute_time()];
+				[status setClientInfo:		client];
+			}
+			@finally {
+				// since we've completed copying messages into coredata,
+				[self _runMessageSaveChain:nil];
+			}
+		}
+	});
+}
+
+// method reporting messages to transport maanger
+- (void)transport:(LoggerTransport *)theTransport
+	   connection:(LoggerConnection *)theConnection
+didReceiveMessages:(NSArray *)theMessages
+			range:(NSRange)rangeInMessagesList
+{
 	dispatch_async(_messageProcessQueue, ^{
 		@autoreleasepool
 		{
@@ -357,8 +442,7 @@ didReceiveMessages:(NSArray *)theMessages
 				
 				for (int i = 0; i < end; i++)
 				{
-					LoggerNativeMessage *aMessage = \
-						[theMessages objectAtIndex:i];
+					LoggerNativeMessage *aMessage = [theMessages objectAtIndex:i];
 
 					LoggerMessageData *messageData =\
 						[NSEntityDescription
@@ -367,6 +451,10 @@ didReceiveMessages:(NSArray *)theMessages
 					
 					struct timeval tm = [aMessage timestamp];
 
+					//run count of the connection
+					[messageData setClientHash:		[theConnection clientHash]];
+					[messageData setRunCount:		[theConnection reconnectionCount]];
+					
 					[messageData setTimestamp:		convert_timeval(&tm)];
 					[messageData setTag:			[aMessage tag]];
 					[messageData setFilename:		[aMessage filename]];
@@ -375,13 +463,13 @@ didReceiveMessages:(NSArray *)theMessages
 					[messageData setSequence:		[aMessage sequence]];
 					[messageData setThreadID:		[aMessage threadID]];
 					[messageData setLineNumber:		[aMessage lineNumber]];
-
+					
 					[messageData setLevel:			[aMessage level]];
 					[messageData setType:			[aMessage type]];
 					[messageData setContentsType:	[aMessage contentsType]];
-
+					
 					[messageData setImageSize:		NSStringFromCGSize([aMessage imageSize])];
-
+					
 					[messageData setMessageText:	[aMessage messageText]];
 					[messageData setMessageType:	[aMessage messageType]];
 					[messageData setTextRepresentation:[aMessage textRepresentation]];
@@ -398,20 +486,28 @@ didReceiveMessages:(NSArray *)theMessages
 	});
 }
 
-// handle disconnection
-- (void)remoteDisconnected:(LoggerConnection *)theConnection
+// method reporting to transport manager
+- (void)transport:(LoggerTransport *)theTransport
+didDisconnectRemote:(LoggerConnection *)theConnection
 {
 	// handle connection specific logic
 	dispatch_async(_messageProcessQueue, ^{
-
-
+		
+		
 		// notify views related to the connection
 		dispatch_async(dispatch_get_main_queue(),^{
 			[[NSNotificationCenter defaultCenter]
 			 postNotificationName:kShowStatusInStatusWindowNotification
 			 object:self];
 		});
-	});
+	});	
 }
+
+- (void)transport:(LoggerTransport *)theTransport
+ removeConnection:(LoggerConnection *)theConnection
+{
+	
+}
+
 
 @end

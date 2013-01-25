@@ -28,29 +28,30 @@
  *
  */
 
+
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
-#include "LoggerConstModel.h"
 
-@interface LoggerMessageData : NSManagedObject
+@class LoggerConnectionStatusData;
 
+@interface LoggerClientData : NSManagedObject
+
+@property (nonatomic, retain) NSString * clientDevice;
 @property (nonatomic) int32_t clientHash;
-@property (nonatomic) int16_t contentsType;
-@property (nonatomic, retain) NSString * filename;
-@property (nonatomic, retain) NSString * functionName;
-@property (nonatomic, retain) NSString * imageSize;
-@property (nonatomic) float landscapeHeight;
-@property (nonatomic) int16_t level;
-@property (nonatomic) float portraitHeight;
+@property (nonatomic, retain) NSString * clientName;
+@property (nonatomic, retain) NSString * clientOSName;
+@property (nonatomic, retain) NSString * clientOSVersion;
+@property (nonatomic, retain) NSString * clientUDID;
+@property (nonatomic, retain) NSString * clientVersion;
 @property (nonatomic) int32_t runCount;
-@property (nonatomic) int32_t sequence;
-@property (nonatomic, retain) NSString * tag;
-@property (nonatomic, retain) NSString * threadID;
-@property (nonatomic) int64_t timestamp;
-@property (nonatomic) int16_t type;
-@property (nonatomic) int32_t lineNumber;
-@property (nonatomic, retain) NSString * messageText;
-@property (nonatomic, retain) NSString * messageType;
-@property (nonatomic, retain) NSString * textRepresentation;
+@property (nonatomic, retain) NSSet *connectionStatus;
+@end
+
+@interface LoggerClientData (CoreDataGeneratedAccessors)
+
+- (void)addConnectionStatusObject:(LoggerConnectionStatusData *)value;
+- (void)removeConnectionStatusObject:(LoggerConnectionStatusData *)value;
+- (void)addConnectionStatus:(NSSet *)values;
+- (void)removeConnectionStatus:(NSSet *)values;
 
 @end

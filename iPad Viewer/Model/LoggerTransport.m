@@ -83,8 +83,6 @@
 
 - (void)attachConnectionToManager:(LoggerConnection *)aConnection
 {
-	MTLog(@"setup new connection [%@]",aConnection);
-	
 	if(LoggerCheckDelegate(transManager
 						   ,@protocol(LoggerTransportDelegate)
 						   ,@selector(transport:didEstablishConnection:)))

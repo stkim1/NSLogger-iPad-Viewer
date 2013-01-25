@@ -33,6 +33,7 @@
 #import "LoggerConnection.h"
 #import "LoggerMessage.h"
 #import "LoggerCommon.h"
+#import "NullStringCheck.h"
 
 char sConnectionAssociatedObjectKey = 1;
 
@@ -41,6 +42,7 @@ char sConnectionAssociatedObjectKey = 1;
 @synthesize reconnectionCount, connected;
 @synthesize clientName, clientVersion, clientOSName, clientOSVersion, clientDevice, clientAddress, clientUDID;
 @synthesize messageProcessingQueue;
+@synthesize clientHash = _clientHash;
 
 - (id)init
 {
@@ -225,25 +227,63 @@ char sConnectionAssociatedObjectKey = 1;
 
 - (void)clientInfoReceived:(LoggerMessage *)message
 {
+	/*
+	 * Adler32 hash : http://en.wikipedia.org/wiki/Adler-32
+	 * Source Code : https://github.com/madler/zlib/blob/master/adler32.c#L65
+	 */
+	uLong hash = adler32(0L, Z_NULL, 0);
+	
 	NSDictionary *parts = message.parts;
-	id value = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_CLIENT_NAME]];
-	if (value != nil)
+	NSString *value = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_CLIENT_NAME]];
+	
+	if (!IS_NULL_STRING(value))
+	{
 		self.clientName = value;
+		hash = adler32(hash, (Bytef *)[self.clientName UTF8String], (uInt)[self.clientName length]);
+	}
+	
 	value = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_CLIENT_VERSION]];
-	if (value != nil)
+	if (!IS_NULL_STRING(value))
+	{
 		self.clientVersion = value;
+		hash = adler32(hash, (Bytef *)[self.clientVersion UTF8String], (uInt)[self.clientVersion length]);
+	}
+	
 	value = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_OS_NAME]];
-	if (value != nil)
+	if (!IS_NULL_STRING(value))
+	{
 		self.clientOSName = value;
+		hash = adler32(hash, (Bytef *)[self.clientOSName UTF8String], (uInt)[self.clientOSName length]);
+	}
+	
 	value = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_OS_VERSION]];
-	if (value != nil)
+	if (!IS_NULL_STRING(value))
+	{
 		self.clientOSVersion = value;
+		hash = adler32(hash, (Bytef *)[self.clientOSVersion UTF8String], (uInt)[self.clientOSVersion length]);
+	}
+	
 	value = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_CLIENT_MODEL]];
-	if (value != nil)
+	if (!IS_NULL_STRING(value))
+	{
 		self.clientDevice = value;
+		hash = adler32(hash, (Bytef *)[self.clientDevice UTF8String], (uInt)[self.clientDevice length]);
+	}
+	
 	value = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_UNIQUEID]];
-	if (value != nil)
+	if (!IS_NULL_STRING(value))
+	{
 		self.clientUDID = value;
+		hash = adler32(hash, (Bytef *)[self.clientUDID UTF8String], (uInt)[self.clientUDID length]);
+	}
+
+	_clientHash = hash;
+	
+	// make sure _client hash is non-nil hash
+	assert(adler32(0L, Z_NULL, 0) != _clientHash);
+	
+	MTLog(@"client hash %lx",hash);
+	
 #if 0
 	[[NSNotificationCenter defaultCenter]
 	 postNotificationName:kShowStatusInStatusWindowNotification
@@ -254,8 +294,6 @@ char sConnectionAssociatedObjectKey = 1;
 
 - (NSString *)clientAppDescription
 {
-	// enforce thread safety (only on main thread)
-	//assert([NSThread isMainThread]);
 	
 	NSMutableString *s = [[[NSMutableString alloc] init] autorelease];
 	if (clientName != nil)

@@ -654,6 +654,8 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 								message.message = [self clientInfoStringForMessage:message];
 								message.threadID = @"";
 
+								// as soon as client info is recieved and client hash is generated,
+								// the new connection gets reporeted to transport manager
 								[cnx clientInfoReceived:message];
 
 #warning need to pass message part to transport manager for connection id

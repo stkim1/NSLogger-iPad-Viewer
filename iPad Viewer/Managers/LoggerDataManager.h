@@ -29,9 +29,9 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "LoggerConnection.h"
+#import "LoggerTransport.h"
 
-@interface LoggerDataManager : NSObject <LoggerConnectionDelegate>
+@interface LoggerDataManager : NSObject <LoggerTransportDelegate>
 +(LoggerDataManager *)sharedDataManager;
 @property (nonatomic, readonly) NSManagedObjectContext *messageDisplayContext;
 @end

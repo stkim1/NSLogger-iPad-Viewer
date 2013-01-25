@@ -33,12 +33,11 @@
 #import "LoggerCertManager.h"
 #import "LoggerNativeTransport.h"
 #import "SynthesizeSingleton.h"
+#import <zlib.h>
 
 @interface LoggerTransportManager()
 @property (nonatomic, retain) LoggerCertManager *certManager;
 @property (nonatomic, retain) NSMutableArray	*transports;
-@property (nonatomic, readonly) NSMutableArray	*connections;
-@property (nonatomic, readonly) dispatch_queue_t connectionManageQueue;
 -(void)_startStopTransports;
 @end
 
@@ -49,15 +48,11 @@
 	NSMutableArray				*_transports;
 	LoggerDataManager			*_dataManager;
 	
-	NSMutableArray				*_connections;
-	dispatch_queue_t			_connectionManageQueue;
 }
 @synthesize prefManager = _prefManager;
 @synthesize certManager = _certManager;
 @synthesize transports = _transports;
 @synthesize dataManager = _dataManager;
-@synthesize connections = _connections;
-@synthesize connectionManageQueue = _connectionManageQueue;
 
 SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransportManager);
 
@@ -82,15 +77,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 		{
 			_transports = [[NSMutableArray alloc] initWithCapacity:0];
 		}
-		
-		_connectionManageQueue = \
-			dispatch_queue_create("com.colorfulglue.connectionmanagerqueue"
-								  ,DISPATCH_QUEUE_SERIAL);
-
-		dispatch_sync(_connectionManageQueue, ^{
-			_connections = [[NSMutableArray alloc] initWithCapacity:0];
-		});
-		
 	}
 
     return self;
@@ -117,7 +103,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 	t.secure = YES;
 	[self.transports addObject:t];
 	[t release];
-	
+
 	// Direct TCP/IP service (SSL mandatory)
 	t = [[LoggerNativeTransport alloc] init];
 	t.transManager = self;
@@ -186,89 +172,11 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 - (void)transport:(LoggerTransport *)theTransport
 didEstablishConnection:(LoggerConnection *)theConnection
 {
-	NSLog(@"setup new connection [%@]",theConnection);
+	MTLog(@"setup new connection [%@]",theConnection);
 
-#if 0
-	// Go through all open documents,
-	// Detect reconnection from a previously disconnected client
-	NSDocumentController *docController = [NSDocumentController sharedDocumentController];
-	for (LoggerDocument *doc in [docController documents])
-	{
-		if (![doc isKindOfClass:[LoggerDocument class]])
-			continue;
-		
-		for (LoggerConnection *c in doc.attachedLogs)
-		{
-			if (c != aConnection && [aConnection isNewRunOfClient:c])
-			{
-				// recycle this document window, bring it to front
-				aConnection.reconnectionCount = ((LoggerConnection *)[doc.attachedLogs lastObject]).reconnectionCount + 1;
-				[doc addConnection:aConnection];
-				return;
-			}
-		}
-	}
-	
-	// Instantiate a new window for this connection
-	LoggerDocument *doc = [[LoggerDocument alloc] initWithConnection:aConnection];
-	[docController addDocument:doc];
-	[doc makeWindowControllers];
-	[doc showWindows];
-	[doc release];
-#endif
-
-	dispatch_async(_connectionManageQueue, ^{
-		
-		int reconnectionCount = 0;
-		
-		for (LoggerConnection *conn in _connections)
-		{
-			if((conn != theConnection) && [theConnection isNewRunOfClient:conn])
-			{
-				if(reconnectionCount <= [conn reconnectionCount])
-				{
-					reconnectionCount = [conn reconnectionCount] + 1;
-				}
-			}
-		}
-		
-		// add newly arrived one into connection pool
-		[_connections addObject:theConnection];
-
-		//we've found an existing connection.
-		//increase reconnection count and notify its reconnection to UI
-		// Modifying reconnection count should only happen in this queue.
-		if(reconnectionCount != 0)
-		{
-#warning !Possible race condition
-			// it is unprotected property that if you try to change in other
-			// thread, you will face a race condition
-			//stkim1_jan.17,2013
-
-			[theConnection setReconnectionCount:reconnectionCount];
-		
-			dispatch_async(dispatch_get_main_queue(), ^{
-				MTLog(@"a connection gets recycled %d", reconnectionCount);
-#if 0
-				[[NSNotificationCenter defaultCenter]
-				 postNotificationName:kShowStatusInStatusWindowNotification
-				 object:theConnection];
-#endif
-			});
-		}
-		else
-		{
-			// report new connection to UI
-			dispatch_async(dispatch_get_main_queue(), ^{
-				MTLog(@"new connection has established");
-#if 0
-				[[NSNotificationCenter defaultCenter]
-				 postNotificationName:kShowStatusInStatusWindowNotification
-				 object:theConnection];
-#endif
-			});
-		}
-	});
+	[_dataManager
+	 transport:theTransport
+	 didEstablishConnection:theConnection];
 }
 
 // method that may not be called on main thread
@@ -280,6 +188,7 @@ didReceiveMessages:(NSArray *)theMessages
 	//MTLog(@"Connection [%@ ] receieve messages (%d) for range (%d~%d)",theConnection,[theMessages count],rangeInMessagesList.location, rangeInMessagesList.length);
 
 	[_dataManager
+	 transport:theTransport
 	 connection:theConnection
 	 didReceiveMessages:theMessages
 	 range:rangeInMessagesList];
@@ -288,16 +197,13 @@ didReceiveMessages:(NSArray *)theMessages
 - (void)transport:(LoggerTransport *)theTransport
 didDisconnectRemote:(LoggerConnection *)theConnection
 {
-	
+	[_dataManager transport:theTransport didDisconnectRemote:theConnection];
 }
 
 - (void)transport:(LoggerTransport *)theTransport
  removeConnection:(LoggerConnection *)theConnection
 {
-#warning say, we remove an object of lastest run. How do we find the # of runs for next connection?
-	dispatch_async(_connectionManageQueue, ^{
-		[_connections removeObject:theConnection];
-	});
+	[_dataManager transport:theTransport removeConnection:theConnection];
 }
 
 

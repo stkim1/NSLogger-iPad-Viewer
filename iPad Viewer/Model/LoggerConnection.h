@@ -33,6 +33,7 @@
 #import <Foundation/Foundation.h>
 #import "LoggerConstApp.h"
 #import "LoggerConstController.h"
+#import <zlib.h>
 
 @class LoggerConnection, LoggerMessage;
 
@@ -63,12 +64,25 @@
 	NSString			*clientDevice;
 	NSString			*clientUDID;
     
-	NSData				*clientAddress;		// depends on the underlying protocol
+
+	// stkim1_jan.22,2013
+	// when new client info arrives, a new hash value will be generated based on
+	// the values above with alder32() hash function.
+	// this hash will give gives us a key to find client info object in coredata
+	uLong				_clientHash;
+
+	// depends on the underlying protocol
+	NSData				*clientAddress;
     
-	//NSMutableArray		*parentIndexesStack;// during messages receive, use this to quickly locate parent indexes in groups
+	// during messages receive, use this to quickly locate parent indexes in groups
+	//NSMutableArray		*parentIndexesStack;
+	
 	dispatch_queue_t	messageProcessingQueue;
-    	
-	int					reconnectionCount;	// when a reconnection is detected (same client, disconnects then reconnects), the # reconnection for this connection
+	
+	//when a reconnection is detected (same client, disconnects then reconnects),
+	//the # reconnection for this connection
+	int					reconnectionCount;
+
 	BOOL				connected;
 }
 // stkim1_jan.15,2013
@@ -81,7 +95,7 @@
 @property (nonatomic, retain) NSString				*clientOSVersion;
 @property (nonatomic, retain) NSString				*clientDevice;
 @property (nonatomic, retain) NSString				*clientUDID;
-
+@property (nonatomic, readonly) uLong				clientHash;
 @property (nonatomic, readonly) NSData				*clientAddress;
 
 @property (nonatomic, assign) int					reconnectionCount;

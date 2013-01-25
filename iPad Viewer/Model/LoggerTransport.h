@@ -72,7 +72,7 @@ didDisconnectRemote:(LoggerConnection *)theConnection;
 	LoggerCertManager			*certManager;
 	NSMutableArray				*connections;
 	NSString					*failureReason;
-
+	
 	BOOL						secure;
 	BOOL						active;
 	BOOL						ready;
