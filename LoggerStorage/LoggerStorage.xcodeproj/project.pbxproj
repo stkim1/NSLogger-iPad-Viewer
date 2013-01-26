@@ -218,10 +218,10 @@
 		04DA12FF16AE8BEC004FDB60 /* DataOperation */ = {
 			isa = PBXGroup;
 			children = (
-				04DA130016AE8BEC004FDB60 /* LoggerDataDelete.h */,
-				04DA130116AE8BEC004FDB60 /* LoggerDataDelete.m */,
 				04DA130216AE8BEC004FDB60 /* LoggerDataOperation.h */,
 				04DA130316AE8BEC004FDB60 /* LoggerDataOperation.m */,
+				04DA130016AE8BEC004FDB60 /* LoggerDataDelete.h */,
+				04DA130116AE8BEC004FDB60 /* LoggerDataDelete.m */,
 				04DA130416AE8BEC004FDB60 /* LoggerDataRead.h */,
 				04DA130516AE8BEC004FDB60 /* LoggerDataRead.m */,
 				04DA130616AE8BEC004FDB60 /* LoggerDataWrite.h */,

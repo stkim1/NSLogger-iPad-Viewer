@@ -281,15 +281,8 @@ char sConnectionAssociatedObjectKey = 1;
 	
 	// make sure _client hash is non-nil hash
 	assert(adler32(0L, Z_NULL, 0) != _clientHash);
-	
-	MTLog(@"client hash %lx",hash);
-	
-#if 0
-	[[NSNotificationCenter defaultCenter]
-	 postNotificationName:kShowStatusInStatusWindowNotification
-	 object:self];
-#endif
 
+	MTLog(@"client hash %lx",hash);
 }
 
 - (NSString *)clientAppDescription

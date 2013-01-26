@@ -220,10 +220,9 @@ dirPartOfFilepath:(NSString *)aDirPartOfFilepath
 	[super dealloc];
 }
 
--(operation_t)data_operation
+-(void)executeOnQueue:(dispatch_queue_t)aQueue
 {
-	operation_t write_data = \
-	^{
+	dispatch_async(aQueue,^{
 		if(IS_NULL_STRING(_basepath))
 		{
 			dispatch_async([self queue_callback],^{
@@ -325,13 +324,13 @@ NSLog(@"make target dir error");
 		{
 			dispatch_io_set_low_water(channel_data_save, 1);
 			dispatch_io_set_high_water(channel_data_save, SIZE_MAX);
-			
+
 			dispatch_data_t data_save = \
 				dispatch_data_create([_data bytes]
 									 ,[_data length]
 									 ,[self queue_io_handler]
 									 ,DISPATCH_DATA_DESTRUCTOR_FREE);
-			
+
 			dispatch_io_write(channel_data_save
 							  ,0
 							  ,data_save
@@ -349,8 +348,6 @@ NSLog(@"make target dir error");
 			dispatch_release(channel_data_save);
 			dispatch_release(data_save);
 		}
-	};
-
-	return [write_data copy];
+	});
 }
 @end

@@ -402,7 +402,7 @@ didEstablishConnection:(LoggerConnection *)theConnection
 
 				[client setRunCount:lastestRunCount];
 
-				#warning make sure reconnectionCount is not a victim of race condition
+#warning make sure reconnectionCount is not a victim of race condition
 				[theConnection setReconnectionCount:lastestRunCount];
 
 				LoggerConnectionStatusData *status = \
@@ -415,9 +415,22 @@ didEstablishConnection:(LoggerConnection *)theConnection
 				[status setClientAddress:	[theConnection clientAddressDescription]];
 				[status setTransportInfo:	[theTransport transportInfoString]];
 				[status setStartTime:		mach_absolute_time()];
-				[status setClientInfo:		client];
+				//[status setClientInfo:		client];
+				[client addConnectionStatusObject:status];
 			}
-			@finally {
+			@catch (NSException *exception)
+			{
+				MTLog(@"CoreData save error! : %@",exception.reason);
+			}
+			@finally
+			{
+				
+#if 0
+				[[NSNotificationCenter defaultCenter]
+				 postNotificationName:kShowStatusInStatusWindowNotification
+				 object:self];
+#endif
+				
 				// since we've completed copying messages into coredata,
 				[self _runMessageSaveChain:nil];
 			}
@@ -434,12 +447,10 @@ didReceiveMessages:(NSArray *)theMessages
 	dispatch_async(_messageProcessQueue, ^{
 		@autoreleasepool
 		{
-			
 			NSUInteger end = [theMessages count];
-			
+
 			@try
 			{
-				
 				for (int i = 0; i < end; i++)
 				{
 					LoggerNativeMessage *aMessage = [theMessages objectAtIndex:i];
@@ -478,7 +489,12 @@ didReceiveMessages:(NSArray *)theMessages
 					[messageData setLandscapeHeight:[aMessage landscapeHeight]];
 				}
 			}
-			@finally {
+			@catch (NSException *exception)
+			{
+				MTLog(@"CoreData save error! : %@",exception.reason);
+			}
+			@finally
+			{
 				// since we've completed copying messages into coredata,
 				[self _runMessageSaveChain:nil];
 			}

@@ -35,7 +35,6 @@
 @class LoggerDataOperation;
 
 typedef void (^callback_t)(LoggerDataOperation *dataOperation, int error, NSData *data);
-typedef void (^operation_t)(void);
 
 #define ENOBASEPATH			0xBABA		/* no base directory presented */
 #define ENOFILEPATH			0xBABE		/* not proper file path */
@@ -55,5 +54,5 @@ typedef void (^operation_t)(void);
 			 filePath:(NSString *)aFilepath
 	   callback_queue:(dispatch_queue_t)a_callback_queue
 			 callback:(callback_t)a_callback_block;
--(operation_t)data_operation;
+-(void)executeOnQueue:(dispatch_queue_t)aQueue;
 @end

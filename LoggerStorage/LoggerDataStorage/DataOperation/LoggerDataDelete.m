@@ -34,10 +34,9 @@
 #include <errno.h>
 
 @implementation LoggerDataDelete
--(operation_t)data_operation
+-(void)executeOnQueue:(dispatch_queue_t)aQueue
 {
-	operation_t delete_data = \
-	^{
+	dispatch_async(aQueue,^{
 		// See man fts(3) for these.  Modify these to do what you want.
 		// here, the combination options mean do not follow child dir,
 		// no statistics report, no following symbolic link
@@ -93,9 +92,7 @@
 				self.callback(self,0,nil);
 			});
 		}
-		
-	};
-
-	return [delete_data copy];
+	
+	});
 }
 @end

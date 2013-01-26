@@ -75,9 +75,9 @@
 	[super dealloc];
 }
 
--(operation_t)data_operation
+-(void)executeOnQueue:(dispatch_queue_t)aQueue
 {
-	return NULL;
+	// subclass must implement this
 }
 
 @end

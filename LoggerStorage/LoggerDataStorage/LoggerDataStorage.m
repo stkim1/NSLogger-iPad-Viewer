@@ -379,10 +379,7 @@ typedef __block LoggerDataStorage* blockself_t;
 			if([blockSelf->_slotWriteOperation count] < blockSelf->_num_cpus)
 			{
 				[blockSelf->_slotWriteOperation addObject:anOperation];
-
-				operation_t data_operation = [anOperation data_operation];
-				dispatch_async(blockSelf->_queueDispatcher,data_operation);
-				[data_operation release];
+				[anOperation executeOnQueue:blockSelf->_queueDispatcher];
 
 #ifdef SHOW_LOG
 				LogMessage(@"Instruction"
@@ -413,9 +410,8 @@ typedef __block LoggerDataStorage* blockself_t;
 			{
 				[blockSelf->_slotReadOperation addObject:anOperation];
 
-				operation_t data_operation = [anOperation data_operation];
-				dispatch_async(blockSelf->_queueDispatcher,data_operation);
-				[data_operation release];
+				
+				[anOperation executeOnQueue:blockSelf->_queueDispatcher];
 #ifdef SHOW_LOG
 				LogMessage(@"Instruction"
 						   ,3
@@ -465,16 +461,15 @@ typedef __block LoggerDataStorage* blockself_t;
 			if(0 < numInstructionWrite)
 			{
 				// dequeue in FIFO order
-				LoggerDataOperation *instruction = \
+				LoggerDataOperation *dataOp = \
 					[blockSelf->_arrayWriteOperationReserve
 					 objectAtIndex:0];
 
-				[blockSelf->_slotWriteOperation addObject:instruction];
+				[blockSelf->_slotWriteOperation addObject:dataOp];
 				[blockSelf->_arrayWriteOperationReserve removeObjectAtIndex:0];
 
-				operation_t data_operation = [instruction data_operation];
-				dispatch_async(blockSelf->_queueDispatcher,data_operation);
-				[data_operation release];
+				
+				[dataOp executeOnQueue:blockSelf->_queueDispatcher];
 #ifdef SHOW_LOG
 				LogMessage(@"Instruction"
 						   ,3
@@ -511,16 +506,14 @@ typedef __block LoggerDataStorage* blockself_t;
 			
 			if(0 < numInstructionRead)
 			{	
-				LoggerDataOperation *instruction = \
+				LoggerDataOperation *dataOp = \
 					[blockSelf->_arrayReadOperationReserve
 					 objectAtIndex:0];
 				
-				[blockSelf->_slotReadOperation addObject:instruction];
+				[blockSelf->_slotReadOperation addObject:dataOp];
 				[blockSelf->_arrayReadOperationReserve removeObjectAtIndex:0];
 
-				operation_t data_operation = [instruction data_operation];
-				dispatch_async(blockSelf->_queueDispatcher,data_operation);
-				[data_operation release];
+				[dataOp executeOnQueue:blockSelf->_queueDispatcher];
 				
 #ifdef SHOW_LOG
 				LogMessage(@"Instruction"

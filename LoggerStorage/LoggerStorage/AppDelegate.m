@@ -22,8 +22,8 @@
 @synthesize storage;
 @synthesize images;
 
-#define kOperationQueue 10
-#define kPauseCount 2
+#define WRITE_OPERATION 50
+#define READ_OPERATION_PER_WRITE 2
 
 - (void)dealloc
 {
@@ -38,8 +38,8 @@
 	// This method ensures that a different image is created from block of data
     UIImage* buddyJesus = [UIImage imageNamed:@"buddy_jesus.jpg"];
 	
-    NSMutableArray* array = [NSMutableArray arrayWithCapacity:kOperationQueue];
-    for (NSUInteger i = 0; i < kOperationQueue; i++) {
+    NSMutableArray* array = [NSMutableArray arrayWithCapacity:WRITE_OPERATION];
+    for (NSUInteger i = 0; i < WRITE_OPERATION; i++) {
 		NSData* imageData = UIImagePNGRepresentation(buddyJesus);
         [array addObject:imageData];
     }
@@ -101,18 +101,17 @@
 
 - (NSString* )testCacheAsyncness:(LoggerDataStorage *)cache
 {
-	for (NSUInteger i = 0; i < kOperationQueue; i++)
+	for (NSUInteger i = 0; i < WRITE_OPERATION; i++)
 	{
 		[cache
 		 writeData:[self.images objectAtIndex:i]
 		 toPath:[NSString stringWithFormat:@"mindcontrol/file-%d.jpg",i]];
 
-
 #if 1
-		if( !(i%kPauseCount) )
+		if( !(i%READ_OPERATION_PER_WRITE) )
 		{
 			[cache
-			 readDataFromPath:@"mindcontrol/file-0.jpg"
+			 readDataFromPath:[NSString stringWithFormat:@"mindcontrol/file-%d.jpg",i-READ_OPERATION_PER_WRITE]
 			 forResult:^(NSData *aData) {
 			 }];
 		}

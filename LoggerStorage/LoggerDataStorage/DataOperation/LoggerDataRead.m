@@ -32,10 +32,9 @@
 #import "LoggerDataRead.h"
 
 @implementation LoggerDataRead
--(operation_t)data_operation
+-(void)executeOnQueue:(dispatch_queue_t)aQueue
 {
-	operation_t read_data = \
-	^{
+	dispatch_async(aQueue,^{
 		int fd = open([[self path] UTF8String],O_RDONLY);
 		
 		dispatch_io_t channel_data_read = \
@@ -99,9 +98,7 @@
 			dispatch_io_close(channel_data_read, 0);
 			dispatch_release(channel_data_read);
 		}
-	};
-
-	return [read_data copy];
+	});
 }
 
 @end
