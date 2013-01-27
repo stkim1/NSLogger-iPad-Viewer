@@ -47,6 +47,7 @@
 @property (nonatomic, readonly) NSManagedObjectContext *messageProcessContext;
 @property (nonatomic, readonly) NSManagedObjectContext *messageSaveContext;
 -(void)_runMessageSaveChain:(NSError **)aSaveError;
+-(void)_runMessageSaveChainWithUIThreadBlock:(void (^)(void))anUIThreadBlock;
 @end
 
 @implementation LoggerDataManager
@@ -343,6 +344,57 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 	}
 }
 
+-(void)_runMessageSaveChainWithUIThreadBlock:(void (^)(void))anUIThreadBlock
+{
+	assert(dispatch_get_current_queue() == _messageProcessQueue);
+	
+	__block NSError *error = nil;
+	__block BOOL	isSavedOk = NO;
+	
+	isSavedOk = [[self messageProcessContext] save:&error];
+	
+	if(!isSavedOk || error != nil)
+	{
+		MTLog(@"we have a save error on message_q <%d>[%@](%@)",isSavedOk,[error domain],[error localizedDescription]);
+	}
+	else
+	{
+		// message display context always saves on main(UI-) thread
+		[[self messageDisplayContext]
+		 performBlock:^{
+			 
+			 isSavedOk = [[self messageDisplayContext] save:&error];
+			 
+			 if(!isSavedOk || error != nil)
+			 {
+				 MTLog(@"we have a save error on display_q %@",[error localizedFailureReason]);
+			 }
+			 else
+			 {
+				 // now, since display MOC have recieved save() method, we can
+				 // issue whatevery notificiation main thread need to recieve
+				 // don't forget that we are already at main thread
+				 anUIThreadBlock();
+
+				 // save message on disk
+				 // we need a counter to check every save() issues over 4k flash mem page
+				 [[self messageSaveContext]
+				  performBlock:^{
+					  
+					  isSavedOk = [[self messageSaveContext] save:&error];
+					  
+					  if(!isSavedOk || error != nil)
+					  {
+						  MTLog(@"we have a save error on save_q %@",[error localizedFailureReason]);
+					  }
+					  
+				  }];
+			 }
+		 }];
+	}
+}
+
+
 //------------------------------------------------------------------------------
 #pragma mark - save message chain
 //------------------------------------------------------------------------------
@@ -367,12 +419,13 @@ didEstablishConnection:(LoggerConnection *)theConnection
 	dispatch_async(_messageProcessQueue, ^{
 		@autoreleasepool
 		{
+			uLong clientHash = [theConnection clientHash];
+			__block int32_t lastestRunCount = 0;
+
 			@try
 			{
 				// run count is 0 based. when there is client info exist,
 				// you can increase runcount by client's runcount
-				int32_t lastestRunCount = 0;
-				
 				LoggerClientData *client = \
 					[[self messageProcessContext]
 					 fetchSingleObjectForEntityName:@"LoggerClientData"
@@ -396,7 +449,7 @@ didEstablishConnection:(LoggerConnection *)theConnection
 				}
 				else
 				{
-					int32_t lastestRunCount = [client runCount];
+					lastestRunCount = [client runCount];
 					lastestRunCount++;
 				}
 
@@ -424,15 +477,16 @@ didEstablishConnection:(LoggerConnection *)theConnection
 			}
 			@finally
 			{
-				
-#if 0
-				[[NSNotificationCenter defaultCenter]
-				 postNotificationName:kShowStatusInStatusWindowNotification
-				 object:self];
-#endif
-				
 				// since we've completed copying messages into coredata,
-				[self _runMessageSaveChain:nil];
+				[self _runMessageSaveChainWithUIThreadBlock:^{
+#warning fix userinfo key:value
+					[[NSNotificationCenter defaultCenter]
+					 postNotificationName:kShowStatusInStatusWindowNotification
+					 object:self
+					 userInfo:
+						 @{@"clientHash" : [NSNumber numberWithInt:clientHash]
+						 ,@"runCount":[NSNumber numberWithInt:lastestRunCount]}];
+				}];
 			}
 		}
 	});
@@ -506,17 +560,52 @@ didReceiveMessages:(NSArray *)theMessages
 - (void)transport:(LoggerTransport *)theTransport
 didDisconnectRemote:(LoggerConnection *)theConnection
 {
-	// handle connection specific logic
+	// handle disconnection specific logic
 	dispatch_async(_messageProcessQueue, ^{
-		
-		
-		// notify views related to the connection
-		dispatch_async(dispatch_get_main_queue(),^{
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:kShowStatusInStatusWindowNotification
-			 object:self];
-		});
-	});	
+		@autoreleasepool {
+
+			MTLog(@"transport:didDisconnectRemote: (%ld)[%d]",theConnection.clientHash, theConnection.reconnectionCount);
+			
+			uLong clientHash = [theConnection clientHash];
+			int32_t lastestRunCount = [theConnection reconnectionCount];
+			
+			@try
+			{
+				// run count is 0 based. when there is client info exist,
+				// you can increase runcount by client's runcount
+				LoggerConnectionStatusData *status = \
+					[[self messageProcessContext]
+					 fetchSingleObjectForEntityName:@"LoggerConnectionStatusData"
+					 withPredicate:
+					 [NSString
+					  stringWithFormat:@"clientHash == %ld AND runCount == %d"
+					  ,clientHash
+					  ,lastestRunCount]];
+				
+				
+				// connection status info cannot be nil. if it is, we are in trouble
+				assert(status != nil);
+				[status setEndTime:mach_absolute_time()];
+			}
+			@catch (NSException *exception)
+			{
+				MTLog(@"CoreData save error! : %@",exception.reason);
+			}
+			@finally
+			{
+				// since we've completed copying messages into coredata,
+				[self _runMessageSaveChainWithUIThreadBlock:^{
+#warning fix userinfo key:value
+					[[NSNotificationCenter defaultCenter]
+					 postNotificationName:kShowStatusInStatusWindowNotification
+					 object:self
+					 userInfo:
+					 @{@"clientHash" : [NSNumber numberWithInt:clientHash]
+					 ,@"runCount":[NSNumber numberWithInt:lastestRunCount]}];
+				}];
+			}
+		}
+	});
 }
 
 - (void)transport:(LoggerTransport *)theTransport

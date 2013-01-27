@@ -44,5 +44,8 @@
 - (void)destoryTransports;
 - (void)startStopTransports;
 
-- (void)reportTransportError:(NSError *)anError;
+//TODO: should be status reporting object rather than error
+- (void)presentTransportStatus:(NSError *)anError;
+
+- (void)presentTransportError:(NSError *)anError;
 @end

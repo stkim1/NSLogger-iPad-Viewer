@@ -36,9 +36,6 @@
 		044FEFA516AC4A810067FA53 /* LoggerIPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 044FEF6D16AC4A810067FA53 /* LoggerIPConnection.m */; };
 		044FEFA616AC4A810067FA53 /* LoggerMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 044FEF6F16AC4A810067FA53 /* LoggerMessage.m */; };
 		044FEFA716AC4A810067FA53 /* LoggerTransport.m in Sources */ = {isa = PBXBuildFile; fileRef = 044FEF7116AC4A810067FA53 /* LoggerTransport.m */; };
-		044FEFA816AC4A810067FA53 /* LoggerNativeConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 044FEF7416AC4A810067FA53 /* LoggerNativeConnection.m */; };
-		044FEFA916AC4A810067FA53 /* LoggerNativeMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 044FEF7616AC4A810067FA53 /* LoggerNativeMessage.m */; };
-		044FEFAA16AC4A810067FA53 /* LoggerNativeTransport.m in Sources */ = {isa = PBXBuildFile; fileRef = 044FEF7816AC4A810067FA53 /* LoggerNativeTransport.m */; };
 		044FEFAB16AC4A810067FA53 /* NSManagedObjectContext+FetchAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 044FEF7C16AC4A810067FA53 /* NSManagedObjectContext+FetchAdditions.m */; };
 		044FEFAC16AC4A810067FA53 /* NSFileManager+DirectoryLocations.m in Sources */ = {isa = PBXBuildFile; fileRef = 044FEF7F16AC4A810067FA53 /* NSFileManager+DirectoryLocations.m */; };
 		044FEFAD16AC4A810067FA53 /* LoggerUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 044FEF8116AC4A810067FA53 /* LoggerUtils.m */; };
@@ -50,6 +47,12 @@
 		044FEFBF16AC4BC30067FA53 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 044FEFBE16AC4BC30067FA53 /* CoreData.framework */; };
 		044FEFC116AC4BCF0067FA53 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 044FEFC016AC4BCF0067FA53 /* CFNetwork.framework */; };
 		044FEFC316AC4BD90067FA53 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 044FEFC216AC4BD90067FA53 /* Security.framework */; };
+		04D13F5116B56AF4004FDB3A /* LoggerNativeConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 04D13F4C16B56AF4004FDB3A /* LoggerNativeConnection.m */; };
+		04D13F5216B56AF4004FDB3A /* LoggerNativeMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 04D13F4E16B56AF4004FDB3A /* LoggerNativeMessage.m */; };
+		04D13F5316B56AF4004FDB3A /* LoggerNativeTransport.m in Sources */ = {isa = PBXBuildFile; fileRef = 04D13F5016B56AF4004FDB3A /* LoggerNativeTransport.m */; };
+		04D13F5816B56B17004FDB3A /* LoggerClientData.m in Sources */ = {isa = PBXBuildFile; fileRef = 04D13F5516B56B17004FDB3A /* LoggerClientData.m */; };
+		04D13F5916B56B17004FDB3A /* LoggerConnectionStatusData.m in Sources */ = {isa = PBXBuildFile; fileRef = 04D13F5716B56B17004FDB3A /* LoggerConnectionStatusData.m */; };
+		04D13F5B16B56B2A004FDB3A /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 04D13F5A16B56B2A004FDB3A /* libz.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -106,12 +109,6 @@
 		044FEF6F16AC4A810067FA53 /* LoggerMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerMessage.m; sourceTree = "<group>"; };
 		044FEF7016AC4A810067FA53 /* LoggerTransport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerTransport.h; sourceTree = "<group>"; };
 		044FEF7116AC4A810067FA53 /* LoggerTransport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerTransport.m; sourceTree = "<group>"; };
-		044FEF7316AC4A810067FA53 /* LoggerNativeConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerNativeConnection.h; sourceTree = "<group>"; };
-		044FEF7416AC4A810067FA53 /* LoggerNativeConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerNativeConnection.m; sourceTree = "<group>"; };
-		044FEF7516AC4A810067FA53 /* LoggerNativeMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerNativeMessage.h; sourceTree = "<group>"; };
-		044FEF7616AC4A810067FA53 /* LoggerNativeMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerNativeMessage.m; sourceTree = "<group>"; };
-		044FEF7716AC4A810067FA53 /* LoggerNativeTransport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerNativeTransport.h; sourceTree = "<group>"; };
-		044FEF7816AC4A810067FA53 /* LoggerNativeTransport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerNativeTransport.m; sourceTree = "<group>"; };
 		044FEF7B16AC4A810067FA53 /* NSManagedObjectContext+FetchAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSManagedObjectContext+FetchAdditions.h"; sourceTree = "<group>"; };
 		044FEF7C16AC4A810067FA53 /* NSManagedObjectContext+FetchAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSManagedObjectContext+FetchAdditions.m"; sourceTree = "<group>"; };
 		044FEF7E16AC4A810067FA53 /* NSFileManager+DirectoryLocations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+DirectoryLocations.h"; sourceTree = "<group>"; };
@@ -132,6 +129,17 @@
 		044FEFBE16AC4BC30067FA53 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		044FEFC016AC4BCF0067FA53 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		044FEFC216AC4BD90067FA53 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		04D13F4B16B56AF4004FDB3A /* LoggerNativeConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerNativeConnection.h; sourceTree = "<group>"; };
+		04D13F4C16B56AF4004FDB3A /* LoggerNativeConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerNativeConnection.m; sourceTree = "<group>"; };
+		04D13F4D16B56AF4004FDB3A /* LoggerNativeMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerNativeMessage.h; sourceTree = "<group>"; };
+		04D13F4E16B56AF4004FDB3A /* LoggerNativeMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerNativeMessage.m; sourceTree = "<group>"; };
+		04D13F4F16B56AF4004FDB3A /* LoggerNativeTransport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerNativeTransport.h; sourceTree = "<group>"; };
+		04D13F5016B56AF4004FDB3A /* LoggerNativeTransport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerNativeTransport.m; sourceTree = "<group>"; };
+		04D13F5416B56B17004FDB3A /* LoggerClientData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerClientData.h; sourceTree = "<group>"; };
+		04D13F5516B56B17004FDB3A /* LoggerClientData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerClientData.m; sourceTree = "<group>"; };
+		04D13F5616B56B17004FDB3A /* LoggerConnectionStatusData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerConnectionStatusData.h; sourceTree = "<group>"; };
+		04D13F5716B56B17004FDB3A /* LoggerConnectionStatusData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerConnectionStatusData.m; sourceTree = "<group>"; };
+		04D13F5A16B56B2A004FDB3A /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -139,6 +147,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04D13F5B16B56B2A004FDB3A /* libz.dylib in Frameworks */,
 				044FEFC316AC4BD90067FA53 /* Security.framework in Frameworks */,
 				044FEFC116AC4BCF0067FA53 /* CFNetwork.framework in Frameworks */,
 				044FEFBF16AC4BC30067FA53 /* CoreData.framework in Frameworks */,
@@ -170,9 +179,8 @@
 				044FEF4816AC4A6C0067FA53 /* LoggerCommon.h */,
 				040AD41B16ACF5F60072DFAD /* Views & Cells */,
 				044FEF8A16AC4A810067FA53 /* ViewController */,
-				044FEF5316AC4A810067FA53 /* CoreDataModel */,
 				044FEF5916AC4A810067FA53 /* Managers */,
-				044FEF7216AC4A810067FA53 /* NativeLogFormat */,
+				044FEF5316AC4A810067FA53 /* CoreDataModel */,
 				044FEF6216AC4A810067FA53 /* Model */,
 				044FEF4A16AC4A810067FA53 /* Constants */,
 				044FEF7916AC4A810067FA53 /* Utilities */,
@@ -193,6 +201,7 @@
 		044FEF1A16AC49810067FA53 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				04D13F5A16B56B2A004FDB3A /* libz.dylib */,
 				044FEFC216AC4BD90067FA53 /* Security.framework */,
 				044FEFC016AC4BCF0067FA53 /* CFNetwork.framework */,
 				044FEFBE16AC4BC30067FA53 /* CoreData.framework */,
@@ -247,6 +256,10 @@
 		044FEF5316AC4A810067FA53 /* CoreDataModel */ = {
 			isa = PBXGroup;
 			children = (
+				04D13F5416B56B17004FDB3A /* LoggerClientData.h */,
+				04D13F5516B56B17004FDB3A /* LoggerClientData.m */,
+				04D13F5616B56B17004FDB3A /* LoggerConnectionStatusData.h */,
+				04D13F5716B56B17004FDB3A /* LoggerConnectionStatusData.m */,
 				044FEF5516AC4A810067FA53 /* LoggerMessageData.h */,
 				044FEF5616AC4A810067FA53 /* LoggerMessageData.m */,
 				044FEF5716AC4A810067FA53 /* LoggerMessages.xcdatamodeld */,
@@ -272,6 +285,7 @@
 		044FEF6216AC4A810067FA53 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				04D13F4A16B56AF4004FDB3A /* NativeLogFormat */,
 				044FEF6316AC4A810067FA53 /* Height_Calculator */,
 				044FEF6A16AC4A810067FA53 /* LoggerConnection.h */,
 				044FEF6B16AC4A810067FA53 /* LoggerConnection.m */,
@@ -296,19 +310,6 @@
 				044FEF6916AC4A810067FA53 /* LoggerMessageHeight.m */,
 			);
 			path = Height_Calculator;
-			sourceTree = "<group>";
-		};
-		044FEF7216AC4A810067FA53 /* NativeLogFormat */ = {
-			isa = PBXGroup;
-			children = (
-				044FEF7316AC4A810067FA53 /* LoggerNativeConnection.h */,
-				044FEF7416AC4A810067FA53 /* LoggerNativeConnection.m */,
-				044FEF7516AC4A810067FA53 /* LoggerNativeMessage.h */,
-				044FEF7616AC4A810067FA53 /* LoggerNativeMessage.m */,
-				044FEF7716AC4A810067FA53 /* LoggerNativeTransport.h */,
-				044FEF7816AC4A810067FA53 /* LoggerNativeTransport.m */,
-			);
-			path = NativeLogFormat;
 			sourceTree = "<group>";
 		};
 		044FEF7916AC4A810067FA53 /* Utilities */ = {
@@ -378,6 +379,19 @@
 				044FEF8E16AC4A810067FA53 /* LoggerMessageViewController.xib */,
 			);
 			path = MessageViewController;
+			sourceTree = "<group>";
+		};
+		04D13F4A16B56AF4004FDB3A /* NativeLogFormat */ = {
+			isa = PBXGroup;
+			children = (
+				04D13F4B16B56AF4004FDB3A /* LoggerNativeConnection.h */,
+				04D13F4C16B56AF4004FDB3A /* LoggerNativeConnection.m */,
+				04D13F4D16B56AF4004FDB3A /* LoggerNativeMessage.h */,
+				04D13F4E16B56AF4004FDB3A /* LoggerNativeMessage.m */,
+				04D13F4F16B56AF4004FDB3A /* LoggerNativeTransport.h */,
+				04D13F5016B56AF4004FDB3A /* LoggerNativeTransport.m */,
+			);
+			path = NativeLogFormat;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -467,9 +481,6 @@
 				044FEFA516AC4A810067FA53 /* LoggerIPConnection.m in Sources */,
 				044FEFA616AC4A810067FA53 /* LoggerMessage.m in Sources */,
 				044FEFA716AC4A810067FA53 /* LoggerTransport.m in Sources */,
-				044FEFA816AC4A810067FA53 /* LoggerNativeConnection.m in Sources */,
-				044FEFA916AC4A810067FA53 /* LoggerNativeMessage.m in Sources */,
-				044FEFAA16AC4A810067FA53 /* LoggerNativeTransport.m in Sources */,
 				044FEFAB16AC4A810067FA53 /* NSManagedObjectContext+FetchAdditions.m in Sources */,
 				044FEFAC16AC4A810067FA53 /* NSFileManager+DirectoryLocations.m in Sources */,
 				044FEFAD16AC4A810067FA53 /* LoggerUtils.m in Sources */,
@@ -478,6 +489,11 @@
 				040AD42216ACF5F60072DFAD /* LoggerClientInfoCell.m in Sources */,
 				040AD42316ACF5F60072DFAD /* LoggerMarkerCell.m in Sources */,
 				040AD42416ACF5F60072DFAD /* LoggerMessageCell.m in Sources */,
+				04D13F5116B56AF4004FDB3A /* LoggerNativeConnection.m in Sources */,
+				04D13F5216B56AF4004FDB3A /* LoggerNativeMessage.m in Sources */,
+				04D13F5316B56AF4004FDB3A /* LoggerNativeTransport.m in Sources */,
+				04D13F5816B56B17004FDB3A /* LoggerClientData.m in Sources */,
+				04D13F5916B56B17004FDB3A /* LoggerConnectionStatusData.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

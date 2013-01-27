@@ -93,9 +93,14 @@
 	}
 }
 
-- (void)presentErrorToManager:(NSError *)anError
+- (void)reportStatusToManager:(NSError *)anError
 {
-	[self.transManager reportTransportError:anError];
+	[self.transManager presentTransportStatus:anError];
+}
+
+- (void)reportErrorToManager:(NSError *)anError
+{
+	[self.transManager presentTransportError:anError];
 }
 
 - (void)startup
@@ -146,7 +151,15 @@
 // method report to the according transport
 - (void)remoteDisconnected:(LoggerConnection *)theConnection
 {
-	
+	if(LoggerCheckDelegate(transManager
+						   ,@protocol(LoggerTransportDelegate)
+						   ,@selector(transport:didDisconnectRemote:)))
+	{
+		[transManager
+		 transport:self
+		 didDisconnectRemote:theConnection];
+	}
+
 }
 
 @end

@@ -94,12 +94,10 @@ didDisconnectRemote:(LoggerConnection *)theConnection;
 - (void)addConnection:(LoggerConnection *)aConnection;
 - (void)removeConnection:(LoggerConnection *)aConnection;
 
-#if TARGET_OS_IPHONE
+
 - (void)attachConnectionToManager:(LoggerConnection *)aConnection;
-- (void)presentErrorToManager:(NSError *)anError;
-#else
-- (void)attachConnectionToWindow:(LoggerConnection *)aConnection;
-#endif
+- (void)reportStatusToManager:(NSError *)anError;
+- (void)reportErrorToManager:(NSError *)anError;
 
 - (NSString *)transportInfoString;
 - (NSString *)transportStatusString;

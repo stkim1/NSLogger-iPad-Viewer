@@ -34,7 +34,8 @@
 
 @interface LoggerCertManager()
 @property (nonatomic, retain) NSError *errorLoadingCert;
-- (CFArrayRef)_loadIdentityFromKeyChain:(NSString*)inStrCertPath  error:(NSError **)outError;
+- (CFArrayRef)_loadIdentityFromKeyChain:(NSString*)inStrCertPath
+								  error:(NSError **)outError;
 @end
 
 @implementation LoggerCertManager

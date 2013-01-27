@@ -102,7 +102,7 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 
 - (void)restart
 {
-	NSLog(@"%@",NSStringFromSelector(_cmd));
+	MTLog(@"%@",NSStringFromSelector(_cmd));
 
 	if (active)
 	{
@@ -145,7 +145,7 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 
 - (void)completeRestart
 {
-	NSLog(@"%@",NSStringFromSelector(_cmd));
+	MTLog(@"%@",NSStringFromSelector(_cmd));
 	if (active)
 	{
 		// wait for the service to be completely shut down, then restart it
@@ -159,7 +159,7 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 
 - (void)startup
 {
-	NSLog(@"%@",NSStringFromSelector(_cmd));
+	MTLog(@"%@",NSStringFromSelector(_cmd));
 	if (!active)
 	{
 		active = YES;
@@ -172,10 +172,20 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 		 selector:@selector(completeRestart)
 		 object:nil];
 		
-		[[NSNotificationCenter defaultCenter]
-		 postNotificationName:kShowStatusInStatusWindowNotification
-		 object:self];
+#warning error code, transport object
+		NSDictionary *dict = \
+			@{NSLocalizedDescriptionKey:@"startup done"};
+		
+		// this is more of an error than status change.
+		[self
+		 reportStatusToManager:
+		 [NSError
+		  errorWithDomain:@"NSLogger"
+		  code:0
+		  userInfo:dict]];
 
+		//[[NSNotificationCenter defaultCenter] postNotificationName:kShowStatusInStatusWindowNotification object:self];
+		
 		[NSThread
 		 detachNewThreadSelector:@selector(listenerThread)
 		 toTarget:self
@@ -185,7 +195,7 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 
 - (void)shutdown
 {
-	NSLog(@"%@",NSStringFromSelector(_cmd));
+	MTLog(@"%@",NSStringFromSelector(_cmd));
 	if (!active)
 		return;
 
@@ -232,9 +242,19 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 	listenerThread = nil;
 	active = NO;
 
-	[[NSNotificationCenter defaultCenter]
-	 postNotificationName:kShowStatusInStatusWindowNotification
-	 object:self];
+#warning error code, transport object
+	NSDictionary *dict = \
+		@{NSLocalizedDescriptionKey:@"transport shutdown"};
+
+	// this is more of an error than status change.
+	[self
+	 reportStatusToManager:
+	 [NSError
+	  errorWithDomain:@"NSLogger"
+	  code:0
+	  userInfo:dict]];
+
+	//[[NSNotificationCenter defaultCenter] postNotificationName:kShowStatusInStatusWindowNotification object:self];
 }
 
 - (void)removeConnection:(LoggerConnection *)aConnection
@@ -253,7 +273,7 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 
 - (BOOL)setup
 {
-	NSLog(@"%@",NSStringFromSelector(_cmd));
+	MTLog(@"%@",NSStringFromSelector(_cmd));
 	@try
 	{
 		CFSocketContext context = {0, self, NULL, NULL, NULL};
@@ -379,9 +399,22 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 			self.failureReason = NSLocalizedString(@"Failed creating sockets for Bonjour%s service.", @"");
 		else
 			self.failureReason = [NSString stringWithFormat:NSLocalizedString(@"Failed listening on port %d (port busy?)",@""), listenerPort];
+		
+		NSDictionary *dict = \
+			@{NSLocalizedDescriptionKey:[e name]
+			,NSLocalizedFailureReasonErrorKey:self.failureReason
+			,NSUnderlyingErrorKey:[e reason]};
+		
+#warning error code, transport object
+		// this is more of an error than status change.
+		[self
+		 reportErrorToManager:
+		 [NSError
+		  errorWithDomain:@"NSLogger"
+		  code:0
+		  userInfo:dict]];
 
-		[[NSNotificationCenter defaultCenter] postNotificationName:kShowStatusInStatusWindowNotification
-															object:self];
+		//[[NSNotificationCenter defaultCenter] postNotificationName:kShowStatusInStatusWindowNotification object:self];
 		
 		if (listenerSocket_ipv4 != NULL)
 		{
@@ -397,29 +430,39 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 	}
 	@finally
 	{
-		[[NSNotificationCenter defaultCenter]
-		 postNotificationName:kShowStatusInStatusWindowNotification
-		 object:self];
+#warning error code, transport object
+		NSDictionary *dict = \
+			@{NSLocalizedDescriptionKey:@"setup done"};
+
+		// this is more of an error than status change.
+		[self
+		 reportStatusToManager:
+		 [NSError
+		  errorWithDomain:@"NSLogger"
+		  code:0
+		  userInfo:dict]];
+
+		//[[NSNotificationCenter defaultCenter] postNotificationName:kShowStatusInStatusWindowNotification object:self];
 	}
 	return YES;
 }
 
 - (void)listenerThread
 {
-	NSLog(@"%@",NSStringFromSelector(_cmd));
+	MTLog(@"%@",NSStringFromSelector(_cmd));
 	
 	listenerThread = [NSThread currentThread];
 	[[listenerThread threadDictionary] setObject:[NSRunLoop currentRunLoop] forKey:@"runLoop"];
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 #ifdef DEBUG
 	NSString *description = [self description];
-	NSLog(@"Entering listenerThread for transport %@", description);
+	MTLog(@"Entering listenerThread for transport %@", description);
 #endif
 	@try
 	{
 		if ([self setup])
 		{
-			NSLog(@"commencing listener thread...");
+			MTLog(@"commencing listener thread...");
 			while (![listenerThread isCancelled])
 			{
 				NSDate *next = [[NSDate alloc] initWithTimeIntervalSinceNow:0.10];
@@ -431,13 +474,13 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 	@catch (NSException * e)
 	{
 #ifdef DEBUG
-		NSLog(@"listenerThread catched exception %@", e);
+		MTLog(@"listenerThread catched exception %@", e);
 #endif
 	}
 	@finally
 	{
 #ifdef DEBUG
-		NSLog(@"Exiting listenerThread for transport %@", description);
+		MTLog(@"Exiting listenerThread for transport %@", description);
 #endif
 		[pool release];
 		listenerThread = nil;
@@ -494,7 +537,7 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 		dataLen -= i;
 		offset += i;
 	}
-	NSLog(@"Received bytes:\n%@", s);
+	MTLog(@"Received bytes:\n%@", s);
 	[s release];
 }
 #endif
@@ -536,36 +579,21 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 
 - (BOOL)canDoSSL
 {
-#if TARGET_OS_IPHONE
 	/*
+	 stkim1_dec.11,2012
 	 by the time transport object reaches this point server cert must be loaded
 	 and ready. If an error ever occured, it should have been reported.
 	 All we want atm is to know whether it's ok to go with SSL
 	 */
-
 	NSError *loadingError = nil;
 	return [self.certManager loadEncryptionCertificate:&loadingError];
-#else
-	// This method can BLOCK THE CURRENT THREAD and run security dialog UI from the main thread
-	if (![self.certManager serverCertsLoadAttempted])
-	{
-		dispatch_sync(dispatch_get_main_queue(), ^{
-			NSError *error = nil;
-			if (![self.certManager loadEncryptionCertificate:&error])
-			{
-				[NSApp performSelector:@selector(presentError:) withObject:error afterDelay:0];
-			}
-		});
-	}
-	return (self.certManager.serverCerts != NULL);
-#endif
 }
 
 - (BOOL)setupSSLForStream:(NSInputStream *)readStream
 {
 	CFArrayRef serverCerts = [[self certManager] serverCerts];
 #ifdef DEBUG
-	NSLog(@"setupSSLForStream, stream=%@ self=%@ serverCerts=%@", readStream, self, serverCerts);
+	MTLog(@"setupSSLForStream, stream=%@ self=%@ serverCerts=%@", readStream, self, serverCerts);
 #endif
 	if (serverCerts != NULL)
 	{
@@ -654,14 +682,11 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 								message.message = [self clientInfoStringForMessage:message];
 								message.threadID = @"";
 
+								// stkim1_jan.18,2013
 								// as soon as client info is recieved and client hash is generated,
 								// the new connection gets reporeted to transport manager
 								[cnx clientInfoReceived:message];
-
-#warning need to pass message part to transport manager for connection id
 								[self attachConnectionToManager:cnx];
-								
-
 							}
 							else
 							{
@@ -680,18 +705,17 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 				break;
 
 			case NSStreamEventErrorOccurred: {
-				NSLog(@"Stream error occurred: stream=%@ self=%@ error=%@", theStream, self, [theStream streamError]);
+				MTLog(@"Stream error occurred: stream=%@ self=%@ error=%@", theStream, self, [theStream streamError]);
 				NSError *error = [theStream streamError];
 				NSInteger errCode = [error code];
 				
-				NSLog(@"errCode [errSSLDecryptionFail:%d],[errSSLBadRecordMac:%d] actual error :%d",errSSLDecryptionFail,errSSLBadRecordMac,errCode);
+				MTLog(@"errCode [errSSLDecryptionFail:%d],[errSSLBadRecordMac:%d] actual error :%d",errSSLDecryptionFail,errSSLBadRecordMac,errCode);
 
 				if (errCode == errSSLDecryptionFail || errCode == errSSLBadRecordMac)
 				{
 					// SSL failure due to the application not being codesigned
 					// See https://devforums.apple.com/thread/77848?tstart=0
-					
-#if TARGET_OS_IPHONE
+
 					NSDictionary *dict = \
 						@{NSLocalizedDescriptionKey:NSLocalizedString(@"NSLogger SSL authentication failure", @"")
 						,NSLocalizedRecoverySuggestionErrorKey:NSLocalizedString(@"Your NSLogger build may not be codesigned. As a result, a conflict between Firewall and Keychain tagging of your viewer requires that you restart NSLogger to complete the SSL certificate authorization.\n\nRestart NSLogger now to fix the issue.", @"")
@@ -699,27 +723,14 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 						,NSLocalizedRecoverySuggestionErrorKey:NSLocalizedString(@"Click the Restart button to restart NSLogger now.", @"")
 						,NSLocalizedRecoveryOptionsErrorKey:[NSArray arrayWithObject:NSLocalizedString(@"Restart", @"")]};
 
+					// stkim1_jan.27,2013 modified for iOS
 					[self
-					 presentErrorToManager:
+					 reportErrorToManager:
 						 [NSError
 						  errorWithDomain:@"NSLogger"
 						  code:errCode
 						  userInfo:dict]
 					 ];
-					
-#else
-					dispatch_async(dispatch_get_main_queue(), ^{
-						NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
-											  NSLocalizedString(@"NSLogger SSL authentication failure", @""), NSLocalizedDescriptionKey,
-											  NSLocalizedString(@"Your NSLogger build may not be codesigned. As a result, a conflict between Firewall and Keychain tagging of your viewer requires that you restart NSLogger to complete the SSL certificate authorization.\n\nRestart NSLogger now to fix the issue.", @""), NSLocalizedRecoverySuggestionErrorKey,
-											  [NSString stringWithFormat:@"CFStream error %d", errCode], NSUnderlyingErrorKey,
-											  NSLocalizedString(@"Click the Restart button to restart NSLogger now.", @""), NSLocalizedRecoverySuggestionErrorKey,
-											  [NSArray arrayWithObject:NSLocalizedString(@"Restart", @"")],  NSLocalizedRecoveryOptionsErrorKey,
-											  //[NSApp delegate], NSRecoveryAttempterErrorKey,
-											  nil];
-						[NSApp presentError:[NSError errorWithDomain:@"NSLogger" code:errCode userInfo:dict]];
-					});
-#endif
 				}
 				break;
 			}
@@ -750,6 +761,7 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 	}
 	@catch (NSException * e)
 	{
+		MTLog(@"error happens : %@",[e reason]);
 	}
 	@finally
 	{
@@ -775,14 +787,39 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 		self.failureReason = [NSString stringWithFormat:NSLocalizedString(@"Bonjour error %d", @""), errorCode];
 	failed = YES;
 
-	[[NSNotificationCenter defaultCenter] postNotificationName:kShowStatusInStatusWindowNotification object:self];
+	NSDictionary *dict = \
+		@{NSLocalizedDescriptionKey:NSLocalizedString(@"NSLogger NSNetService failure", @"")
+		,NSLocalizedFailureReasonErrorKey:self.failureReason};
+
+	// this is more of an error than status change.
+	[self
+	 reportErrorToManager:
+	 [NSError
+	  errorWithDomain:@"NSLogger"
+	  code:errorCode
+	  userInfo:dict]];
+
+	//[[NSNotificationCenter defaultCenter] postNotificationName:kShowStatusInStatusWindowNotification object:self];
 }
 
 - (void)netServiceDidPublish:(NSNetService *)sender
 {
 	ready = YES;
-	[[NSNotificationCenter defaultCenter] postNotificationName:kShowStatusInStatusWindowNotification
-														object:self];
+	
+#warning need to represent transport object
+	NSDictionary *dict = \
+	@{NSLocalizedDescriptionKey:NSLocalizedString(@"NSLogger NSNetService success", @"")
+	,NSLocalizedFailureReasonErrorKey:@"netServiceDidPublish"};
+	
+	// this is more of an error than status change.
+	[self
+	 reportStatusToManager:
+	 [NSError
+	  errorWithDomain:@"NSLogger"
+	  code:0
+	  userInfo:dict]];
+
+	//[[NSNotificationCenter defaultCenter] postNotificationName:kShowStatusInStatusWindowNotification object:self];
 }
 
 @end
@@ -869,7 +906,7 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 	@catch (NSException * e)
 	{
 #ifdef DEBUG
-		NSLog(@"LoggerNativeTransport %p: exception catched in AcceptSocketCallback: %@", info, e);
+		MTLog(@"LoggerNativeTransport %p: exception catched in AcceptSocketCallback: %@", info, e);
 #endif
 	}
 	@finally

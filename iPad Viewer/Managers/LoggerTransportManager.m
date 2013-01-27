@@ -69,7 +69,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 			// we load server cert at this point to reduce any delay might happen later
 			// in transport object.
 			[aCertManager loadEncryptionCertificate:&error];
-#warning alert cert loading error
+#warning report error if you find a cert loading error
 			_certManager = aCertManager;
 		}
 		
@@ -157,12 +157,41 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 // -----------------------------------------------------------------------------
 #pragma mark - Handling Connection from Transport
 // -----------------------------------------------------------------------------
-- (void)reportTransportError:(NSError *)anError
+- (void)presentTransportStatus:(NSError *)anError
 {
-	dispatch_sync(dispatch_get_main_queue(), ^{
-		MTLog(@"we need to report error");
-#warning report error
-	});
+	if([NSThread isMainThread])
+	{
+		[[NSNotificationCenter defaultCenter]
+		 postNotificationName:kShowStatusInStatusWindowNotification
+		 object:anError];
+	}
+	else
+	{
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[[NSNotificationCenter defaultCenter]
+			 postNotificationName:kShowStatusInStatusWindowNotification
+			 object:anError];
+		});
+	}
+}
+
+- (void)presentTransportError:(NSError *)anError
+{
+	if([NSThread isMainThread])
+	{
+		[[NSNotificationCenter defaultCenter]
+		 postNotificationName:kErrorReportNotification
+		 object:anError];
+	}
+	else
+	{
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[[NSNotificationCenter defaultCenter]
+			 postNotificationName:kErrorReportNotification
+			 object:anError];
+		});
+	}
+	
 }
 
 // -----------------------------------------------------------------------------
