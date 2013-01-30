@@ -30,3 +30,19 @@
  */
 #import "LoggerConstModel.h"
 
+NSString * const kShowTransportStatusNotification = @"ShowTransportStatus";
+NSString * const kShowTransportErrorNotification = @"ShowTransportError";
+
+NSString * const kTransportTag			= @"tag";
+NSString * const kTransportSecure		= @"secure";
+NSString * const kTransportReady		= @"ready";
+NSString * const kTransportFailed		= @"failed";
+NSString * const kTransportInfoString	= @"transportInfoString";
+NSString * const kTransportStatusString	= @"transportStatusString";
+NSString * const kTransportError		= @"transportError";
+
+// client status value
+NSString * const kShowClientConnectedNotification = @"ShowClientConnected";
+NSString * const kShowClientDisconnectedNotification = @"SHowClientDisconnected";
+NSString * const kClientHash			= @"clientHash";
+NSString * const kClientRunCount		= @"clientRunCount";

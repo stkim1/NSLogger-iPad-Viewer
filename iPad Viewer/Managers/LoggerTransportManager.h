@@ -44,8 +44,8 @@
 - (void)destoryTransports;
 - (void)startStopTransports;
 
-//TODO: should be status reporting object rather than error
-- (void)presentTransportStatus:(NSError *)anError;
+// presnet status of a transport to view layer
+- (void)presentTransportStatus:(NSDictionary *)aStatusDict;
+- (void)presentTransportError:(NSDictionary *)anErrorDict;
 
-- (void)presentTransportError:(NSError *)anError;
 @end

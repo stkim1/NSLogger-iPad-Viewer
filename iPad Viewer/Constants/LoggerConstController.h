@@ -32,5 +32,3 @@
 #import <Foundation/Foundation.h>
 
 extern NSString * const kPrefsChangedNotification;
-extern NSString * const kShowStatusInStatusWindowNotification;
-extern NSString * const kErrorReportNotification;

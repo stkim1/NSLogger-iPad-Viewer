@@ -37,6 +37,7 @@
 @synthesize certManager;
 @synthesize connections;
 @synthesize secure, active, ready, failed, failureReason;
+@synthesize tag;
 
 - (id)init
 {
@@ -93,14 +94,14 @@
 	}
 }
 
-- (void)reportStatusToManager:(NSError *)anError
+- (void)reportStatusToManager:(NSDictionary *)aStatusDict
 {
-	[self.transManager presentTransportStatus:anError];
+	[self.transManager presentTransportStatus:aStatusDict];
 }
 
-- (void)reportErrorToManager:(NSError *)anError
+- (void)reportErrorToManager:(NSDictionary *)anErrorDict
 {
-	[self.transManager presentTransportError:anError];
+	[self.transManager presentTransportError:anErrorDict];
 }
 
 - (void)startup
@@ -129,6 +130,18 @@
 	// subclasses should implement this, LoggerStatusWindowController uses it
 	return nil;
 }
+
+- (NSDictionary *)status
+{
+	return
+		@{kTransportTag:[NSNumber numberWithInt:[self tag]],
+		kTransportSecure:[NSNumber numberWithBool:[self secure]],
+		kTransportReady:[NSNumber numberWithBool:[self ready]],
+		kTransportFailed:[NSNumber numberWithBool:[self failed]],
+		kTransportInfoString:[self transportInfoString],
+		kTransportStatusString:[self transportStatusString]};
+}
+
 
 //------------------------------------------------------------------------------
 #pragma mark - logger connection delegate
@@ -159,7 +172,6 @@
 		 transport:self
 		 didDisconnectRemote:theConnection];
 	}
-
 }
 
 @end

@@ -32,5 +32,3 @@
 #import "LoggerConstController.h"
 
 NSString * const kPrefsChangedNotification = @"PrefsChangedNotification";
-NSString * const kShowStatusInStatusWindowNotification = @"ShowStatusInStatusWindowNotification";
-NSString * const kErrorReportNotification = @"ErrorReportNotification";

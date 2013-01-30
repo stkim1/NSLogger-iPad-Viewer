@@ -39,6 +39,7 @@
 @property (nonatomic, retain) LoggerCertManager *certManager;
 @property (nonatomic, retain) NSMutableArray	*transports;
 -(void)_startStopTransports;
+-(void)_presentNotification:(NSDictionary *)aNotiDict forKey:(NSString *)aKey;
 @end
 
 @implementation LoggerTransportManager
@@ -91,6 +92,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 	t.certManager = self.certManager;
 	t.publishBonjourService = YES;
 	t.secure = NO;
+	t.tag = 0;
 	[self.transports addObject:t];
 	[t release];
 	
@@ -101,6 +103,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 	t.certManager = self.certManager;
 	t.publishBonjourService = YES;
 	t.secure = YES;
+	t.tag = 1;
 	[self.transports addObject:t];
 	[t release];
 
@@ -111,6 +114,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 	t.certManager = self.certManager;
 	t.listenerPort = [self.prefManager directTCPIPResponderPort];
 	t.secure = YES;
+	t.tag = 2;
 	[self.transports addObject:t];
 	[t release];
 }
@@ -155,43 +159,40 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 }
 
 // -----------------------------------------------------------------------------
-#pragma mark - Handling Connection from Transport
+#pragma mark - Handling Report from Transport
 // -----------------------------------------------------------------------------
-- (void)presentTransportStatus:(NSError *)anError
+-(void)_presentNotification:(NSDictionary *)aNotiDict forKey:(NSString *)aKey
 {
 	if([NSThread isMainThread])
 	{
 		[[NSNotificationCenter defaultCenter]
-		 postNotificationName:kShowStatusInStatusWindowNotification
-		 object:anError];
+		 postNotificationName:aKey
+		 object:self
+		 userInfo:aNotiDict];
 	}
 	else
 	{
 		dispatch_async(dispatch_get_main_queue(), ^{
 			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:kShowStatusInStatusWindowNotification
-			 object:anError];
+			 postNotificationName:aKey
+			 object:self
+			 userInfo:aNotiDict];
 		});
 	}
 }
 
-- (void)presentTransportError:(NSError *)anError
+- (void)presentTransportStatus:(NSDictionary *)aStatusDict
 {
-	if([NSThread isMainThread])
-	{
-		[[NSNotificationCenter defaultCenter]
-		 postNotificationName:kErrorReportNotification
-		 object:anError];
-	}
-	else
-	{
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:kErrorReportNotification
-			 object:anError];
-		});
-	}
-	
+	[self
+	 _presentNotification:aStatusDict
+	 forKey:kShowTransportStatusNotification];
+}
+
+- (void)presentTransportError:(NSDictionary *)anErrorDict
+{
+	[self
+	 _presentNotification:anErrorDict
+	 forKey:kShowTransportErrorNotification];
 }
 
 // -----------------------------------------------------------------------------
@@ -203,6 +204,10 @@ didEstablishConnection:(LoggerConnection *)theConnection
 {
 	MTLog(@"setup new connection [%@]",theConnection);
 
+	// report transport status first
+	[self
+	 presentTransportStatus:[theTransport status]];
+	
 	[_dataManager
 	 transport:theTransport
 	 didEstablishConnection:theConnection];
@@ -214,8 +219,6 @@ didEstablishConnection:(LoggerConnection *)theConnection
 didReceiveMessages:(NSArray *)theMessages
 			range:(NSRange)rangeInMessagesList
 {
-	//MTLog(@"Connection [%@ ] receieve messages (%d) for range (%d~%d)",theConnection,[theMessages count],rangeInMessagesList.location, rangeInMessagesList.length);
-
 	[_dataManager
 	 transport:theTransport
 	 connection:theConnection
@@ -226,6 +229,10 @@ didReceiveMessages:(NSArray *)theMessages
 - (void)transport:(LoggerTransport *)theTransport
 didDisconnectRemote:(LoggerConnection *)theConnection
 {
+	// report transport status first
+	[self
+	 presentTransportStatus:[theTransport status]];
+	
 	[_dataManager transport:theTransport didDisconnectRemote:theConnection];
 }
 

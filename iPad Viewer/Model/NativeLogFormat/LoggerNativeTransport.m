@@ -172,20 +172,8 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 		 selector:@selector(completeRestart)
 		 object:nil];
 		
-#warning error code, transport object
-		NSDictionary *dict = \
-			@{NSLocalizedDescriptionKey:@"startup done"};
-		
-		// this is more of an error than status change.
-		[self
-		 reportStatusToManager:
-		 [NSError
-		  errorWithDomain:@"NSLogger"
-		  code:0
-		  userInfo:dict]];
+		[self reportStatusToManager:[self status]];
 
-		//[[NSNotificationCenter defaultCenter] postNotificationName:kShowStatusInStatusWindowNotification object:self];
-		
 		[NSThread
 		 detachNewThreadSelector:@selector(listenerThread)
 		 toTarget:self
@@ -242,19 +230,7 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 	listenerThread = nil;
 	active = NO;
 
-#warning error code, transport object
-	NSDictionary *dict = \
-		@{NSLocalizedDescriptionKey:@"transport shutdown"};
-
-	// this is more of an error than status change.
-	[self
-	 reportStatusToManager:
-	 [NSError
-	  errorWithDomain:@"NSLogger"
-	  code:0
-	  userInfo:dict]];
-
-	//[[NSNotificationCenter defaultCenter] postNotificationName:kShowStatusInStatusWindowNotification object:self];
+	[self reportStatusToManager:[self status]];
 }
 
 - (void)removeConnection:(LoggerConnection *)aConnection
@@ -400,22 +376,24 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 		else
 			self.failureReason = [NSString stringWithFormat:NSLocalizedString(@"Failed listening on port %d (port busy?)",@""), listenerPort];
 		
-		NSDictionary *dict = \
-			@{NSLocalizedDescriptionKey:[e name]
-			,NSLocalizedFailureReasonErrorKey:self.failureReason
-			,NSUnderlyingErrorKey:[e reason]};
 		
-#warning error code, transport object
-		// this is more of an error than status change.
-		[self
-		 reportErrorToManager:
-		 [NSError
-		  errorWithDomain:@"NSLogger"
-		  code:0
-		  userInfo:dict]];
+		NSDictionary *status = [self status];
+		
+		NSMutableDictionary *errorStatus = \
+			[NSMutableDictionary dictionaryWithDictionary:status];
+		
+		[errorStatus
+		 setObject:
+			[NSError
+			 errorWithDomain:@"NSLogger"
+			 code:0
+			 userInfo:
+				@{NSLocalizedDescriptionKey:[e name],
+				NSLocalizedFailureReasonErrorKey:[e reason]}]
+		 forKey:kTransportError];
+		
+		[self reportErrorToManager:errorStatus];
 
-		//[[NSNotificationCenter defaultCenter] postNotificationName:kShowStatusInStatusWindowNotification object:self];
-		
 		if (listenerSocket_ipv4 != NULL)
 		{
 			CFRelease(listenerSocket_ipv4);
@@ -430,19 +408,7 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 	}
 	@finally
 	{
-#warning error code, transport object
-		NSDictionary *dict = \
-			@{NSLocalizedDescriptionKey:@"setup done"};
-
-		// this is more of an error than status change.
-		[self
-		 reportStatusToManager:
-		 [NSError
-		  errorWithDomain:@"NSLogger"
-		  code:0
-		  userInfo:dict]];
-
-		//[[NSNotificationCenter defaultCenter] postNotificationName:kShowStatusInStatusWindowNotification object:self];
+		[self reportStatusToManager:[self status]];
 	}
 	return YES;
 }
@@ -724,13 +690,20 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 						,NSLocalizedRecoveryOptionsErrorKey:[NSArray arrayWithObject:NSLocalizedString(@"Restart", @"")]};
 
 					// stkim1_jan.27,2013 modified for iOS
-					[self
-					 reportErrorToManager:
-						 [NSError
-						  errorWithDomain:@"NSLogger"
-						  code:errCode
-						  userInfo:dict]
-					 ];
+					NSDictionary *status = [self status];
+					
+					NSMutableDictionary *errorStatus = \
+						[NSMutableDictionary dictionaryWithDictionary:status];
+
+					[errorStatus
+					 setObject:
+						[NSError
+						 errorWithDomain:@"NSLogger"
+						 code:errCode
+						 userInfo:dict]
+					 forKey:kTransportError];
+					
+					[self reportErrorToManager:errorStatus];
 				}
 				break;
 			}
@@ -787,39 +760,26 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 		self.failureReason = [NSString stringWithFormat:NSLocalizedString(@"Bonjour error %d", @""), errorCode];
 	failed = YES;
 
-	NSDictionary *dict = \
-		@{NSLocalizedDescriptionKey:NSLocalizedString(@"NSLogger NSNetService failure", @"")
-		,NSLocalizedFailureReasonErrorKey:self.failureReason};
-
-	// this is more of an error than status change.
-	[self
-	 reportErrorToManager:
-	 [NSError
-	  errorWithDomain:@"NSLogger"
-	  code:errorCode
-	  userInfo:dict]];
-
-	//[[NSNotificationCenter defaultCenter] postNotificationName:kShowStatusInStatusWindowNotification object:self];
+	NSDictionary *status = [self status];
+	
+	NSMutableDictionary *errorStatus = \
+		[NSMutableDictionary dictionaryWithDictionary:status];
+	
+	[errorStatus
+	 setObject:
+		 [NSError
+		  errorWithDomain:@"NSLogger"
+		  code:errorCode
+		  userInfo:@{NSLocalizedDescriptionKey:NSLocalizedString(@"NSLogger NSNetService failure", @"")}]
+	 forKey:kTransportError];
+	
+	[self reportErrorToManager:errorStatus];
 }
 
 - (void)netServiceDidPublish:(NSNetService *)sender
 {
 	ready = YES;
-	
-#warning need to represent transport object
-	NSDictionary *dict = \
-	@{NSLocalizedDescriptionKey:NSLocalizedString(@"NSLogger NSNetService success", @"")
-	,NSLocalizedFailureReasonErrorKey:@"netServiceDidPublish"};
-	
-	// this is more of an error than status change.
-	[self
-	 reportStatusToManager:
-	 [NSError
-	  errorWithDomain:@"NSLogger"
-	  code:0
-	  userInfo:dict]];
-
-	//[[NSNotificationCenter defaultCenter] postNotificationName:kShowStatusInStatusWindowNotification object:self];
+	[self reportStatusToManager:[self status]];
 }
 
 @end

@@ -38,6 +38,7 @@
 #import <CFNetwork/CFNetwork.h>
 #import <Security/SecureTransport.h>
 
+#import "LoggerConstModel.h"
 #import "LoggerConnection.h"
 
 @class LoggerTransportManager;
@@ -77,6 +78,10 @@ didDisconnectRemote:(LoggerConnection *)theConnection;
 	BOOL						active;
 	BOOL						ready;
 	BOOL						failed;
+	
+	// stkim1_jan.29,2013
+	// tag of transport. This is more of an unique id for views to identify
+	int32_t						tag;
 }
 @property (nonatomic, assign)	LoggerTransportManager	*transManager;
 @property (nonatomic, retain)	LoggerPreferenceManager	*prefManager;
@@ -85,6 +90,7 @@ didDisconnectRemote:(LoggerConnection *)theConnection;
 @property (nonatomic, readonly) BOOL					active;
 @property (nonatomic, readonly) BOOL					failed;
 @property (nonatomic, readonly) BOOL					ready;
+@property (nonatomic, readwrite) int32_t				tag;
 @property (nonatomic, readonly) NSMutableArray			*connections;
 @property (nonatomic, retain) NSString					*failureReason;
 
@@ -94,12 +100,13 @@ didDisconnectRemote:(LoggerConnection *)theConnection;
 - (void)addConnection:(LoggerConnection *)aConnection;
 - (void)removeConnection:(LoggerConnection *)aConnection;
 
-
 - (void)attachConnectionToManager:(LoggerConnection *)aConnection;
-- (void)reportStatusToManager:(NSError *)anError;
-- (void)reportErrorToManager:(NSError *)anError;
+- (void)reportStatusToManager:(NSDictionary *)aStatusDict;
+- (void)reportErrorToManager:(NSDictionary *)anErrorDict;
 
 - (NSString *)transportInfoString;
 - (NSString *)transportStatusString;
+
+- (NSDictionary *)status;
 
 @end

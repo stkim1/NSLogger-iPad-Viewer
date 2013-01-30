@@ -29,8 +29,28 @@
  *
  */
 
+// LoggerMessage types
 enum {
 	kMessageString = 0,
 	kMessageData,
 	kMessageImage
 };
+
+// transport status key value
+extern NSString * const kShowTransportStatusNotification;
+extern NSString * const kShowTransportErrorNotification;
+extern NSString * const kTransportTag;
+extern NSString * const kTransportSecure;
+extern NSString * const kTransportReady;
+extern NSString * const kTransportFailed;
+extern NSString * const kTransportInfoString;
+extern NSString * const kTransportStatusString;
+extern NSString * const kTransportError;
+
+// client status value
+extern NSString * const kShowClientConnectedNotification;
+extern NSString * const kShowClientDisconnectedNotification;
+extern NSString * const kClientHash;
+extern NSString * const kClientRunCount;
+
+
