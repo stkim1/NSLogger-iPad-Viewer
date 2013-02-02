@@ -37,6 +37,8 @@
 #import "LoggerMarkerCell.h"
 #import "LoggerClientInfoCell.h"
 
+#import "LoggerConstModel.h"
+
 @interface LoggerMessageViewController ()
 @property (nonatomic, retain) NSFetchedResultsController	*messageFetchResultController;
 @end
@@ -61,8 +63,9 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	
 	[self setDataManager:[LoggerDataManager sharedDataManager]];
+	
+#if 0
 	assert([self.dataManager messageDisplayContext] != nil);
 	
 	NSFetchRequest *request =\
@@ -115,7 +118,80 @@
 	[sortByTimestamp release],sortByTimestamp = nil;
 	[entity release],entity = nil;
 	[request release],request = nil;
+#endif
+	
+	[[NSNotificationCenter defaultCenter]
+	 addObserver:self
+	 selector:@selector(readMessages:)
+	 name:kShowClientConnectedNotification
+	 object:nil];
+}
 
+-(void)readMessages:(NSNotification *)aNotification
+{
+	NSDictionary *userInfo = [aNotification userInfo];
+	
+	MTLog(@"userInfo %@",userInfo);
+	
+	uLong clientHash = [[userInfo objectForKey:kClientHash] integerValue];
+	int32_t runCount = [[userInfo objectForKey:kClientRunCount] integerValue];
+	
+	assert([self.dataManager messageDisplayContext] != nil);
+	
+	NSFetchRequest *request = [[NSFetchRequest alloc] init];
+
+	NSEntityDescription *entity =\
+	[NSEntityDescription
+	 entityForName:@"LoggerMessageData"
+	 inManagedObjectContext:
+	 [[self dataManager] messageDisplayContext]];
+	
+	[request setShouldRefreshRefetchedObjects:YES];
+	[request setEntity:entity];
+	[request setFetchBatchSize:20];
+	//[request setFetchLimit:40];
+	//[request setFetchOffset:0];
+
+	[request setPredicate:
+		[NSPredicate
+		 predicateWithFormat:
+		 @"clientHash == %d AND runCount == %d"
+		 ,clientHash
+		 ,runCount]];
+	
+	NSSortDescriptor *sortByTimestamp = \
+	[[NSSortDescriptor alloc]
+	 initWithKey:@"timestamp"
+	 ascending:NO];
+	
+	NSSortDescriptor *sortBySequence = \
+	[[NSSortDescriptor alloc]
+	 initWithKey:@"sequence"
+	 ascending:NO];
+	
+	[request setSortDescriptors:@[sortBySequence,sortByTimestamp]];
+	
+	[NSFetchedResultsController deleteCacheWithName:nil];
+	
+	NSFetchedResultsController *frc = \
+	[[NSFetchedResultsController alloc]
+	 initWithFetchRequest:request
+	 managedObjectContext:[[self dataManager] messageDisplayContext]
+	 sectionNameKeyPath:nil//@"uniqueID"
+	 cacheName:nil];
+#warning cache policy
+	
+	[frc setDelegate:self];
+	[self setMessageFetchResultController:frc];
+	
+	NSError *error = nil;
+	[frc performFetch:&error];
+	
+	[frc release],frc = nil;
+	[sortBySequence release],sortBySequence = nil;
+	[sortByTimestamp release],sortByTimestamp = nil;
+	[entity release],entity = nil;
+	[request release],request = nil;
 }
 
 -(void)viewDidAppear:(BOOL)animated

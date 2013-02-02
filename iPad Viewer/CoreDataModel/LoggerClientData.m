@@ -28,7 +28,6 @@
  *
  */
 
-
 #import "LoggerClientData.h"
 #import "LoggerConnectionStatusData.h"
 

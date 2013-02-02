@@ -28,7 +28,6 @@
  *
  */
 
-
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 
@@ -37,13 +36,13 @@
 @interface LoggerClientData : NSManagedObject
 
 @property (nonatomic, retain) NSString * clientDevice;
-@property (nonatomic) int32_t clientHash;
+@property (nonatomic, retain) NSNumber * clientHash;
 @property (nonatomic, retain) NSString * clientName;
 @property (nonatomic, retain) NSString * clientOSName;
 @property (nonatomic, retain) NSString * clientOSVersion;
 @property (nonatomic, retain) NSString * clientUDID;
 @property (nonatomic, retain) NSString * clientVersion;
-@property (nonatomic) int32_t runCount;
+@property (nonatomic, retain) NSNumber * runCount;
 @property (nonatomic, retain) NSSet *connectionStatus;
 @end
 

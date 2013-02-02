@@ -28,7 +28,6 @@
  *
  */
 
-
 #import "LoggerConnectionStatusData.h"
 #import "LoggerClientData.h"
 
@@ -43,4 +42,18 @@
 @dynamic transportInfo;
 @dynamic clientInfo;
 
+
+#if 0
+-(void)didTurnIntoFault
+{
+	MTLog(@"[FAULTED %p]",self);
+	[super didTurnIntoFault];
+}
+
+-(void)dealloc
+{
+	MTLog(@"[DEALLOCED %p]",self);
+	[super dealloc];
+}
+#endif
 @end

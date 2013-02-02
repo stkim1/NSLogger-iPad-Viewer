@@ -228,6 +228,9 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 		_messageSaveContext = \
 			[[NSManagedObjectContext alloc]
 			 initWithConcurrencyType:NSPrivateQueueConcurrencyType];
+
+		// undo-manager is not necessary for entire app
+		[_messageSaveContext setUndoManager:nil];
 		
 		[_messageSaveContext
 		 performBlockAndWait:^{
@@ -261,6 +264,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 		_messageDisplayContext = \
 			[[NSManagedObjectContext alloc]
 			 initWithConcurrencyType:NSMainQueueConcurrencyType];
+		[_messageDisplayContext setUndoManager:nil];
 		[_messageDisplayContext setParentContext:saveContext];
 		[_messageDisplayContext setUndoManager:nil];
 	}
@@ -291,6 +295,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 		_messageProcessContext = \
 			[[NSManagedObjectContext alloc]
 			 initWithConcurrencyType:NSConfinementConcurrencyType];
+		[_messageProcessContext setUndoManager:nil];
 		[_messageProcessContext setParentContext:displayContext];
 		[_messageProcessContext setUndoManager:nil];
 	}
@@ -328,6 +333,10 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 			 }
 			 else
 			 {
+				 dispatch_async(_messageProcessQueue, ^{
+					[[self messageProcessContext] reset];
+				 });
+				 
 				 // initialize PSC on disk
 				 [[self messageSaveContext]
 				  performBlock:^{
@@ -377,6 +386,10 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 				 // don't forget that we are already at main thread
 				 aMainThreadBlock();
 
+				 dispatch_async(_messageProcessQueue, ^{
+					 [[self messageProcessContext] reset];
+				 });
+				 
 				 // save message on disk
 				 // we need a counter to check every save() issues over 4k flash mem page
 				 [[self messageSaveContext]
@@ -391,7 +404,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 					  
 				  }];
 			 }
-		 }];
+		 }];		
 	}
 }
 
@@ -442,7 +455,7 @@ didEstablishConnection:(LoggerConnection *)theConnection
 						 insertNewObjectForEntityForName:@"LoggerClientData"
 						 inManagedObjectContext:[self messageProcessContext]];
 
-					[client setClientHash:			clientHash];
+					[client setClientHash:			[NSNumber numberWithUnsignedLong:clientHash]];
 					[client setClientName:			[theConnection clientName]];
 					[client setClientVersion:		[theConnection clientVersion]];
 					[client setClientOSName:		[theConnection clientOSName]];
@@ -455,23 +468,27 @@ didEstablishConnection:(LoggerConnection *)theConnection
 					lastestRunCount++;
 				}
 
-				[client setRunCount:lastestRunCount];
-
-#warning make sure reconnectionCount is not a victim of race condition
+				[client setRunCount:[NSNumber numberWithInt:lastestRunCount]];
+#warning make sure you encounter no race condition. this is an unprotected value
 				[theConnection setReconnectionCount:lastestRunCount];
 
+				
+MTLog(@"transport:didEstablishConnection: (%lx)[%d]",theConnection.clientHash, theConnection.reconnectionCount);
+				
 				LoggerConnectionStatusData *status = \
 					[NSEntityDescription
 					 insertNewObjectForEntityForName:@"LoggerConnectionStatusData"
 					 inManagedObjectContext:[self messageProcessContext]];
 
-				[status setClientHash:		[theConnection clientHash]];
-				[status setRunCount:		lastestRunCount];
+				[status setClientHash:		[NSNumber numberWithUnsignedLong:clientHash]];
+				[status setRunCount:		[NSNumber numberWithInt:lastestRunCount]];
 				[status setClientAddress:	[theConnection clientAddressDescription]];
 				[status setTransportInfo:	[theTransport transportInfoString]];
-				[status setStartTime:		mach_absolute_time()];
+				[status setStartTime:		[NSNumber numberWithLongLong:mach_absolute_time()]];
 				//[status setClientInfo:		client];
 				[client addConnectionStatusObject:status];
+				
+				
 			}
 			@catch (NSException *exception)
 			{
@@ -484,7 +501,7 @@ didEstablishConnection:(LoggerConnection *)theConnection
 					 postNotificationName:kShowClientConnectedNotification
 					 object:[LoggerTransportManager sharedTransportManager]
 					 userInfo:
-					 @{kClientHash:[NSNumber numberWithInt:clientHash]
+					 @{kClientHash:[NSNumber numberWithUnsignedLong:clientHash]
 					 ,kClientRunCount:[NSNumber numberWithInt:lastestRunCount]}];
 				}];
 			}
@@ -541,6 +558,7 @@ didReceiveMessages:(NSArray *)theMessages
 					
 					[messageData setPortraitHeight:	[aMessage portraitHeight]];
 					[messageData setLandscapeHeight:[aMessage landscapeHeight]];
+					
 				}
 			}
 			@catch (NSException *exception)
@@ -564,7 +582,7 @@ didDisconnectRemote:(LoggerConnection *)theConnection
 	dispatch_async(_messageProcessQueue, ^{
 		@autoreleasepool {
 
-			MTLog(@"transport:didDisconnectRemote: (%ld)[%d]",theConnection.clientHash, theConnection.reconnectionCount);
+			MTLog(@"transport:didDisconnectRemote: (%lx)[%d]",theConnection.clientHash, theConnection.reconnectionCount);
 			
 			uLong clientHash = [theConnection clientHash];
 			int32_t lastestRunCount = [theConnection reconnectionCount];
@@ -582,10 +600,9 @@ didDisconnectRemote:(LoggerConnection *)theConnection
 					  ,clientHash
 					  ,lastestRunCount]];
 				
-				
 				// connection status info cannot be nil. if it is, we are in trouble
 				assert(status != nil);
-				[status setEndTime:mach_absolute_time()];
+				[status setEndTime:[NSNumber numberWithLongLong:mach_absolute_time()]];
 			}
 			@catch (NSException *exception)
 			{
@@ -599,7 +616,7 @@ didDisconnectRemote:(LoggerConnection *)theConnection
 					 postNotificationName:kShowClientDisconnectedNotification
 					 object:[LoggerTransportManager sharedTransportManager]
 					 userInfo:
-					 @{kClientHash:[NSNumber numberWithInt:clientHash]
+					 @{kClientHash:[NSNumber numberWithUnsignedLong:clientHash]
 					 ,kClientRunCount:[NSNumber numberWithInt:lastestRunCount]}];
 				}];
 			}

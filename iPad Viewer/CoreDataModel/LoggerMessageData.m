@@ -51,4 +51,17 @@
 @dynamic messageType;
 @dynamic textRepresentation;
 
+#if 0
+-(void)didTurnIntoFault
+{
+	MTLog(@"<%@>[FAULTED %p]",NSStringFromClass([self class]),self);
+	[super didTurnIntoFault];
+}
+
+-(void)dealloc
+{
+	MTLog(@"<%@>[DEALLOCED %p]",NSStringFromClass([self class]),self);
+	[super dealloc];
+}
+#endif
 @end
