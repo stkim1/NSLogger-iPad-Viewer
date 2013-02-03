@@ -56,4 +56,20 @@
 	[super dealloc];
 }
 #endif
+
+// this is an approximated value to be stored in PSC
+-(unsigned long)rawDataSize
+{
+	unsigned long size = 0;
+
+	size += [[self clientAddress] length];
+	size += 4;//clienthash
+	size += 8;//endTime
+	size += 4;//runcount
+	size += 8;//starttime
+	size += [[self transportInfo] length];
+	
+	return size;
+}
+
 @end

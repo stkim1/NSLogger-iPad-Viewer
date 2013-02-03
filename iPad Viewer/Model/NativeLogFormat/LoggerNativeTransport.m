@@ -431,9 +431,17 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 			MTLog(@"commencing listener thread...");
 			while (![listenerThread isCancelled])
 			{
+/*
 				NSDate *next = [[NSDate alloc] initWithTimeIntervalSinceNow:0.10];
 				[[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:next];
 				[next release];
+ */
+				//stkim1 Feb.02,2013
+				//Double autorelease pool is in place to reduce memory pool size
+				// as well as performance hit
+				@autoreleasepool {
+					[[NSRunLoop currentRunLoop] run];
+				}
 			}
 		}
 	}

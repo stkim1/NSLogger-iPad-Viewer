@@ -53,4 +53,5 @@
 @property (nonatomic, retain) NSString * messageType;
 @property (nonatomic, retain) NSString * textRepresentation;
 
+-(unsigned long)rawDataSize;
 @end

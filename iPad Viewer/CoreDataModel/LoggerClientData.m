@@ -44,4 +44,21 @@
 @dynamic runCount;
 @dynamic connectionStatus;
 
+-(unsigned long)rawDataSize
+{
+	unsigned long size = 0;
+
+	size += [[self clientDevice] length];
+	size += 4;//clienthash
+	size += [[self clientName] length];
+	size += [[self clientOSName] length];
+	size += [[self clientOSVersion] length];
+	size += [[self clientUDID] length];
+	size += [[self clientVersion] length];
+	size += 4;//runCount
+	
+	return size;
+
+}
+
 @end

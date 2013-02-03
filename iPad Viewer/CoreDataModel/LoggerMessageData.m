@@ -64,4 +64,29 @@
 	[super dealloc];
 }
 #endif
+
+-(unsigned long)rawDataSize
+{
+	unsigned long size = 0;
+	
+	size += 4;// client hash
+	size += 2;// contentsType
+	size += [[self filename] length];
+	size += [[self functionName] length];
+	size += [[self imageSize] length];
+	size += 4; // landscape height
+	size += 4; // run count
+	size += 4; // sequence
+	size += 4; // tag
+	size += [[self threadID] length];
+	size += 8; // timestamp
+	size += 2; // type;
+	size += 4; // lineNumber
+	size += [[self messageText] length];
+	size += [[self messageType] length];
+	size += [[self textRepresentation] length];
+	
+	return size;
+	
+}
 @end

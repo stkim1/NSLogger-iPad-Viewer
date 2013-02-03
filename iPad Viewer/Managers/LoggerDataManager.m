@@ -42,13 +42,28 @@
 #import <mach/mach_time.h>
 #import "LoggerTransportManager.h"
 
+/*
+ Save operation is expensive. if we could reduce the frequency of save operation
+ reasonably, we should follow the suit. A way to reduce the requency is batch 
+ saving. Accumulate an approximated size of save operation and save in a shot. 
+ 
+ It requires us to setup a threadhold size that could be used againt measure
+ when to fire save(). I deciced to set a threadhold based on Florent advice of
+ Flash memory paging. FLASH memory saves data by page, whose size is usually 
+ 4096 byte. Scheme is pretty simple that we will fire save() when we have more
+ data than multiple of DEFAULT_FLASH_PAGING_SIZE to save
+ */
+
+#define DEFAULT_FLASH_PAGING_SIZE	4096
+#define DEFAULT_SAVING_BLOCK_SIZE	(DEFAULT_FLASH_PAGING_SIZE << 1) // 8192
+
 @interface LoggerDataManager()
 @property (nonatomic, readonly) NSManagedObjectModel *managedObjectModel;
 @property (nonatomic, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 @property (nonatomic, readonly) NSManagedObjectContext *messageProcessContext;
 @property (nonatomic, readonly) NSManagedObjectContext *messageSaveContext;
--(void)_runMessageSaveChain:(NSError **)aSaveError;
--(void)_runMessageSaveChainWithMainThreadBlock:(void (^)(void))aMainThreadBlock;
+-(void)_runMessageSaveChain:(unsigned long)theSaveDataSize
+		withMainThreadBlock:(void (^)(NSError *saveError))aMainThreadBlock;
 @end
 
 @implementation LoggerDataManager
@@ -58,6 +73,7 @@
 
 	// The root disk save context
 	NSManagedObjectContext *_messageSaveContext;
+	unsigned long			_messageSaveSizeCount;
 	
 	// Secondary display/UI context. NSFetchRequestController takes
 	// this to display message on UITableViewCell
@@ -228,13 +244,12 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 		_messageSaveContext = \
 			[[NSManagedObjectContext alloc]
 			 initWithConcurrencyType:NSPrivateQueueConcurrencyType];
-
-		// undo-manager is not necessary for entire app
-		[_messageSaveContext setUndoManager:nil];
 		
 		[_messageSaveContext
 		 performBlockAndWait:^{
 			 [_messageSaveContext setPersistentStoreCoordinator:coordinator];
+
+			 // undo-manager is not necessary for entire app
 			 [_messageSaveContext setUndoManager:nil];
 		 }];
 	}
@@ -264,7 +279,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 		_messageDisplayContext = \
 			[[NSManagedObjectContext alloc]
 			 initWithConcurrencyType:NSMainQueueConcurrencyType];
-		[_messageDisplayContext setUndoManager:nil];
 		[_messageDisplayContext setParentContext:saveContext];
 		[_messageDisplayContext setUndoManager:nil];
 	}
@@ -295,7 +309,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 		_messageProcessContext = \
 			[[NSManagedObjectContext alloc]
 			 initWithConcurrencyType:NSConfinementConcurrencyType];
-		[_messageProcessContext setUndoManager:nil];
 		[_messageProcessContext setParentContext:displayContext];
 		[_messageProcessContext setUndoManager:nil];
 	}
@@ -307,104 +320,80 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 //------------------------------------------------------------------------------
 #pragma mark - save message chain
 //------------------------------------------------------------------------------
--(void)_runMessageSaveChain:(NSError **)aSaveError
+-(void)_runMessageSaveChain:(unsigned long)theSaveDataSize
+		withMainThreadBlock:(void (^)(NSError *saveError))aMainThreadBlock
 {
 	assert(dispatch_get_current_queue() == _messageProcessQueue);
 	
-	__block NSError *error = nil;
-	__block BOOL	isSavedOk = NO;
+	BOOL	isProcessMocSavedOk = NO;
+	NSError *processMocSaveError = nil;
+	isProcessMocSavedOk =
+		[[self messageProcessContext] save:&processMocSaveError];
 	
-	isSavedOk = [[self messageProcessContext] save:&error];
-	
-	if(!isSavedOk || error != nil)
+	if(!isProcessMocSavedOk || processMocSaveError != nil)
 	{
-		MTLog(@"we have a save error on message_q <%d>[%@](%@)",isSavedOk,[error domain],[error localizedDescription]);
+		MTLog(@"we have a save error on message_q [%@](%@)"
+			  ,[processMocSaveError domain]
+			  ,[processMocSaveError localizedDescription]);
 	}
 	else
 	{
 		[[self messageDisplayContext]
 		 performBlock:^{
 			 
-			 isSavedOk = [[self messageDisplayContext] save:&error];
+			 BOOL	isDisplayMocSavedOk = NO;
+			 NSError *displayMocSaveError = nil;
 			 
-			 if(!isSavedOk || error != nil)
+			 isDisplayMocSavedOk =
+				 [[self messageDisplayContext] save:&displayMocSaveError];
+			 
+			 // we are still at main thread
+			 if(aMainThreadBlock != NULL)
 			 {
-				 MTLog(@"we have a save error on display_q %@",[error localizedFailureReason]);
+				 // whether message save() gets done ok, or not,
+				 // we will report to main thread with the result
+				 aMainThreadBlock(displayMocSaveError);
+			 }
+			 
+			 if(!isDisplayMocSavedOk || displayMocSaveError != nil)
+			 {
+				 MTLog(@"we have a save error on display_q %@"
+					   ,[displayMocSaveError localizedFailureReason]);
 			 }
 			 else
 			 {
-				 dispatch_async(_messageProcessQueue, ^{
-					[[self messageProcessContext] reset];
-				 });
-				 
 				 // initialize PSC on disk
 				 [[self messageSaveContext]
 				  performBlock:^{
-
-					  isSavedOk = [[self messageSaveContext] save:&error];
 					  
-					  if(!isSavedOk || error != nil)
+					  _messageSaveSizeCount += theSaveDataSize;
+					  
+					  if(DEFAULT_SAVING_BLOCK_SIZE <= _messageSaveSizeCount)
 					  {
-						  MTLog(@"we have a save error on save_q %@",[error localizedFailureReason]);
+						  MTLog(@"accumulated data size to be saved is %ld",_messageSaveSizeCount);
+
+						  BOOL	isSaveMocSavedOk = NO;
+						  NSError *saveMocSaveError = nil;
+						  
+						  isSaveMocSavedOk =\
+							  [[self messageSaveContext] save:&saveMocSaveError];
+						  
+						  if(!isSaveMocSavedOk || saveMocSaveError != nil)
+						  {
+							  MTLog(@"we have a save error on save_q %@"
+									,[saveMocSaveError localizedFailureReason]);
+						  }
+						  
+						  _messageSaveSizeCount = 0;
 					  }
 					  
 				  }];
+				 
 			 }
 		 }];
-	}
-}
-
--(void)_runMessageSaveChainWithMainThreadBlock:(void (^)(void))aMainThreadBlock
-{
-	assert(dispatch_get_current_queue() == _messageProcessQueue);
-	
-	__block NSError *error = nil;
-	__block BOOL	isSavedOk = NO;
-	
-	isSavedOk = [[self messageProcessContext] save:&error];
-	
-	if(!isSavedOk || error != nil)
-	{
-		MTLog(@"we have a save error on message_q <%d>[%@](%@)",isSavedOk,[error domain],[error localizedDescription]);
-	}
-	else
-	{
-		// message display context always saves on main(UI-) thread
-		[[self messageDisplayContext]
-		 performBlock:^{
-			 
-			 isSavedOk = [[self messageDisplayContext] save:&error];
-			 
-			 if(!isSavedOk || error != nil)
-			 {
-				 MTLog(@"we have a save error on display_q %@",[error localizedFailureReason]);
-			 }
-			 else
-			 {
-				 // now, since display MOC have recieved save() method, we can
-				 // issue whatevery notificiation main thread need to recieve
-				 // don't forget that we are already at main thread
-				 aMainThreadBlock();
-
-				 dispatch_async(_messageProcessQueue, ^{
-					 [[self messageProcessContext] reset];
-				 });
-				 
-				 // save message on disk
-				 // we need a counter to check every save() issues over 4k flash mem page
-				 [[self messageSaveContext]
-				  performBlock:^{
-					  
-					  isSavedOk = [[self messageSaveContext] save:&error];
-					  
-					  if(!isSavedOk || error != nil)
-					  {
-						  MTLog(@"we have a save error on save_q %@",[error localizedFailureReason]);
-					  }
-					  
-				  }];
-			 }
-		 }];		
+		
+		// as soon as save() done on process MOC, clear off all NSManagedObjects(NMO)
+		[[self messageProcessContext] reset];
 	}
 }
 
@@ -438,6 +427,9 @@ didEstablishConnection:(LoggerConnection *)theConnection
 			// you can increase runcount by client's runcount
 			int32_t lastestRunCount = 0;
 			uLong clientHash = [theConnection clientHash];
+			
+			// data size to be saved/updated to PSC
+			unsigned long dataSaveSize = 0;
 
 			@try
 			{
@@ -489,6 +481,8 @@ MTLog(@"transport:didEstablishConnection: (%lx)[%d]",theConnection.clientHash, t
 				[client addConnectionStatusObject:status];
 				
 				
+				dataSaveSize += [client rawDataSize];
+				dataSaveSize += [status rawDataSize];
 			}
 			@catch (NSException *exception)
 			{
@@ -496,13 +490,14 @@ MTLog(@"transport:didEstablishConnection: (%lx)[%d]",theConnection.clientHash, t
 			}
 			@finally
 			{
-				[self _runMessageSaveChainWithMainThreadBlock:^{
+				[self _runMessageSaveChain:dataSaveSize
+				 withMainThreadBlock:^(NSError *saveError){
 					[[NSNotificationCenter defaultCenter]
 					 postNotificationName:kShowClientConnectedNotification
 					 object:[LoggerTransportManager sharedTransportManager]
 					 userInfo:
-					 @{kClientHash:[NSNumber numberWithUnsignedLong:clientHash]
-					 ,kClientRunCount:[NSNumber numberWithInt:lastestRunCount]}];
+						 @{kClientHash:[NSNumber numberWithUnsignedLong:clientHash]
+						 ,kClientRunCount:[NSNumber numberWithInt:lastestRunCount]}];
 				}];
 			}
 		}
@@ -520,6 +515,9 @@ didReceiveMessages:(NSArray *)theMessages
 		{
 			NSUInteger end = [theMessages count];
 
+			// data size to be saved/updated to PSC
+			unsigned long dataSaveSize = 0;
+			
 			@try
 			{
 				for (int i = 0; i < end; i++)
@@ -559,7 +557,10 @@ didReceiveMessages:(NSArray *)theMessages
 					[messageData setPortraitHeight:	[aMessage portraitHeight]];
 					[messageData setLandscapeHeight:[aMessage landscapeHeight]];
 					
+					dataSaveSize += [messageData rawDataSize];
+					
 				}
+				
 			}
 			@catch (NSException *exception)
 			{
@@ -568,7 +569,8 @@ didReceiveMessages:(NSArray *)theMessages
 			@finally
 			{
 				// since we've completed copying messages into coredata,
-				[self _runMessageSaveChain:nil];
+				[self _runMessageSaveChain:dataSaveSize
+				 withMainThreadBlock:NULL];
 			}
 		}
 	});
@@ -586,6 +588,9 @@ didDisconnectRemote:(LoggerConnection *)theConnection
 			
 			uLong clientHash = [theConnection clientHash];
 			int32_t lastestRunCount = [theConnection reconnectionCount];
+			
+			// data size to be saved/updated to PSC
+			unsigned long dataSaveSize = 0;
 
 			@try
 			{
@@ -603,6 +608,8 @@ didDisconnectRemote:(LoggerConnection *)theConnection
 				// connection status info cannot be nil. if it is, we are in trouble
 				assert(status != nil);
 				[status setEndTime:[NSNumber numberWithLongLong:mach_absolute_time()]];
+				
+				dataSaveSize += [status rawDataSize];
 			}
 			@catch (NSException *exception)
 			{
@@ -610,8 +617,9 @@ didDisconnectRemote:(LoggerConnection *)theConnection
 			}
 			@finally
 			{
-				// since we've completed copying messages into coredata,
-				[self _runMessageSaveChainWithMainThreadBlock:^{
+				// when connection gets finished, flush off all remaining NMO to PSC
+				[self _runMessageSaveChain:dataSaveSize + DEFAULT_SAVING_BLOCK_SIZE
+				 withMainThreadBlock:^(NSError *saveError){
 					[[NSNotificationCenter defaultCenter]
 					 postNotificationName:kShowClientDisconnectedNotification
 					 object:[LoggerTransportManager sharedTransportManager]
