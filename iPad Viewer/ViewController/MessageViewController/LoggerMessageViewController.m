@@ -97,15 +97,14 @@
 	
 	[request setSortDescriptors:@[sortBySequence,sortByTimestamp]];
 	
-	[NSFetchedResultsController deleteCacheWithName:nil];
+	[NSFetchedResultsController deleteCacheWithName:@"mock-cache"];
 	
 	NSFetchedResultsController *frc = \
 		[[NSFetchedResultsController alloc]
 		 initWithFetchRequest:request
 		 managedObjectContext:[[self dataManager] messageDisplayContext]
 		 sectionNameKeyPath:nil//@"uniqueID"
-		 cacheName:nil];
-#warning cache policy
+		 cacheName:@"mock-cache"];
 
 	[frc setDelegate:self];
 	[self setMessageFetchResultController:frc];
@@ -171,15 +170,16 @@
 	
 	[request setSortDescriptors:@[sortBySequence,sortByTimestamp]];
 	
-	[NSFetchedResultsController deleteCacheWithName:nil];
+	NSString *cacheName = [NSString stringWithFormat:@"Cache-%lx",clientHash];
+	
+	[NSFetchedResultsController deleteCacheWithName:cacheName];
 	
 	NSFetchedResultsController *frc = \
 	[[NSFetchedResultsController alloc]
 	 initWithFetchRequest:request
 	 managedObjectContext:[[self dataManager] messageDisplayContext]
 	 sectionNameKeyPath:nil//@"uniqueID"
-	 cacheName:nil];
-#warning cache policy
+	 cacheName:cacheName];
 	
 	[frc setDelegate:self];
 	[self setMessageFetchResultController:frc];

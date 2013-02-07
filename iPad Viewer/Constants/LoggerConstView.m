@@ -30,4 +30,8 @@
  */
 #import "LoggerConstView.h"
 
+NSString * const kDefaultFontName = @"Lucida Grande";
+NSString * const kTagAndLevelFontName = @"LucidaGrande-Bold";
+NSString * const kMonospacedFontName = @"Inconsolata";
+
 NSString * const kMessageAttributesChangedNotification = @"MessageAttributesChangedNotification";

@@ -32,6 +32,9 @@
 #import "LoggerMarkerCell.h"
 
 NSString * const kMarkerCellReuseID = @"markerCell";
+extern UIFont *displayDefaultFont;
+extern UIFont *displayTagAndLevelFont;
+extern UIFont *displayMonospacedFont;
 
 @implementation LoggerMarkerCell
 

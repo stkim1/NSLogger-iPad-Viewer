@@ -43,6 +43,14 @@
 
 #define MSG_CELL_PORTRAIT_WIDTH			768.f
 #define MSG_CELL_LANDSCAPE_WDITH		1024.f
-#define DEFAULT_FONT_SIZE				10.f
+
+extern NSString * const kDefaultFontName;
+#define DEFAULT_FONT_SIZE				11.f
+
+extern NSString * const kTagAndLevelFontName;
+#define DEFAULT_TAG_LEVEL_SIZE			11.f
+
+extern NSString * const kMonospacedFontName;
+#define DEFAULT_MONOSPACED_SIZE			11.f
 
 extern NSString * const kMessageAttributesChangedNotification;

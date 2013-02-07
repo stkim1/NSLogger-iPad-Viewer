@@ -34,5 +34,12 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>NSLoggerResource.bundle/fonts/Lucida Grande Bold.ttf</string>
+		<string>NSLoggerResource.bundle/fonts/Lucida Grande.ttf</string>
+		<string>NSLoggerResource.bundle/fonts/Inconsolata.ttf</string>
+		<string>NSLoggerResource.bundle/fonts/Courier Prime.ttf</string>
+	</array>
 </dict>
 </plist>

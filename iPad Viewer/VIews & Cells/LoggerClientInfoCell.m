@@ -31,6 +31,9 @@
 #import "LoggerClientInfoCell.h"
 
 NSString * const kClientInfoCellReuseID = @"clientInfoCell";
+extern UIFont *displayDefaultFont;
+extern UIFont *displayTagAndLevelFont;
+extern UIFont *displayMonospacedFont;
 
 @implementation LoggerClientInfoCell
 

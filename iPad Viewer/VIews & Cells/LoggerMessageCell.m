@@ -35,8 +35,9 @@
 #import "LoggerMessageCell.h"
 
 NSString * const kMessageCellReuseID = @"messageCell";
-
-UIFont *sDisplayFont = nil;
+UIFont *displayDefaultFont = nil;
+UIFont *displayTagAndLevelFont = nil;
+UIFont *displayMonospacedFont = nil;
 
 @interface LoggerMessageView : UIView
 @end
@@ -52,9 +53,19 @@ UIFont *sDisplayFont = nil;
 
 +(void)initialize
 {
-	if(sDisplayFont == nil)
+	if(displayDefaultFont == nil)
 	{
-		sDisplayFont = [[UIFont systemFontOfSize:DEFAULT_FONT_SIZE] retain];
+		displayDefaultFont = [[UIFont fontWithName:kDefaultFontName size:DEFAULT_FONT_SIZE] retain];
+	}
+	
+	if(displayTagAndLevelFont == nil)
+	{
+		displayTagAndLevelFont = [[UIFont fontWithName:kTagAndLevelFontName size:DEFAULT_TAG_LEVEL_SIZE] retain];
+	}
+	
+	if(displayMonospacedFont == nil)
+	{
+		displayMonospacedFont = [[UIFont fontWithName:kMonospacedFontName size:DEFAULT_MONOSPACED_SIZE] retain];
 	}
 }
 
@@ -137,7 +148,7 @@ UIFont *sDisplayFont = nil;
 		
 		// compute display string size, limit to cell height
 		CGSize lr = [s
-					 sizeWithFont:sDisplayFont
+					 sizeWithFont:displayDefaultFont
 					 forWidth:MSG_CELL_PORTRAIT_WIDTH
 					 lineBreakMode:NSLineBreakByWordWrapping];
 		
@@ -159,7 +170,7 @@ UIFont *sDisplayFont = nil;
 			hint = NSLocalizedString(@"Double-click to see all text...", @"");
 			hintHeight =
 				[hint
-				 sizeWithFont:sDisplayFont
+				 sizeWithFont:displayDefaultFont
 				 constrainedToSize:r.size
 				 lineBreakMode:NSLineBreakByWordWrapping].height;
 		}
@@ -167,7 +178,7 @@ UIFont *sDisplayFont = nil;
 		r.size.height -= hintHeight;
 		[s
 		 drawInRect:r
-		 withFont:sDisplayFont
+		 withFont:displayDefaultFont
 		 lineBreakMode:NSLineBreakByWordWrapping
 		 alignment:NSTextAlignmentLeft];
 		
@@ -179,7 +190,7 @@ UIFont *sDisplayFont = nil;
 			r.size.height = hintHeight;
 			[hint
 			 drawInRect:r
-			 withFont:sDisplayFont
+			 withFont:displayDefaultFont
 			 lineBreakMode:NSLineBreakByWordWrapping
 			 alignment:NSTextAlignmentLeft];
 		}
@@ -189,7 +200,7 @@ UIFont *sDisplayFont = nil;
 		NSString *s = [_messageData textRepresentation];
 		[s
 		 drawInRect:r
-		 withFont:sDisplayFont
+		 withFont:displayDefaultFont
 		 lineBreakMode:NSLineBreakByWordWrapping
 		 alignment:NSTextAlignmentLeft];
 		

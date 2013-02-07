@@ -37,7 +37,6 @@
 #import "LoggerConstView.h"
 
 extern NSString * const kMessageCellReuseID;
-extern UIFont *sDisplayFont;
 
 @interface LoggerMessageCell : UITableViewCell
 {

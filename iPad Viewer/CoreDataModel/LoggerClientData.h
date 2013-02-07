@@ -42,7 +42,6 @@
 @property (nonatomic, retain) NSString * clientOSVersion;
 @property (nonatomic, retain) NSString * clientUDID;
 @property (nonatomic, retain) NSString * clientVersion;
-@property (nonatomic, retain) NSNumber * runCount;
 @property (nonatomic, retain) NSSet *connectionStatus;
 
 -(unsigned long)rawDataSize;

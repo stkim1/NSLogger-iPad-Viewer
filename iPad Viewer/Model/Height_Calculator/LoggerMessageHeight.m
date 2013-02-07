@@ -32,9 +32,9 @@
 #import "LoggerMessageHeight.h"
 #import "LoggerMessage.h"
 
-static CGFloat	sMinimumHeightForCell = 0;
-static CGFloat	sDefaultFileLineFunctionHeight = 0;
-static UIFont	*sDisplayFont = nil;
+static CGFloat	_minimumHeightForCell = 0;
+static CGFloat	_defaultFileLineFunctionHeight = 0;
+static UIFont	*_measureDefaultFont = nil;
 
 @implementation LoggerMessageHeight
 
@@ -43,17 +43,17 @@ static UIFont	*sDisplayFont = nil;
 	// load font resource and reuse it throughout app's lifecycle
 	// since the font will never go out on main thread for drawing,
 	// it is fine to do that
-	if(sDisplayFont == nil)
+	if(_measureDefaultFont == nil)
 	{
-		sDisplayFont = [[UIFont systemFontOfSize:DEFAULT_FONT_SIZE] retain];
+		_measureDefaultFont = [[UIFont fontWithName:kDefaultFontName size:DEFAULT_FONT_SIZE] retain];
 	}
 }
 
 + (CGFloat)minimumHeightForCellOnWidth:(CGFloat)aWidth
 {
-	if(sMinimumHeightForCell == 0)
+	if(_minimumHeightForCell == 0)
 	{
-		UIFont *defaultSizedFont = sDisplayFont;
+		UIFont *defaultSizedFont = _measureDefaultFont;
 		
 		CGSize r1 = [@"10:10:10.256"
 					 sizeWithFont:defaultSizedFont
@@ -75,16 +75,16 @@ static UIFont	*sDisplayFont = nil;
 					 forWidth:aWidth
 					 lineBreakMode:NSLineBreakByWordWrapping];
 		
-		sMinimumHeightForCell = \
+		_minimumHeightForCell = \
 		fmaxf((r1.height + r2.height), (r3.height + r4.height)) + 4;
 	}
 	
-	return sMinimumHeightForCell;
+	return _minimumHeightForCell;
 }
 
 + (CGFloat)heightForFileLineFunctionOnWidth:(CGFloat)aWidth
 {
-	if (sDefaultFileLineFunctionHeight == 0)
+	if (_defaultFileLineFunctionHeight == 0)
 	{
 		UIFont *defaultSizedFont = \
 			[UIFont systemFontOfSize:DEFAULT_FONT_SIZE];
@@ -94,9 +94,9 @@ static UIFont	*sDisplayFont = nil;
 					forWidth:aWidth
 					lineBreakMode:NSLineBreakByWordWrapping];
 
-		sDefaultFileLineFunctionHeight = r.height + 6;
+		_defaultFileLineFunctionHeight = r.height + 6;
 	}
-	return sDefaultFileLineFunctionHeight;
+	return _defaultFileLineFunctionHeight;
 }
 
 + (CGFloat)heightForMessage:(LoggerMessage *)aMessage onWidth:(CGFloat)aWidth
@@ -105,7 +105,7 @@ static UIFont	*sDisplayFont = nil;
 		[LoggerMessageHeight
 		 minimumHeightForCellOnWidth:aWidth];
 
-	UIFont *defaultSizedFont = sDisplayFont;
+	UIFont *defaultSizedFont = _measureDefaultFont;
 	
 	CGSize sz = CGSizeMake(aWidth, minimumHeight);
 

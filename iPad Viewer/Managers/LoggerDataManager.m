@@ -383,12 +383,15 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 							  MTLog(@"we have a save error on save_q %@"
 									,[saveMocSaveError localizedFailureReason]);
 						  }
-						  
+						  else
+						  {
+							  // clear MOC to save mem
+							  [[self messageSaveContext] reset];
+						  }
 						  _messageSaveSizeCount = 0;
 					  }
 					  
 				  }];
-				 
 			 }
 		 }];
 		
@@ -425,7 +428,7 @@ didEstablishConnection:(LoggerConnection *)theConnection
 
 			// run count is 0 based. when there is client info exist,
 			// you can increase runcount by client's runcount
-			int32_t lastestRunCount = 0;
+			int32_t lastRunCount = 0;
 			uLong clientHash = [theConnection clientHash];
 			
 			// data size to be saved/updated to PSC
@@ -454,15 +457,12 @@ didEstablishConnection:(LoggerConnection *)theConnection
 					[client setClientDevice:		[theConnection clientDevice]];
 					[client setClientUDID:			[theConnection clientUDID]];
 				}
-				else
-				{
-					lastestRunCount = [client runCount];
-					lastestRunCount++;
-				}
 
-				[client setRunCount:[NSNumber numberWithInt:lastestRunCount]];
+				// runcount is 0-based 
+				lastRunCount = [[client connectionStatus] count];
+				
 #warning make sure you encounter no race condition. this is an unprotected value
-				[theConnection setReconnectionCount:lastestRunCount];
+				[theConnection setReconnectionCount:lastRunCount];
 
 				
 MTLog(@"transport:didEstablishConnection: (%lx)[%d]",theConnection.clientHash, theConnection.reconnectionCount);
@@ -473,7 +473,7 @@ MTLog(@"transport:didEstablishConnection: (%lx)[%d]",theConnection.clientHash, t
 					 inManagedObjectContext:[self messageProcessContext]];
 
 				[status setClientHash:		[NSNumber numberWithUnsignedLong:clientHash]];
-				[status setRunCount:		[NSNumber numberWithInt:lastestRunCount]];
+				[status setRunCount:		[NSNumber numberWithInt:lastRunCount]];
 				[status setClientAddress:	[theConnection clientAddressDescription]];
 				[status setTransportInfo:	[theTransport transportInfoString]];
 				[status setStartTime:		[NSNumber numberWithLongLong:mach_absolute_time()]];
@@ -497,7 +497,7 @@ MTLog(@"transport:didEstablishConnection: (%lx)[%d]",theConnection.clientHash, t
 					 object:[LoggerTransportManager sharedTransportManager]
 					 userInfo:
 						 @{kClientHash:[NSNumber numberWithUnsignedLong:clientHash]
-						 ,kClientRunCount:[NSNumber numberWithInt:lastestRunCount]}];
+						 ,kClientRunCount:[NSNumber numberWithInt:lastRunCount]}];
 				}];
 			}
 		}
@@ -587,7 +587,7 @@ didDisconnectRemote:(LoggerConnection *)theConnection
 			MTLog(@"transport:didDisconnectRemote: (%lx)[%d]",theConnection.clientHash, theConnection.reconnectionCount);
 			
 			uLong clientHash = [theConnection clientHash];
-			int32_t lastestRunCount = [theConnection reconnectionCount];
+			int32_t lastRunCount = [theConnection reconnectionCount];
 			
 			// data size to be saved/updated to PSC
 			unsigned long dataSaveSize = 0;
@@ -603,7 +603,7 @@ didDisconnectRemote:(LoggerConnection *)theConnection
 					 [NSString
 					  stringWithFormat:@"clientHash == %ld AND runCount == %d"
 					  ,clientHash
-					  ,lastestRunCount]];
+					  ,lastRunCount]];
 				
 				// connection status info cannot be nil. if it is, we are in trouble
 				assert(status != nil);
@@ -625,7 +625,7 @@ didDisconnectRemote:(LoggerConnection *)theConnection
 					 object:[LoggerTransportManager sharedTransportManager]
 					 userInfo:
 					 @{kClientHash:[NSNumber numberWithUnsignedLong:clientHash]
-					 ,kClientRunCount:[NSNumber numberWithInt:lastestRunCount]}];
+					 ,kClientRunCount:[NSNumber numberWithInt:lastRunCount]}];
 				}];
 			}
 		}

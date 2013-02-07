@@ -41,7 +41,6 @@
 @dynamic clientOSVersion;
 @dynamic clientUDID;
 @dynamic clientVersion;
-@dynamic runCount;
 @dynamic connectionStatus;
 
 -(unsigned long)rawDataSize
@@ -55,7 +54,6 @@
 	size += [[self clientOSVersion] length];
 	size += [[self clientUDID] length];
 	size += [[self clientVersion] length];
-	size += 4;//runCount
 	
 	return size;
 
