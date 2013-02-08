@@ -28,6 +28,7 @@
  *
  */
 
+
 #import "LoggerMessageData.h"
 
 @implementation LoggerMessageData
@@ -39,31 +40,17 @@
 @dynamic imageSize;
 @dynamic landscapeHeight;
 @dynamic level;
+@dynamic lineNumber;
+@dynamic messageText;
+@dynamic messageType;
 @dynamic portraitHeight;
 @dynamic runCount;
 @dynamic sequence;
 @dynamic tag;
+@dynamic textRepresentation;
 @dynamic threadID;
 @dynamic timestamp;
 @dynamic type;
-@dynamic lineNumber;
-@dynamic messageText;
-@dynamic messageType;
-@dynamic textRepresentation;
-
-#if 0
--(void)didTurnIntoFault
-{
-	MTLog(@"<%@>[FAULTED %p]",NSStringFromClass([self class]),self);
-	[super didTurnIntoFault];
-}
-
--(void)dealloc
-{
-	MTLog(@"<%@>[DEALLOCED %p]",NSStringFromClass([self class]),self);
-	[super dealloc];
-}
-#endif
 
 -(unsigned long)rawDataSize
 {

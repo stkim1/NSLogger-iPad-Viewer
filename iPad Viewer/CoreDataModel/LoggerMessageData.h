@@ -34,24 +34,24 @@
 
 @interface LoggerMessageData : NSManagedObject
 
-@property (nonatomic) int32_t clientHash;
-@property (nonatomic) int16_t contentsType;
+@property (nonatomic, retain) NSNumber * clientHash;
+@property (nonatomic, retain) NSNumber * contentsType;
 @property (nonatomic, retain) NSString * filename;
 @property (nonatomic, retain) NSString * functionName;
 @property (nonatomic, retain) NSString * imageSize;
-@property (nonatomic) float landscapeHeight;
-@property (nonatomic) int16_t level;
-@property (nonatomic) float portraitHeight;
-@property (nonatomic) int32_t runCount;
-@property (nonatomic) int32_t sequence;
-@property (nonatomic, retain) NSString * tag;
-@property (nonatomic, retain) NSString * threadID;
-@property (nonatomic) int64_t timestamp;
-@property (nonatomic) int16_t type;
-@property (nonatomic) int32_t lineNumber;
+@property (nonatomic, retain) NSNumber * landscapeHeight;
+@property (nonatomic, retain) NSNumber * level;
+@property (nonatomic, retain) NSNumber * lineNumber;
 @property (nonatomic, retain) NSString * messageText;
 @property (nonatomic, retain) NSString * messageType;
+@property (nonatomic, retain) NSNumber * portraitHeight;
+@property (nonatomic, retain) NSNumber * runCount;
+@property (nonatomic, retain) NSNumber * sequence;
+@property (nonatomic, retain) NSString * tag;
 @property (nonatomic, retain) NSString * textRepresentation;
+@property (nonatomic, retain) NSString * threadID;
+@property (nonatomic, retain) NSNumber * timestamp;
+@property (nonatomic, retain) NSNumber * type;
 
 -(unsigned long)rawDataSize;
 @end

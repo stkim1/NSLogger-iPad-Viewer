@@ -117,13 +117,14 @@
 	[sortByTimestamp release],sortByTimestamp = nil;
 	[entity release],entity = nil;
 	[request release],request = nil;
-#endif
+#else
 	
 	[[NSNotificationCenter defaultCenter]
 	 addObserver:self
 	 selector:@selector(readMessages:)
 	 name:kShowClientConnectedNotification
 	 object:nil];
+#endif
 }
 
 -(void)readMessages:(NSNotification *)aNotification
@@ -136,6 +137,14 @@
 	int32_t runCount = [[userInfo objectForKey:kClientRunCount] integerValue];
 	
 	assert([self.dataManager messageDisplayContext] != nil);
+	
+	
+	if([self messageFetchResultController] != nil)
+	{
+		[[self messageFetchResultController] setDelegate:nil];
+		[self setMessageFetchResultController:nil];
+	}
+	
 	
 	NSFetchRequest *request = [[NSFetchRequest alloc] init];
 
@@ -240,7 +249,7 @@
 
 	LoggerMessageCell *cell = nil;
 
-	switch (msg.type)
+	switch ([msg.type shortValue])
 	{
 		case LOGMSG_TYPE_LOG:
 		case LOGMSG_TYPE_BLOCKSTART:
@@ -308,18 +317,6 @@
 	return cell;
 }
 
-#ifdef TEST_CELL_INDEXPATH
-- (void)tableView:(UITableView *)aTableView
-  willDisplayCell:(UITableViewCell *)aCell
-forRowAtIndexPath:(NSIndexPath *)anIndexPath
-{
-	LoggerMessageData *msg = \
-		[self.messageFetchResultController objectAtIndexPath:anIndexPath];
-
-	[(LoggerMessageCell *)aCell willDisplayForIndexPath:anIndexPath messageData:msg];
-}
-#endif
-
 //------------------------------------------------------------------------------
 #pragma mark - UITableViewDelegate Delegate Methods
 //------------------------------------------------------------------------------
@@ -327,7 +324,7 @@ forRowAtIndexPath:(NSIndexPath *)anIndexPath
 heightForRowAtIndexPath:(NSIndexPath *)anIndexPath
 {
 	LoggerMessageData *data = [self.messageFetchResultController objectAtIndexPath:anIndexPath];
-	return [data portraitHeight];
+	return [[data portraitHeight] floatValue];
 }
 
 - (CGFloat)tableView:(UITableView *)aTableView

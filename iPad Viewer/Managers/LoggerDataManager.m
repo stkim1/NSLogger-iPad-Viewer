@@ -532,21 +532,21 @@ didReceiveMessages:(NSArray *)theMessages
 					struct timeval tm = [aMessage timestamp];
 
 					//run count of the connection
-					[messageData setClientHash:		[theConnection clientHash]];
-					[messageData setRunCount:		[theConnection reconnectionCount]];
+					[messageData setClientHash:		[NSNumber numberWithUnsignedLong:[theConnection clientHash]]];
+					[messageData setRunCount:		[NSNumber numberWithInt:[theConnection reconnectionCount]]];
 					
-					[messageData setTimestamp:		convert_timeval(&tm)];
+					[messageData setTimestamp:		[NSNumber numberWithUnsignedLongLong:timetoint64(&tm)]];
 					[messageData setTag:			[aMessage tag]];
 					[messageData setFilename:		[aMessage filename]];
 					[messageData setFunctionName:	[aMessage functionName]];
 					
-					[messageData setSequence:		[aMessage sequence]];
+					[messageData setSequence:		[NSNumber numberWithUnsignedInteger:[aMessage sequence]]];
 					[messageData setThreadID:		[aMessage threadID]];
-					[messageData setLineNumber:		[aMessage lineNumber]];
+					[messageData setLineNumber:		[NSNumber numberWithInt:[aMessage lineNumber]]];
 					
-					[messageData setLevel:			[aMessage level]];
-					[messageData setType:			[aMessage type]];
-					[messageData setContentsType:	[aMessage contentsType]];
+					[messageData setLevel:			[NSNumber numberWithShort:[aMessage level]]];
+					[messageData setType:			[NSNumber numberWithShort:[aMessage type]]];
+					[messageData setContentsType:	[NSNumber numberWithShort:[aMessage contentsType]]];
 					
 					[messageData setImageSize:		NSStringFromCGSize([aMessage imageSize])];
 					
@@ -554,9 +554,9 @@ didReceiveMessages:(NSArray *)theMessages
 					[messageData setMessageType:	[aMessage messageType]];
 					[messageData setTextRepresentation:[aMessage textRepresentation]];
 					
-					[messageData setPortraitHeight:	[aMessage portraitHeight]];
-					[messageData setLandscapeHeight:[aMessage landscapeHeight]];
-					
+					[messageData setPortraitHeight: [NSNumber numberWithFloat:[aMessage portraitHeight]]];
+					[messageData setLandscapeHeight:[NSNumber numberWithFloat:[aMessage landscapeHeight]]];
+
 					dataSaveSize += [messageData rawDataSize];
 					
 				}

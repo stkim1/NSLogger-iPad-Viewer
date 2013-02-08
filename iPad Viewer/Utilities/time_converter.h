@@ -31,7 +31,7 @@
 #include <sys/time.h>
 
 static inline
-uint64_t convert_timeval(struct timeval *tm)
+uint64_t timetoint64(struct timeval *tm)
 {
 	uint64_t time = 0;
 	time = tm->tv_sec;
@@ -41,7 +41,7 @@ uint64_t convert_timeval(struct timeval *tm)
 }
 
 static inline
-struct timeval convert_time64(uint64_t tm)
+struct timeval int64totime(uint64_t tm)
 {
 	uint32_t tv_sec = (uint32_t)(tm >> 32);
 	uint32_t tv_usec = (uint32_t)tm;

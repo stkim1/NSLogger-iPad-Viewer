@@ -35,32 +35,35 @@
 #import <UIKit/UIKit.h>
 #import "LoggerMessageData.h"
 #import "LoggerConstView.h"
+#import "UIColorRGBA.h"
+#import "time_converter.h"
+#import "LoggerUtils.h"
 
 extern NSString * const kMessageCellReuseID;
+#define DEAFULT_BACKGROUND_GRAY_VALUE	0.97f
 
 @interface LoggerMessageCell : UITableViewCell
 {
 	UIView					*_messageView;		// a view which draws content of message
 	UITableView				*_hostTableView;	// a tableview hosting this cell
 	LoggerMessageData		*_messageData;		// *NOT RETAINED* : this comes from CoreData
-
-#ifdef TEST_CELL_INDEXPATH
-	NSIndexPath				*_indexPath;
-#endif
 }
 @property (nonatomic, assign) UITableView				*hostTableView;
 @property (nonatomic, readonly) LoggerMessageData		*messageData;
+
++ (UIColor *)colorForTag:(NSString *)tag;
 
 // initialize with predefined style and reuse identifier
 -(id)initWithPreConfig;
 
 // this method actually draws message content. subclasses should draw their own
--(void)drawMessageView:(CGRect)aRect;
+-(void)drawMessageView:(CGRect)cellFrame;
 -(void)setupForIndexpath:(NSIndexPath *)anIndexPath
 			 messageData:(LoggerMessageData *)aMessageData;
 
-#ifdef TEST_CELL_INDEXPATH
--(void)willDisplayForIndexPath:(NSIndexPath *)anIndexPath
-				   messageData:(LoggerMessageData *)aMessageData;
-#endif
+- (void)drawTimestampAndDeltaInRect:(CGRect)aDrawRect
+			   highlightedTextColor:(UIColor *)aHighlightedTextColor;
+
+- (void)drawMessageInRect:(CGRect)aDrawRect
+	 highlightedTextColor:(UIColor *)aHighlightedTextColor;
 @end

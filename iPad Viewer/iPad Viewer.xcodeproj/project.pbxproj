@@ -62,6 +62,7 @@
 		040AD41F16ACF5F60072DFAD /* LoggerMarkerCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerMarkerCell.m; sourceTree = "<group>"; };
 		040AD42016ACF5F60072DFAD /* LoggerMessageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerMessageCell.h; sourceTree = "<group>"; };
 		040AD42116ACF5F60072DFAD /* LoggerMessageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerMessageCell.m; sourceTree = "<group>"; };
+		0431653C16C5486300C078D8 /* UIColorRGBA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIColorRGBA.h; sourceTree = "<group>"; };
 		044FEF1716AC49810067FA53 /* iPad Viewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iPad Viewer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		044FEF1B16AC49810067FA53 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		044FEF1D16AC49810067FA53 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -171,6 +172,14 @@
 				040AD42116ACF5F60072DFAD /* LoggerMessageCell.m */,
 			);
 			path = "Views & Cells";
+			sourceTree = "<group>";
+		};
+		0431653B16C5486300C078D8 /* UIColor */ = {
+			isa = PBXGroup;
+			children = (
+				0431653C16C5486300C078D8 /* UIColorRGBA.h */,
+			);
+			path = UIColor;
 			sourceTree = "<group>";
 		};
 		044FEF0C16AC49810067FA53 = {
@@ -315,6 +324,7 @@
 		044FEF7916AC4A810067FA53 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				0431653B16C5486300C078D8 /* UIColor */,
 				044FEF7A16AC4A810067FA53 /* CoreData */,
 				044FEF7D16AC4A810067FA53 /* Directory */,
 				044FEF8016AC4A810067FA53 /* LoggerUtils.h */,

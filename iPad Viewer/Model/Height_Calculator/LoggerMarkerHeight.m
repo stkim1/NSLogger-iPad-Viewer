@@ -32,6 +32,10 @@
 #import "LoggerMarkerHeight.h"
 #import "LoggerMessage.h"
 
+extern UIFont	*measureDefaultFont;
+extern UIFont	*measureTagAndLevelFont;
+extern UIFont	*measureMonospacedFont;
+
 @implementation LoggerMarkerHeight
 + (CGFloat)heightForMessage:(LoggerMessage *)aMessage onWidth:(CGFloat)aWidth
 {
@@ -39,16 +43,15 @@
 		[LoggerMessageHeight
 		 minimumHeightForCellOnWidth:aWidth];
 	
-	UIFont *defaultSizedFont = \
-		[UIFont systemFontOfSize:DEFAULT_FONT_SIZE];
+	UIFont *monospacedFont   = measureMonospacedFont;
 	
 	CGSize sz = CGSizeMake(aWidth, minimumHeight);
 	
 	sz.width -= 8;
 	sz.height -= 4;
-	
+
 	CGSize lr = [aMessage.message
-				 sizeWithFont:defaultSizedFont
+				 sizeWithFont:monospacedFont
 				 forWidth:aWidth
 				 lineBreakMode:NSLineBreakByWordWrapping];
 	

@@ -34,18 +34,31 @@
 
 static CGFloat	_minimumHeightForCell = 0;
 static CGFloat	_defaultFileLineFunctionHeight = 0;
-static UIFont	*_measureDefaultFont = nil;
+
+UIFont	*measureDefaultFont = nil;
+UIFont	*measureTagAndLevelFont = nil;
+UIFont	*measureMonospacedFont = nil;
 
 @implementation LoggerMessageHeight
 
 + (void)initialize
 {
 	// load font resource and reuse it throughout app's lifecycle
-	// since the font will never go out on main thread for drawing,
+	// since these font will never go out on main thread for drawing,
 	// it is fine to do that
-	if(_measureDefaultFont == nil)
+	if(measureDefaultFont == nil)
 	{
-		_measureDefaultFont = [[UIFont fontWithName:kDefaultFontName size:DEFAULT_FONT_SIZE] retain];
+		measureDefaultFont = [[UIFont fontWithName:kDefaultFontName size:DEFAULT_FONT_SIZE] retain];
+	}
+
+	if(measureTagAndLevelFont == nil)
+	{
+		measureTagAndLevelFont = [[UIFont fontWithName:kTagAndLevelFontName size:DEFAULT_TAG_LEVEL_SIZE] retain];
+	}
+	
+	if(measureMonospacedFont == nil)
+	{
+		measureMonospacedFont = [[UIFont fontWithName:kMonospacedFontName size:DEFAULT_MONOSPACED_SIZE] retain];
 	}
 }
 
@@ -53,7 +66,8 @@ static UIFont	*_measureDefaultFont = nil;
 {
 	if(_minimumHeightForCell == 0)
 	{
-		UIFont *defaultSizedFont = _measureDefaultFont;
+		UIFont *defaultSizedFont = measureDefaultFont;
+		UIFont *tagAndLevelFont  = measureTagAndLevelFont;
 		
 		CGSize r1 = [@"10:10:10.256"
 					 sizeWithFont:defaultSizedFont
@@ -71,7 +85,7 @@ static UIFont	*_measureDefaultFont = nil;
 					 lineBreakMode:NSLineBreakByWordWrapping];
 		
 		CGSize r4 = [@"qWTy"
-					 sizeWithFont:defaultSizedFont
+					 sizeWithFont:tagAndLevelFont
 					 forWidth:aWidth
 					 lineBreakMode:NSLineBreakByWordWrapping];
 		
@@ -86,11 +100,10 @@ static UIFont	*_measureDefaultFont = nil;
 {
 	if (_defaultFileLineFunctionHeight == 0)
 	{
-		UIFont *defaultSizedFont = \
-			[UIFont systemFontOfSize:DEFAULT_FONT_SIZE];
+		UIFont *tagAndLevelFont  = measureTagAndLevelFont;
 
 		CGSize r = [@"file:100 funcQyTg"
-					sizeWithFont:defaultSizedFont
+					sizeWithFont:tagAndLevelFont
 					forWidth:aWidth
 					lineBreakMode:NSLineBreakByWordWrapping];
 
@@ -105,7 +118,7 @@ static UIFont	*_measureDefaultFont = nil;
 		[LoggerMessageHeight
 		 minimumHeightForCellOnWidth:aWidth];
 
-	UIFont *defaultSizedFont = _measureDefaultFont;
+	UIFont *monospacedFont   = measureMonospacedFont;
 	
 	CGSize sz = CGSizeMake(aWidth, minimumHeight);
 
@@ -121,7 +134,7 @@ static UIFont	*_measureDefaultFont = nil;
 				s = [s substringToIndex:2048];
 			
 			CGSize lr = [s
-						 sizeWithFont:defaultSizedFont
+						 sizeWithFont:monospacedFont
 						 forWidth:aWidth
 						 lineBreakMode:NSLineBreakByWordWrapping];
 			sz.height = fminf(lr.height, sz.height);
@@ -134,7 +147,7 @@ static UIFont	*_measureDefaultFont = nil;
 			if (nLines > MAX_DATA_LINES)
 				nLines = MAX_DATA_LINES + 1;
 			CGSize lr = [@"000:"
-						 sizeWithFont:defaultSizedFont
+						 sizeWithFont:monospacedFont
 						 forWidth:aWidth
 						 lineBreakMode:NSLineBreakByWordWrapping];
 			sz.height = lr.height * nLines;

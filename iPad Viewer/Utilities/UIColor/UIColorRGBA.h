@@ -1,19 +1,18 @@
 /*
- * LoggerClientHeight.h
  *
  * BSD license follows (http://www.opensource.org/licenses/bsd-license.php)
  *
- * Copyright (c) 2010-2011 Florent Pillet <fpillet@gmail.com> All Rights Reserved.
+ * Copyright (c) 2012-2013 Sung-Taek, Kim <stkim1@colorfulglue.com> All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
  * Redistributions of  source code  must retain  the above  copyright notice,
  * this list of  conditions and the following  disclaimer. Redistributions in
  * binary  form must  reproduce  the  above copyright  notice,  this list  of
  * conditions and the following disclaimer  in the documentation and/or other
- * materials  provided with  the distribution.  Neither the  name of  Florent
- * Pillet nor the names of its contributors may be used to endorse or promote
+ * materials  provided with  the distribution.  Neither the  name of  Sung-Ta
+ * ek kim nor the names of its contributors may be used to endorse or promote
  * products  derived  from  this  software  without  specific  prior  written
  * permission.  THIS  SOFTWARE  IS  PROVIDED BY  THE  COPYRIGHT  HOLDERS  AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
@@ -29,32 +28,7 @@
  *
  */
 
-#import "LoggerClientHeight.h"
-#import "LoggerMessage.h"
-
-extern UIFont	*measureDefaultFont;
-extern UIFont	*measureTagAndLevelFont;
-extern UIFont	*measureMonospacedFont;
-
-@implementation LoggerClientHeight
-+ (CGFloat)heightForMessage:(LoggerMessage *)aMessage onWidth:(CGFloat)aWidth
-{
-	CGFloat minimumHeight = \
-		[LoggerMessageHeight
-		 minimumHeightForCellOnWidth:aWidth];
-	
-	UIFont *monospacedFont   = measureMonospacedFont;
-	
-	CGSize sz = CGSizeMake(aWidth, minimumHeight);
-
-	sz.width -= 8;
-	sz.height -= 4;
-
-	CGSize lr = [aMessage.message
-				 sizeWithFont:monospacedFont
-				 forWidth:aWidth
-				 lineBreakMode:NSLineBreakByWordWrapping];
-				
-	return fminf(lr.height, sz.height);
-}
-@end
+#define RGBCOLOR(r,g,b) [UIColor colorWithRed:(r)/255.0 green:(g)/255.0 blue:(b)/255.0 alpha:1]
+#define RGBACOLOR(r,g,b,a) [UIColor colorWithRed:(r)/255.0 green:(g)/255.0 blue:(b)/255.0 alpha:(a)]
+#define HEXRGBACOLOR(rgba) [UIColor colorWithRed:((float)(((unsigned int)rgba & 0xFF000000) >> 24))/255.0 green:((float)(((unsigned int)rgba & 0xFF0000) >> 16))/255.0 blue:((float)(((unsigned int)rgba & 0xFF00) >> 8 ))/255.0 alpha:((float)((unsigned int)rgba & 0xFF))/255.0]
+#define GRAYCOLOR(graylevel) [UIColor colorWithRed:graylevel green:graylevel blue:graylevel alpha:1]
