@@ -51,8 +51,11 @@
 	[[LoggerTransportManager sharedTransportManager] startStopTransports];
 
 	//[(LoggerMessageViewController *)self.window.rootViewController
-	 //setDataManager:[LoggerDataManager sharedDataManager]];
+	//setDataManager:[LoggerDataManager sharedDataManager]];
 
+	// prevent screen to go sleep. Fine control over this property will be added later
+	application.idleTimerDisabled  = YES;
+	
 	[self.window makeKeyAndVisible];
     return YES;
 }
