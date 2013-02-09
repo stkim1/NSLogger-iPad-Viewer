@@ -13,4 +13,4 @@ DETAILED DOCUMENTS, EXAMPLES, AND DEMOS TO BE ADDED SOON(™)
 
 
 _VER. 0.1.4_<br/>
-_Updated : Feb. 8, 2013_
+_Updated : Feb. 9, 2013_

@@ -124,8 +124,37 @@
 	 selector:@selector(readMessages:)
 	 name:kShowClientConnectedNotification
 	 object:nil];
+	
+	[[NSNotificationCenter defaultCenter]
+	 addObserver:self
+	 selector:@selector(deleteMessages:)
+	 name:kShowClientDisconnectedNotification
+	 object:nil];
+	
+	
+	
 #endif
 }
+
+-(void)insertTableViewSection
+{
+	NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:0];
+	
+	[self.tableView
+	 insertSections:indexSet
+	 withRowAnimation:UITableViewRowAnimationAutomatic];
+}
+
+
+-(void)deleteTableViewSection
+{
+	NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:0];
+
+	[self.tableView
+	 deleteSections:indexSet
+	 withRowAnimation:UITableViewRowAnimationAutomatic];
+}
+
 
 -(void)readMessages:(NSNotification *)aNotification
 {
@@ -137,14 +166,13 @@
 	int32_t runCount = [[userInfo objectForKey:kClientRunCount] integerValue];
 	
 	assert([self.dataManager messageDisplayContext] != nil);
-	
-	
-	if([self messageFetchResultController] != nil)
+		
+	if(_messageFetchResultController != nil)
 	{
-		[[self messageFetchResultController] setDelegate:nil];
-		[self setMessageFetchResultController:nil];
+		self.messageFetchResultController.delegate = nil;
+		self.messageFetchResultController = nil;
+		[self deleteTableViewSection];
 	}
-	
 	
 	NSFetchRequest *request = [[NSFetchRequest alloc] init];
 
@@ -153,8 +181,8 @@
 	 entityForName:@"LoggerMessageData"
 	 inManagedObjectContext:
 	 [[self dataManager] messageDisplayContext]];
-	
-	[request setShouldRefreshRefetchedObjects:YES];
+#warning possible bug introduction. watchout
+	[request setShouldRefreshRefetchedObjects:NO];
 	[request setEntity:entity];
 	[request setFetchBatchSize:20];
 	//[request setFetchLimit:40];
@@ -190,8 +218,13 @@
 	 sectionNameKeyPath:nil//@"uniqueID"
 	 cacheName:cacheName];
 	
+
 	[frc setDelegate:self];
 	[self setMessageFetchResultController:frc];
+	
+	// alert tableview to prepare for incoming data
+	// before fetching started, make sure every setup is completed
+	[self insertTableViewSection];
 	
 	NSError *error = nil;
 	[frc performFetch:&error];
@@ -202,6 +235,11 @@
 	[entity release],entity = nil;
 	[request release],request = nil;
 }
+
+-(void)deleteMessages:(NSNotification *)aNotification
+{
+}
+
 
 -(void)viewDidAppear:(BOOL)animated
 {
@@ -224,10 +262,31 @@
 //------------------------------------------------------------------------------
 #pragma mark - UITableViewDataSource Delegate Methods
 //------------------------------------------------------------------------------
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+	NSInteger numberOfSections = 0;
+
+	if(_messageFetchResultController == nil)
+	{
+		return numberOfSections;
+	}
+	
+	//numberOfSections = [[self.messageFetchResultController sections] count];
+	numberOfSections = 1;
+
+	return numberOfSections;
+}
+
 - (NSInteger)tableView:(UITableView *)aTableView
  numberOfRowsInSection:(NSInteger)aSection
 {
     NSInteger numberOfRows = 0;
+
+	if(_messageFetchResultController == nil)
+	{
+		return numberOfRows;
+	}
+	
 	
     if ([[self.messageFetchResultController sections] count] > 0)
 	{
@@ -236,14 +295,18 @@
         numberOfRows = [sectionInfo numberOfObjects];
     }
 	
-	//MTLog(@"numberOfRowsInSection %d",numberOfRows);
-	
     return numberOfRows;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)aTableView
 		 cellForRowAtIndexPath:(NSIndexPath *)anIndexPath
 {
+	
+	if(_messageFetchResultController == nil)
+	{
+		return 0;
+	}
+	
 	LoggerMessageData *msg = \
 		[self.messageFetchResultController objectAtIndexPath:anIndexPath];
 
@@ -325,18 +388,6 @@ heightForRowAtIndexPath:(NSIndexPath *)anIndexPath
 {
 	LoggerMessageData *data = [self.messageFetchResultController objectAtIndexPath:anIndexPath];
 	return [[data portraitHeight] floatValue];
-}
-
-- (CGFloat)tableView:(UITableView *)aTableView
-heightForHeaderInSection:(NSInteger)aSection
-{
-	return 0.f;
-}
-
-- (CGFloat)tableView:(UITableView *)aTableView
-heightForFooterInSection:(NSInteger)aSection
-{
-	return 0.f;
 }
 
 //------------------------------------------------------------------------------
