@@ -91,7 +91,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 {
 	// unencrypted Bonjour service (for backwards compatibility)
 	LoggerNativeTransport *t;
-#if 0
 	t = [[LoggerNativeTransport alloc] init];
 	t.transManager = self;
 	t.prefManager = [self prefManager];
@@ -101,7 +100,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 	t.tag = 0;
 	[self.transports addObject:t];
 	[t release];
-#endif
+
 	// SSL Bonjour service
 	t = [[LoggerNativeTransport alloc] init];
 	t.transManager = self;
@@ -112,7 +111,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 	t.tag = 1;
 	[self.transports addObject:t];
 	[t release];
-#if 0
+
 	// Direct TCP/IP service (SSL mandatory)
 	t = [[LoggerNativeTransport alloc] init];
 	t.transManager = self;
@@ -123,7 +122,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 	t.tag = 2;
 	[self.transports addObject:t];
 	[t release];
-#endif
 }
 
 -(void)destoryTransports
@@ -156,33 +154,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 	}
 }
 
--(void)_startStopTransports
-{
-	NSLog(@"%@",NSStringFromSelector(_cmd));
-	// Start and stop transports as needed
-	for (LoggerTransport *transport in self.transports)
-	{
-		if ([transport isKindOfClass:[LoggerNativeTransport class]])
-		{
-			LoggerNativeTransport *t = (LoggerNativeTransport *)transport;
-			if (t.publishBonjourService)
-			{
-				if ([self.prefManager shouldPublishBonjourService])
-					[t restart];
-				else if (t.active)
-					[t shutdown];
-			}
-			else
-			{
-				if ([self.prefManager hasDirectTCPIPResponder])
-					[t restart];
-				else
-					[t shutdown];
-			}
-		}
-	}
-}
-
 // -----------------------------------------------------------------------------
 #pragma mark - AppDelegate Cycle Handle
 // -----------------------------------------------------------------------------
@@ -210,8 +181,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
 	[self performSelector:@selector(destoryTransports) withObject:nil afterDelay:0];	
 }
-
-
 
 
 // -----------------------------------------------------------------------------
