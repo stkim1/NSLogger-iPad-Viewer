@@ -37,13 +37,13 @@
 
 @interface LoggerNativeTransport : LoggerTransport <NSNetServiceDelegate, NSStreamDelegate>
 {
-	NSThread *listenerThread;
-	NSNetService *bonjourService;
-	CFSocketRef listenerSocket_ipv4;
-	CFSocketRef listenerSocket_ipv6;
-	NSString *bonjourServiceName;
-	int listenerPort;
-	BOOL publishBonjourService;
+	NSThread			*listenerThread;
+	NSNetService		*bonjourService;
+	CFSocketRef			listenerSocket_ipv4;
+	CFSocketRef			listenerSocket_ipv6;
+	NSString			*bonjourServiceName;
+	int					listenerPort;
+	BOOL				publishBonjourService;
 }
 
 @property (nonatomic, assign) int listenerPort;

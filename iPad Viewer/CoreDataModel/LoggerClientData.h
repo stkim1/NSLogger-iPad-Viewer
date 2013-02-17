@@ -43,8 +43,6 @@
 @property (nonatomic, retain) NSString * clientUDID;
 @property (nonatomic, retain) NSString * clientVersion;
 @property (nonatomic, retain) NSSet *connectionStatus;
-
--(unsigned long)rawDataSize;
 @end
 
 @interface LoggerClientData (CoreDataGeneratedAccessors)

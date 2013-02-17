@@ -68,9 +68,6 @@
 {
 	if ([connections containsObject:aConnection])
 	{
-		[aConnection shutdown];
-		[connections removeObject:aConnection];
-		
 		if(LoggerCheckDelegate(transManager
 							   ,@protocol(LoggerTransportDelegate)
 							   ,@selector(transport:removeConnection:)))
@@ -79,6 +76,8 @@
 			 transport:self
 			 removeConnection:aConnection];
 		}
+		[aConnection shutdown];
+		[connections removeObject:aConnection];
 	}
 }
 

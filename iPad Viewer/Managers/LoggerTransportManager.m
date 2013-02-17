@@ -38,8 +38,12 @@
 @interface LoggerTransportManager()
 @property (nonatomic, retain) LoggerCertManager *certManager;
 @property (nonatomic, retain) NSMutableArray	*transports;
--(void)_startStopTransports;
--(void)_presentNotification:(NSDictionary *)aNotiDict forKey:(NSString *)aKey;
+
+- (void)createTransports;
+- (void)destoryTransports;
+- (void)startTransports;
+- (void)stopTransports;
+- (void)presentNotification:(NSDictionary *)aNotiDict forKey:(NSString *)aKey;
 @end
 
 @implementation LoggerTransportManager
@@ -86,7 +90,9 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 -(void)createTransports
 {
 	// unencrypted Bonjour service (for backwards compatibility)
-	LoggerNativeTransport *t = [[LoggerNativeTransport alloc] init];
+	LoggerNativeTransport *t;
+#if 0
+	t = [[LoggerNativeTransport alloc] init];
 	t.transManager = self;
 	t.prefManager = [self prefManager];
 	t.certManager = self.certManager;
@@ -95,7 +101,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 	t.tag = 0;
 	[self.transports addObject:t];
 	[t release];
-	
+#endif
 	// SSL Bonjour service
 	t = [[LoggerNativeTransport alloc] init];
 	t.transManager = self;
@@ -106,7 +112,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 	t.tag = 1;
 	[self.transports addObject:t];
 	[t release];
-
+#if 0
 	// Direct TCP/IP service (SSL mandatory)
 	t = [[LoggerNativeTransport alloc] init];
 	t.transManager = self;
@@ -117,11 +123,37 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 	t.tag = 2;
 	[self.transports addObject:t];
 	[t release];
+#endif
 }
 
 -(void)destoryTransports
 {
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);	
+}
+
+-(void)startTransports
+{
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
 	
+	// Start and stop transports as needed
+	for (LoggerNativeTransport *transport in self.transports)
+	{
+		if(!transport.active)
+		{
+			[transport restart];
+		}
+	}
+}
+
+-(void)stopTransports
+{
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
+	
+	// Start and stop transports as needed
+	for (LoggerNativeTransport *transport in self.transports)
+	{
+		[transport shutdown];
+	}
 }
 
 -(void)_startStopTransports
@@ -151,17 +183,41 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 	}
 }
 
--(void)startStopTransports
+// -----------------------------------------------------------------------------
+#pragma mark - AppDelegate Cycle Handle
+// -----------------------------------------------------------------------------
+
+-(void)appStarted
 {
-	NSLog(@"%@",NSStringFromSelector(_cmd));
-	// start transports
-	[self performSelector:@selector(_startStopTransports) withObject:nil afterDelay:0];
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
+	[self performSelector:@selector(createTransports) withObject:nil afterDelay:0];
 }
+
+-(void)appBecomeActive
+{
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
+	[self performSelector:@selector(startTransports) withObject:nil afterDelay:0];
+}
+
+-(void)appResignActive
+{
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
+	[self performSelector:@selector(stopTransports) withObject:nil afterDelay:0];
+}
+
+-(void)appWillTerminate
+{
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
+	[self performSelector:@selector(destoryTransports) withObject:nil afterDelay:0];	
+}
+
+
+
 
 // -----------------------------------------------------------------------------
 #pragma mark - Handling Report from Transport
 // -----------------------------------------------------------------------------
--(void)_presentNotification:(NSDictionary *)aNotiDict forKey:(NSString *)aKey
+-(void)presentNotification:(NSDictionary *)aNotiDict forKey:(NSString *)aKey
 {
 	if([NSThread isMainThread])
 	{
@@ -183,15 +239,13 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 
 - (void)presentTransportStatus:(NSDictionary *)aStatusDict
 {
-	[self
-	 _presentNotification:aStatusDict
+	[self presentNotification:aStatusDict
 	 forKey:kShowTransportStatusNotification];
 }
 
 - (void)presentTransportError:(NSDictionary *)anErrorDict
 {
-	[self
-	 _presentNotification:anErrorDict
+	[self presentNotification:anErrorDict
 	 forKey:kShowTransportErrorNotification];
 }
 
@@ -205,9 +259,8 @@ didEstablishConnection:(LoggerConnection *)theConnection
 	MTLog(@"setup new connection [%@]",theConnection);
 
 	// report transport status first
-	[self
-	 presentTransportStatus:[theTransport status]];
-	
+	[self presentTransportStatus:[theTransport status]];
+
 	[_dataManager
 	 transport:theTransport
 	 didEstablishConnection:theConnection];
@@ -230,8 +283,7 @@ didReceiveMessages:(NSArray *)theMessages
 didDisconnectRemote:(LoggerConnection *)theConnection
 {
 	// report transport status first
-	[self
-	 presentTransportStatus:[theTransport status]];
+	[self presentTransportStatus:[theTransport status]];
 	
 	[_dataManager transport:theTransport didDisconnectRemote:theConnection];
 }

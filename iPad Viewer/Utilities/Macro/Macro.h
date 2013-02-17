@@ -28,26 +28,30 @@
  *
  */
 
-/*
-// This macro defines
-	1) log printout,
-	2) Assertion, 3)dealloc check,
-	3) delloac helper.
-	4) delegate check
-*/
-
 #ifdef DEBUG
-	#define MTLog(args...)			\
-		NSLog(@"%@",[NSString stringWithFormat:args])
+	#define MTLogVerify(args...) NSLog(@"%@",[NSString stringWithFormat:args])
+	#define MTLogInfo(args...)   NSLog(@"%@",[NSString stringWithFormat:args])
+	#define MTLogDebug(args...)  NSLog(@"%@",[NSString stringWithFormat:args])
+	#define MTLogError(args...)  NSLog(@"%@",[NSString stringWithFormat:args])
+	#define MTLogAssert(args...) NSLog(@"%@",[NSString stringWithFormat:args])
+
+	#define MTLog(args...)       NSLog(@"%@",[NSString stringWithFormat:args])
+
 	#define MTAssert(cond,desc...)	\
 		NSAssert(cond, @"%@", [NSString stringWithFormat: desc])
+
 	#define MTDealloc(__POINTER) \
 		do{ MTLog(@"%@ dealloc",self); [super dealloc]; } while(0)
 #else
+
+	#define MTLogVerify(args...)
+	#define MTLogInfo(args...)
+	#define MTLogDebug(args...)
+	#define MTLogError(args...)
+	#define MTLogAssert(args...)
 	#define MTLog(args...)
-	#define MTAssert(cond,desc...)
-	#define MTDealloc(__POINTER) \
-		do { [super dealloc]; } while(0)
+	#define MTAssert(cond,desc...)	assert(cond)
+	#define MTDealloc(__POINTER)	do { [super dealloc]; } while(0)
 #endif
 
 #define LoggerCheckDelegate(__POINTER,__PROTOCOL,__SELECTOR) \

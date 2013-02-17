@@ -28,22 +28,19 @@
  *
  */
 
-
 #import <Foundation/Foundation.h>
-#import "LoggerPreferenceManager.h"
-#import "LoggerTransport.h"
-#import "LoggerConnection.h"
-#import "LoggerDataManager.h"
-#import "AppDelegateCycleHandle.h"
 
-@interface LoggerTransportManager : NSObject <LoggerTransportDelegate,AppDelegateCycleHandle>
-@property (nonatomic, retain) LoggerPreferenceManager		*prefManager;
-@property (nonatomic, assign) LoggerDataManager				*dataManager;
-+ (LoggerTransportManager *)sharedTransportManager;
+@protocol AppDelegateCycleHandle <NSObject>
 
+// when app did start
+-(void)appStarted;
 
-// presnet status of a transport to view layer
-- (void)presentTransportStatus:(NSDictionary *)aStatusDict;
-- (void)presentTransportError:(NSDictionary *)anErrorDict;
+// app resigned from activity (power button, home button clicked)
+-(void)appResignActive;
 
+// app becomes active again
+-(void)appBecomeActive;
+
+// app will terminate
+-(void)appWillTerminate;
 @end

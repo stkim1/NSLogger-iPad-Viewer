@@ -130,6 +130,7 @@
 		044FEFBE16AC4BC30067FA53 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		044FEFC016AC4BCF0067FA53 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		044FEFC216AC4BD90067FA53 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		047BF70016D0E43900866DFB /* AppDelegateCycleHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegateCycleHandle.h; sourceTree = "<group>"; };
 		04D13F4B16B56AF4004FDB3A /* LoggerNativeConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerNativeConnection.h; sourceTree = "<group>"; };
 		04D13F4C16B56AF4004FDB3A /* LoggerNativeConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerNativeConnection.m; sourceTree = "<group>"; };
 		04D13F4D16B56AF4004FDB3A /* LoggerNativeMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerNativeMessage.h; sourceTree = "<group>"; };
@@ -324,17 +325,18 @@
 		044FEF7916AC4A810067FA53 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				0431653B16C5486300C078D8 /* UIColor */,
-				044FEF7A16AC4A810067FA53 /* CoreData */,
-				044FEF7D16AC4A810067FA53 /* Directory */,
+				047BF70016D0E43900866DFB /* AppDelegateCycleHandle.h */,
 				044FEF8016AC4A810067FA53 /* LoggerUtils.h */,
 				044FEF8116AC4A810067FA53 /* LoggerUtils.m */,
-				044FEF8216AC4A810067FA53 /* Macro */,
-				044FEF8416AC4A810067FA53 /* String */,
 				044FEF8616AC4A810067FA53 /* SynthesizeSingleton.h */,
 				044FEF8716AC4A810067FA53 /* time_converter.h */,
 				044FEF8816AC4A810067FA53 /* ValueTransformers.h */,
 				044FEF8916AC4A810067FA53 /* ValueTransformers.m */,
+				044FEF7A16AC4A810067FA53 /* CoreData */,
+				044FEF7D16AC4A810067FA53 /* Directory */,
+				044FEF8216AC4A810067FA53 /* Macro */,
+				044FEF8416AC4A810067FA53 /* String */,
+				0431653B16C5486300C078D8 /* UIColor */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";

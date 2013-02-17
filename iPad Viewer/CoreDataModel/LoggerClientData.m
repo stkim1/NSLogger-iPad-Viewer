@@ -31,7 +31,6 @@
 #import "LoggerClientData.h"
 #import "LoggerConnectionStatusData.h"
 
-
 @implementation LoggerClientData
 
 @dynamic clientDevice;
@@ -42,21 +41,4 @@
 @dynamic clientUDID;
 @dynamic clientVersion;
 @dynamic connectionStatus;
-
--(unsigned long)rawDataSize
-{
-	unsigned long size = 0;
-
-	size += [[self clientDevice] length];
-	size += 4;//clienthash
-	size += [[self clientName] length];
-	size += [[self clientOSName] length];
-	size += [[self clientOSVersion] length];
-	size += [[self clientUDID] length];
-	size += [[self clientVersion] length];
-	
-	return size;
-
-}
-
 @end

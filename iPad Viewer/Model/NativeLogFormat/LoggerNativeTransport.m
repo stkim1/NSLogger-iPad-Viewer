@@ -52,6 +52,15 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 	[super dealloc];
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - Info Strings
+//------------------------------------------------------------------------------
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<%@ %p listenerPort=%d publishBonjourService=%d secure=%d>",
+			[self class], self, listenerPort, (int)publishBonjourService, (int)secure];
+}
+
 - (NSString *)transportInfoString
 {
 	if (publishBonjourService)
@@ -100,9 +109,256 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 	return NSLocalizedString(@"Unavailable", @"Transport status: service unavailable");
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - Property Controls
+//------------------------------------------------------------------------------
+- (BOOL)canDoSSL
+{
+	/*
+	 stkim1_dec.11,2012
+	 by the time transport object reaches this point server cert must be loaded
+	 and ready. If an error ever occured, it should have been reported.
+	 All we want atm is to know whether it's ok to go with SSL
+	 */
+	NSError *loadingError = nil;
+	return [self.certManager loadEncryptionCertificate:&loadingError];
+}
+
+- (BOOL)setup
+{
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
+	@try
+	{
+		CFSocketContext context = {0, self, NULL, NULL, NULL};
+		
+		// create sockets
+		listenerSocket_ipv4 = CFSocketCreate(kCFAllocatorDefault,
+											 PF_INET,
+											 SOCK_STREAM,
+											 IPPROTO_TCP,
+											 kCFSocketAcceptCallBack,
+											 &AcceptSocketCallback,
+											 &context);
+		
+		listenerSocket_ipv6 = CFSocketCreate(kCFAllocatorDefault,
+											 PF_INET6,
+											 SOCK_STREAM,
+											 IPPROTO_TCP,
+											 kCFSocketAcceptCallBack,
+											 &AcceptSocketCallback,
+											 &context);
+		
+		if (listenerSocket_ipv4 == NULL || listenerSocket_ipv6 == NULL)
+		{
+			@throw [NSException exceptionWithName:@"CFSocketCreate"
+										   reason:NSLocalizedString(@"Failed creating listener socket (CFSocketCreate failed)", @"")
+										 userInfo:nil];
+		}
+		
+		// set socket options & addresses
+		int yes = 1;
+		setsockopt(CFSocketGetNative(listenerSocket_ipv4), SOL_SOCKET, SO_REUSEADDR, (void *)&yes, sizeof(yes));
+		setsockopt(CFSocketGetNative(listenerSocket_ipv6), SOL_SOCKET, SO_REUSEADDR, (void *)&yes, sizeof(yes));
+		
+		// set up the IPv4 endpoint; if port is 0, this will cause the kernel to choose a port for us
+		struct sockaddr_in addr4;
+		memset(&addr4, 0, sizeof(addr4));
+		addr4.sin_len = sizeof(addr4);
+		addr4.sin_family = AF_INET;
+		addr4.sin_port = htons(listenerPort);
+		addr4.sin_addr.s_addr = htonl(INADDR_ANY);
+		NSData *address4 = [NSData dataWithBytes:&addr4 length:sizeof(addr4)];
+		
+	    if (CFSocketSetAddress(listenerSocket_ipv4, (CFDataRef)address4) != kCFSocketSuccess)
+		{
+			@throw [NSException
+					exceptionWithName:@"CFSocketSetAddress"
+					reason:NSLocalizedString(@"Failed setting IPv4 socket address", @"")
+					userInfo:nil];
+		}
+		
+		if (listenerPort == 0)
+		{
+			// now that the binding was successful, we get the port number
+			// -- we will need it for the v6 endpoint and for NSNetService
+			NSData *addr = [(NSData *)CFSocketCopyAddress(listenerSocket_ipv4) autorelease];
+			memcpy(&addr4, [addr bytes], [addr length]);
+			listenerPort = ntohs(addr4.sin_port);
+		}
+		
+	    // set up the IPv6 endpoint
+		struct sockaddr_in6 addr6;
+		memset(&addr6, 0, sizeof(addr6));
+		addr6.sin6_len = sizeof(addr6);
+		addr6.sin6_family = AF_INET6;
+		addr6.sin6_port = htons(listenerPort);
+		memcpy(&(addr6.sin6_addr), &in6addr_any, sizeof(addr6.sin6_addr));
+		NSData *address6 = [NSData dataWithBytes:&addr6 length:sizeof(addr6)];
+		
+		if (CFSocketSetAddress(listenerSocket_ipv6, (CFDataRef)address6) != kCFSocketSuccess)
+		{
+			@throw [NSException
+					exceptionWithName:@"CFSocketSetAddress"
+					reason:NSLocalizedString(@"Failed setting IPv6 socket address", @"")
+					userInfo:nil];
+		}
+		
+		// set up the run loop sources for the sockets
+		CFRunLoopRef rl = CFRunLoopGetCurrent();
+		CFRunLoopSourceRef source4 = CFSocketCreateRunLoopSource(kCFAllocatorDefault, listenerSocket_ipv4, 0);
+		CFRunLoopAddSource(rl, source4, kCFRunLoopCommonModes);
+		CFRelease(source4);
+		
+		CFRunLoopSourceRef source6 = CFSocketCreateRunLoopSource(kCFAllocatorDefault, listenerSocket_ipv6, 0);
+		CFRunLoopAddSource(rl, source6, kCFRunLoopCommonModes);
+		CFRelease(source6);
+		
+		// register Bonjour service
+		if (publishBonjourService)
+		{
+			// The service type is nslogger-ssl (now the default), or nslogger for backwards
+			// compatibility with pre-1.0.
+			NSString *serviceType = (NSString *)(secure ? LOGGER_SERVICE_TYPE_SSL : LOGGER_SERVICE_TYPE);
+			
+			// The service name is either the one defined in the prefs, of by default
+			// the local computer name (as defined in the sharing prefs panel
+			// (see Technical Q&A QA1228 http://developer.apple.com/library/mac/#qa/qa2001/qa1228.html )
+			NSString *serviceName = [self.prefManager bonjourServiceName];
+			if (serviceName == nil || ![serviceName isKindOfClass:[NSString class]])
+				serviceName = @"";
+			
+			[bonjourServiceName release];
+			bonjourServiceName = [serviceName retain];
+			
+			bonjourService =
+			[[NSNetService alloc]
+			 initWithDomain:@""
+			 type:(NSString *)serviceType
+			 name:(NSString *)serviceName
+			 port:listenerPort];
+			[bonjourService setDelegate:self];
+			[bonjourService publish];
+		}
+		else
+		{
+			ready = YES;
+		}
+		
+	}
+	@catch (NSException * e)
+	{
+		failed = YES;
+		if (publishBonjourService)
+			self.failureReason = NSLocalizedString(@"Failed creating sockets for Bonjour%s service.", @"");
+		else
+			self.failureReason = [NSString stringWithFormat:NSLocalizedString(@"Failed listening on port %d (port busy?)",@""), listenerPort];
+		
+		
+		NSDictionary *status = [self status];
+		
+		NSMutableDictionary *errorStatus = \
+		[NSMutableDictionary dictionaryWithDictionary:status];
+		
+		[errorStatus
+		 setObject:
+		 [NSError
+		  errorWithDomain:@"NSLogger"
+		  code:0
+		  userInfo:
+		  @{NSLocalizedDescriptionKey:[e name],
+		  NSLocalizedFailureReasonErrorKey:[e reason]}]
+		 forKey:kTransportError];
+		
+		[self reportErrorToManager:errorStatus];
+		
+		if (listenerSocket_ipv4 != NULL)
+		{
+			CFRelease(listenerSocket_ipv4);
+			listenerSocket_ipv4 = NULL;
+		}
+		if (listenerSocket_ipv6 != NULL)
+		{
+			CFRelease(listenerSocket_ipv6);
+			listenerSocket_ipv6 = NULL;
+		}
+		return NO;
+	}
+	@finally
+	{
+		[self reportStatusToManager:[self status]];
+	}
+	return YES;
+}
+
+- (void)listenerThread
+{
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
+	
+	listenerThread = [NSThread currentThread];
+	[[listenerThread threadDictionary] setObject:[NSRunLoop currentRunLoop] forKey:@"runLoop"];
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+#ifdef DEBUG
+	NSString *description = [self description];
+	MTLog(@"Entering listenerThread for transport %@", description);
+#endif
+	@try
+	{
+		if ([self setup])
+		{
+			MTLog(@"commencing listener thread...");
+			while (![listenerThread isCancelled])
+			{
+				/*
+				 NSDate *next = [[NSDate alloc] initWithTimeIntervalSinceNow:0.10];
+				 [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:next];
+				 [next release];
+				 */
+				//stkim1 Feb.02,2013
+				//Double autorelease pool is in place to reduce memory pool size
+				// as well as performance hit
+				@autoreleasepool {
+					[[NSRunLoop currentRunLoop] run];
+				}
+			}
+		}
+	}
+	@catch (NSException * e)
+	{
+#ifdef DEBUG
+		MTLogAssert(@"listenerThread catched exception %@", e);
+#endif
+	}
+	@finally
+	{
+#ifdef DEBUG
+		MTLogInfo(@"Exiting listenerThread for transport %@", description);
+#endif
+		[pool release];
+		listenerThread = nil;
+		active = NO;
+	}
+}
+
+- (void)removeConnection:(LoggerConnection *)aConnection
+{
+	if (listenerThread != nil && [NSThread currentThread] != listenerThread)
+	{
+		[self
+		 performSelector:_cmd
+		 onThread:listenerThread
+		 withObject:aConnection
+		 waitUntilDone:NO];
+		return;
+	}
+	[super removeConnection:aConnection];
+}
+
+//------------------------------------------------------------------------------
+#pragma mark - Activity Controls
+//------------------------------------------------------------------------------
 - (void)restart
 {
-	MTLog(@"%@",NSStringFromSelector(_cmd));
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
 
 	if (active)
 	{
@@ -143,23 +399,9 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 	}
 }
 
-- (void)completeRestart
-{
-	MTLog(@"%@",NSStringFromSelector(_cmd));
-	if (active)
-	{
-		// wait for the service to be completely shut down, then restart it
-		[self performSelector:_cmd withObject:nil afterDelay:0.1];
-		return;
-	}
-	if (!publishBonjourService)
-		listenerPort = [self.prefManager directTCPIPResponderPort];
-	[self startup];
-}
-
 - (void)startup
 {
-	MTLog(@"%@",NSStringFromSelector(_cmd));
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
 	if (!active)
 	{
 		active = YES;
@@ -173,7 +415,7 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 		 object:nil];
 		
 		[self reportStatusToManager:[self status]];
-
+		
 		[NSThread
 		 detachNewThreadSelector:@selector(listenerThread)
 		 toTarget:self
@@ -181,9 +423,27 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 	}
 }
 
+- (void)completeRestart
+{
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
+	if (active)
+	{
+		// wait for the service to be completely shut down, then restart it
+		[self performSelector:_cmd withObject:nil afterDelay:0.1];
+		return;
+	}
+	
+	if (!publishBonjourService)
+	{
+		listenerPort = [self.prefManager directTCPIPResponderPort];
+	}
+
+	[self startup];
+}
+
 - (void)shutdown
 {
-	MTLog(@"%@",NSStringFromSelector(_cmd));
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
 	if (!active)
 		return;
 
@@ -233,239 +493,37 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 	[self reportStatusToManager:[self status]];
 }
 
-- (void)removeConnection:(LoggerConnection *)aConnection
+//------------------------------------------------------------------------------
+#pragma mark - Network Delegate/Callback
+//------------------------------------------------------------------------------
+- (BOOL)setupSSLForStream:(NSInputStream *)readStream
 {
-	if (listenerThread != nil && [NSThread currentThread] != listenerThread)
+	CFArrayRef serverCerts = [[self certManager] serverCerts];
+#ifdef DEBUG
+	MTLog(@"setupSSLForStream, stream=%@ self=%@ serverCerts=%@", readStream, self, serverCerts);
+#endif
+	if (serverCerts != NULL)
 	{
-		[self
-		 performSelector:_cmd
-		 onThread:listenerThread
-		 withObject:aConnection
-		 waitUntilDone:NO];
-		return;
+		// setup stream for SSL
+		const void *SSLKeys[] = {
+			kCFStreamSSLLevel,
+			kCFStreamSSLValidatesCertificateChain,
+			kCFStreamSSLIsServer,
+			kCFStreamSSLCertificates
+		};
+		const void *SSLValues[] = {
+			kCFStreamSocketSecurityLevelNegotiatedSSL,
+			kCFBooleanFalse,			// no certificate chain validation (we use a self-signed certificate)
+			kCFBooleanTrue,				// we are server
+			serverCerts,
+		};
+		CFDictionaryRef SSLDict = CFDictionaryCreate(NULL, SSLKeys, SSLValues, 4, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+		CFReadStreamSetProperty((CFReadStreamRef)readStream, kCFStreamPropertySSLSettings, SSLDict);
+		CFRelease(SSLDict);
+		return YES;
 	}
-	[super removeConnection:aConnection];
-}
-
-- (BOOL)setup
-{
-	MTLog(@"%@",NSStringFromSelector(_cmd));
-	@try
-	{
-		CFSocketContext context = {0, self, NULL, NULL, NULL};
-		
-		// create sockets
-		listenerSocket_ipv4 = CFSocketCreate(kCFAllocatorDefault,
-											 PF_INET,
-											 SOCK_STREAM, 
-											 IPPROTO_TCP,
-											 kCFSocketAcceptCallBack,
-											 &AcceptSocketCallback,
-											 &context);
-		
-		listenerSocket_ipv6 = CFSocketCreate(kCFAllocatorDefault,
-											 PF_INET6,
-											 SOCK_STREAM, 
-											 IPPROTO_TCP,
-											 kCFSocketAcceptCallBack,
-											 &AcceptSocketCallback,
-											 &context);
-		
-		if (listenerSocket_ipv4 == NULL || listenerSocket_ipv6 == NULL)
-		{
-			@throw [NSException exceptionWithName:@"CFSocketCreate"
-										   reason:NSLocalizedString(@"Failed creating listener socket (CFSocketCreate failed)", @"")
-										 userInfo:nil];
-		}
-		
-		// set socket options & addresses
-		int yes = 1;
-		setsockopt(CFSocketGetNative(listenerSocket_ipv4), SOL_SOCKET, SO_REUSEADDR, (void *)&yes, sizeof(yes));
-		setsockopt(CFSocketGetNative(listenerSocket_ipv6), SOL_SOCKET, SO_REUSEADDR, (void *)&yes, sizeof(yes));
-		
-		// set up the IPv4 endpoint; if port is 0, this will cause the kernel to choose a port for us
-		struct sockaddr_in addr4;
-		memset(&addr4, 0, sizeof(addr4));
-		addr4.sin_len = sizeof(addr4);
-		addr4.sin_family = AF_INET;
-		addr4.sin_port = htons(listenerPort);
-		addr4.sin_addr.s_addr = htonl(INADDR_ANY);
-		NSData *address4 = [NSData dataWithBytes:&addr4 length:sizeof(addr4)];
-		
-	    if (CFSocketSetAddress(listenerSocket_ipv4, (CFDataRef)address4) != kCFSocketSuccess)
-		{
-			@throw [NSException
-					exceptionWithName:@"CFSocketSetAddress"
-					reason:NSLocalizedString(@"Failed setting IPv4 socket address", @"")
-					userInfo:nil];
-		}
-		
-		if (listenerPort == 0)
-		{
-			// now that the binding was successful, we get the port number 
-			// -- we will need it for the v6 endpoint and for NSNetService
-			NSData *addr = [(NSData *)CFSocketCopyAddress(listenerSocket_ipv4) autorelease];
-			memcpy(&addr4, [addr bytes], [addr length]);
-			listenerPort = ntohs(addr4.sin_port);
-		}
-		
-	    // set up the IPv6 endpoint
-		struct sockaddr_in6 addr6;
-		memset(&addr6, 0, sizeof(addr6));
-		addr6.sin6_len = sizeof(addr6);
-		addr6.sin6_family = AF_INET6;
-		addr6.sin6_port = htons(listenerPort);
-		memcpy(&(addr6.sin6_addr), &in6addr_any, sizeof(addr6.sin6_addr));
-		NSData *address6 = [NSData dataWithBytes:&addr6 length:sizeof(addr6)];
-		
-		if (CFSocketSetAddress(listenerSocket_ipv6, (CFDataRef)address6) != kCFSocketSuccess)
-		{
-			@throw [NSException
-					exceptionWithName:@"CFSocketSetAddress"
-					reason:NSLocalizedString(@"Failed setting IPv6 socket address", @"")
-					userInfo:nil];
-		}
-		
-		// set up the run loop sources for the sockets
-		CFRunLoopRef rl = CFRunLoopGetCurrent();
-		CFRunLoopSourceRef source4 = CFSocketCreateRunLoopSource(kCFAllocatorDefault, listenerSocket_ipv4, 0);
-		CFRunLoopAddSource(rl, source4, kCFRunLoopCommonModes);
-		CFRelease(source4);
-		
-		CFRunLoopSourceRef source6 = CFSocketCreateRunLoopSource(kCFAllocatorDefault, listenerSocket_ipv6, 0);
-		CFRunLoopAddSource(rl, source6, kCFRunLoopCommonModes);
-		CFRelease(source6);
-
-		// register Bonjour service
-		if (publishBonjourService)
-		{
-			// The service type is nslogger-ssl (now the default), or nslogger for backwards
-			// compatibility with pre-1.0.
-			NSString *serviceType = (NSString *)(secure ? LOGGER_SERVICE_TYPE_SSL : LOGGER_SERVICE_TYPE);
-
-			// The service name is either the one defined in the prefs, of by default
-			// the local computer name (as defined in the sharing prefs panel
-			// (see Technical Q&A QA1228 http://developer.apple.com/library/mac/#qa/qa2001/qa1228.html )
-			NSString *serviceName = [self.prefManager bonjourServiceName];
-			if (serviceName == nil || ![serviceName isKindOfClass:[NSString class]])
-				serviceName = @"";
-
-			[bonjourServiceName release];
-			bonjourServiceName = [serviceName retain];
-
-			bonjourService =
-				[[NSNetService alloc]
-				 initWithDomain:@""
-				 type:(NSString *)serviceType
-				 name:(NSString *)serviceName
-				 port:listenerPort];
-			[bonjourService setDelegate:self];
-			[bonjourService publish];
-		}
-		else
-		{
-			ready = YES;
-		}
-
-	}
-	@catch (NSException * e)
-	{
-		failed = YES;
-		if (publishBonjourService)
-			self.failureReason = NSLocalizedString(@"Failed creating sockets for Bonjour%s service.", @"");
-		else
-			self.failureReason = [NSString stringWithFormat:NSLocalizedString(@"Failed listening on port %d (port busy?)",@""), listenerPort];
-		
-		
-		NSDictionary *status = [self status];
-		
-		NSMutableDictionary *errorStatus = \
-			[NSMutableDictionary dictionaryWithDictionary:status];
-		
-		[errorStatus
-		 setObject:
-			[NSError
-			 errorWithDomain:@"NSLogger"
-			 code:0
-			 userInfo:
-				@{NSLocalizedDescriptionKey:[e name],
-				NSLocalizedFailureReasonErrorKey:[e reason]}]
-		 forKey:kTransportError];
-		
-		[self reportErrorToManager:errorStatus];
-
-		if (listenerSocket_ipv4 != NULL)
-		{
-			CFRelease(listenerSocket_ipv4);
-			listenerSocket_ipv4 = NULL;
-		}
-		if (listenerSocket_ipv6 != NULL)
-		{
-			CFRelease(listenerSocket_ipv6);
-			listenerSocket_ipv6 = NULL;
-		}
-		return NO;
-	}
-	@finally
-	{
-		[self reportStatusToManager:[self status]];
-	}
-	return YES;
-}
-
-- (void)listenerThread
-{
-	MTLog(@"%@",NSStringFromSelector(_cmd));
 	
-	listenerThread = [NSThread currentThread];
-	[[listenerThread threadDictionary] setObject:[NSRunLoop currentRunLoop] forKey:@"runLoop"];
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-#ifdef DEBUG
-	NSString *description = [self description];
-	MTLog(@"Entering listenerThread for transport %@", description);
-#endif
-	@try
-	{
-		if ([self setup])
-		{
-			MTLog(@"commencing listener thread...");
-			while (![listenerThread isCancelled])
-			{
-/*
-				NSDate *next = [[NSDate alloc] initWithTimeIntervalSinceNow:0.10];
-				[[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:next];
-				[next release];
- */
-				//stkim1 Feb.02,2013
-				//Double autorelease pool is in place to reduce memory pool size
-				// as well as performance hit
-				@autoreleasepool {
-					[[NSRunLoop currentRunLoop] run];
-				}
-			}
-		}
-	}
-	@catch (NSException * e)
-	{
-#ifdef DEBUG
-		MTLog(@"listenerThread catched exception %@", e);
-#endif
-	}
-	@finally
-	{
-#ifdef DEBUG
-		MTLog(@"Exiting listenerThread for transport %@", description);
-#endif
-		[pool release];
-		listenerThread = nil;
-		active = NO;
-	}
-}
-
-- (NSString *)description
-{
-	return [NSString stringWithFormat:@"<%@ %p listenerPort=%d publishBonjourService=%d secure=%d>", 
-			[self class], self, listenerPort, (int)publishBonjourService, (int)secure];
+	return NO;
 }
 
 #ifdef DEBUG
@@ -549,48 +607,6 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 	if (clientAppInfo == nil)
 		header = NSLocalizedString(@"Client connected\n", @"");
 	return [NSString stringWithFormat:@"%@%@%@%@%@", header, clientAppInfo, osInfo, hardwareInfo, uniqueIDString];
-}
-
-- (BOOL)canDoSSL
-{
-	/*
-	 stkim1_dec.11,2012
-	 by the time transport object reaches this point server cert must be loaded
-	 and ready. If an error ever occured, it should have been reported.
-	 All we want atm is to know whether it's ok to go with SSL
-	 */
-	NSError *loadingError = nil;
-	return [self.certManager loadEncryptionCertificate:&loadingError];
-}
-
-- (BOOL)setupSSLForStream:(NSInputStream *)readStream
-{
-	CFArrayRef serverCerts = [[self certManager] serverCerts];
-#ifdef DEBUG
-	MTLog(@"setupSSLForStream, stream=%@ self=%@ serverCerts=%@", readStream, self, serverCerts);
-#endif
-	if (serverCerts != NULL)
-	{
-		// setup stream for SSL
-		const void *SSLKeys[] = {
-			kCFStreamSSLLevel,
-			kCFStreamSSLValidatesCertificateChain,
-			kCFStreamSSLIsServer,
-			kCFStreamSSLCertificates
-		};
-		const void *SSLValues[] = {
-			kCFStreamSocketSecurityLevelNegotiatedSSL,
-			kCFBooleanFalse,			// no certificate chain validation (we use a self-signed certificate)
-			kCFBooleanTrue,				// we are server
-			serverCerts,
-		};
-		CFDictionaryRef SSLDict = CFDictionaryCreate(NULL, SSLKeys, SSLValues, 4, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-		CFReadStreamSetProperty((CFReadStreamRef)readStream, kCFStreamPropertySSLSettings, SSLDict);
-		CFRelease(SSLDict);
-		return YES;
-	}
-
-	return NO;
 }
 
 // -----------------------------------------------------------------------------
@@ -742,7 +758,7 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 	}
 	@catch (NSException * e)
 	{
-		MTLog(@"error happens : %@",[e reason]);
+		MTLogAssert(@"error happens : %@",[e reason]);
 	}
 	@finally
 	{
@@ -874,7 +890,7 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 	@catch (NSException * e)
 	{
 #ifdef DEBUG
-		MTLog(@"LoggerNativeTransport %p: exception catched in AcceptSocketCallback: %@", info, e);
+		MTLogAssert(@"LoggerNativeTransport %p: exception catched in AcceptSocketCallback: %@", info, e);
 #endif
 	}
 	@finally

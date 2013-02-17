@@ -42,6 +42,4 @@
 @property (nonatomic, retain) NSNumber *startTime;
 @property (nonatomic, retain) NSString *transportInfo;
 @property (nonatomic, retain) LoggerClientData *clientInfo;
-
--(unsigned long)rawDataSize;
 @end

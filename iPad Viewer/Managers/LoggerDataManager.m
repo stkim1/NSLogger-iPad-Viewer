@@ -64,6 +64,10 @@
 @property (nonatomic, readonly) NSManagedObjectContext *messageSaveContext;
 -(void)_runMessageSaveChain:(unsigned long)theSaveDataSize
 		withMainThreadBlock:(void (^)(NSError *saveError))aMainThreadBlock;
+
+-(void)_runMessageSaveChain:(unsigned long)theSaveDataSize
+		flushDisplayContext:(BOOL)flushDisplayContext
+		withMainThreadBlock:(void (^)(NSError *saveError))aMainThreadBlock;
 @end
 
 @implementation LoggerDataManager
@@ -323,6 +327,16 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 -(void)_runMessageSaveChain:(unsigned long)theSaveDataSize
 		withMainThreadBlock:(void (^)(NSError *saveError))aMainThreadBlock
 {
+	[self
+	 _runMessageSaveChain:theSaveDataSize
+	 flushDisplayContext:NO
+	 withMainThreadBlock:aMainThreadBlock];	
+}
+
+-(void)_runMessageSaveChain:(unsigned long)theSaveDataSize
+		flushDisplayContext:(BOOL)flushDisplayContext
+		withMainThreadBlock:(void (^)(NSError *saveError))aMainThreadBlock
+{
 	assert(dispatch_get_current_queue() == _messageProcessQueue);
 	
 	BOOL	isProcessMocSavedOk = NO;
@@ -346,7 +360,13 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 			 
 			 isDisplayMocSavedOk =
 				 [[self messageDisplayContext] save:&displayMocSaveError];
-			 
+
+			 // clear off display MOC to accept new connection
+			 if(flushDisplayContext)
+			 {
+				 [[self messageDisplayContext] reset];
+			 }
+
 			 // we are still at main thread
 			 if(aMainThreadBlock != NULL)
 			 {
@@ -368,7 +388,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 					  
 					  _messageSaveSizeCount += theSaveDataSize;
 					  
-					  if(DEFAULT_SAVING_BLOCK_SIZE <= _messageSaveSizeCount)
+					  if(flushDisplayContext || DEFAULT_SAVING_BLOCK_SIZE <= _messageSaveSizeCount)
 					  {
 						  MTLog(@"accumulated data size to be saved is %ld",_messageSaveSizeCount);
 
@@ -390,7 +410,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 						  }
 						  _messageSaveSizeCount = 0;
 					  }
-					  
 				  }];
 			 }
 		 }];
@@ -430,9 +449,6 @@ didEstablishConnection:(LoggerConnection *)theConnection
 			// you can increase runcount by client's runcount
 			int32_t lastRunCount = 0;
 			uLong clientHash = [theConnection clientHash];
-			
-			// data size to be saved/updated to PSC
-			unsigned long dataSaveSize = 0;
 
 			@try
 			{
@@ -479,10 +495,6 @@ MTLog(@"transport:didEstablishConnection: (%lx)[%d]",theConnection.clientHash, t
 				[status setStartTime:		[NSNumber numberWithLongLong:mach_absolute_time()]];
 				//[status setClientInfo:		client];
 				[client addConnectionStatusObject:status];
-				
-				
-				dataSaveSize += [client rawDataSize];
-				dataSaveSize += [status rawDataSize];
 			}
 			@catch (NSException *exception)
 			{
@@ -490,7 +502,11 @@ MTLog(@"transport:didEstablishConnection: (%lx)[%d]",theConnection.clientHash, t
 			}
 			@finally
 			{
-				[self _runMessageSaveChain:dataSaveSize
+				// once you say 'yes' to save change for flushing, it doesn't matter
+				// how much data you want to save.
+				[self
+				 _runMessageSaveChain:0
+				 flushDisplayContext:YES
 				 withMainThreadBlock:^(NSError *saveError){
 					[[NSNotificationCenter defaultCenter]
 					 postNotificationName:kShowClientConnectedNotification
@@ -580,6 +596,14 @@ didReceiveMessages:(NSArray *)theMessages
 - (void)transport:(LoggerTransport *)theTransport
 didDisconnectRemote:(LoggerConnection *)theConnection
 {
+	
+	if(theConnection == nil)
+	{
+		MTLogDebug(@"%s theConnection is nil",__PRETTY_FUNCTION__);
+		return;
+	}
+		
+
 	// handle disconnection specific logic
 	dispatch_async(_messageProcessQueue, ^{
 		@autoreleasepool {
@@ -588,10 +612,6 @@ didDisconnectRemote:(LoggerConnection *)theConnection
 			
 			uLong clientHash = [theConnection clientHash];
 			int32_t lastRunCount = [theConnection reconnectionCount];
-			
-			// data size to be saved/updated to PSC
-			unsigned long dataSaveSize = 0;
-
 			@try
 			{
 				// run count is 0 based. when there is client info exist,
@@ -608,8 +628,6 @@ didDisconnectRemote:(LoggerConnection *)theConnection
 				// connection status info cannot be nil. if it is, we are in trouble
 				assert(status != nil);
 				[status setEndTime:[NSNumber numberWithLongLong:mach_absolute_time()]];
-				
-				dataSaveSize += [status rawDataSize];
 			}
 			@catch (NSException *exception)
 			{
@@ -617,8 +635,8 @@ didDisconnectRemote:(LoggerConnection *)theConnection
 			}
 			@finally
 			{
-				// when connection gets finished, flush off all remaining NMO to PSC
-				[self _runMessageSaveChain:dataSaveSize + DEFAULT_SAVING_BLOCK_SIZE
+				// when connection gets finished, flush off processing/saving MOC of NMOs
+				[self _runMessageSaveChain:(DEFAULT_SAVING_BLOCK_SIZE + 1)
 				 withMainThreadBlock:^(NSError *saveError){
 					[[NSNotificationCenter defaultCenter]
 					 postNotificationName:kShowClientDisconnectedNotification
