@@ -30,8 +30,10 @@
 
 #import <Foundation/Foundation.h>
 #import "LoggerTransport.h"
+#import "LoggerDataStorage.h"
 
 @interface LoggerDataManager : NSObject <LoggerTransportDelegate>
 +(LoggerDataManager *)sharedDataManager;
 @property (nonatomic, readonly) NSManagedObjectContext *messageDisplayContext;
+@property (nonatomic, retain) LoggerDataStorage *dataStorage;
 @end

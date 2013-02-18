@@ -72,26 +72,31 @@
 
 @implementation LoggerDataManager
 {
-	NSManagedObjectModel *_managedObjectModel;
+	NSManagedObjectModel	*_managedObjectModel;
 	NSPersistentStoreCoordinator *_persistentStoreCoordinator;
 
 	// The root disk save context
-	NSManagedObjectContext *_messageSaveContext;
+	NSManagedObjectContext	*_messageSaveContext;
 	unsigned long			_messageSaveSizeCount;
 	
 	// Secondary display/UI context. NSFetchRequestController takes
 	// this to display message on UITableViewCell
-	NSManagedObjectContext *_messageDisplayContext;
+	NSManagedObjectContext	*_messageDisplayContext;
 	
 	// finally, mesage process queue and context
-	NSManagedObjectContext *_messageProcessContext;
-	dispatch_queue_t	_messageProcessQueue;
+	NSManagedObjectContext	*_messageProcessContext;
+	dispatch_queue_t		_messageProcessQueue;
+	
+	// data storage
+	LoggerDataStorage		*_dataStorage;
+	
 }
 @synthesize managedObjectModel = _managedObjectModel;
 @synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
 @synthesize messageDisplayContext = _messageDisplayContext;
 @synthesize messageProcessContext = _messageProcessContext;
 @synthesize messageSaveContext = _messageSaveContext;
+@synthesize dataStorage = _dataStorage;
 
 SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager);
 
@@ -546,12 +551,13 @@ didReceiveMessages:(NSArray *)theMessages
 						 inManagedObjectContext:[self messageProcessContext]];
 					
 					struct timeval tm = [aMessage timestamp];
+					uint64_t tm64 = timetoint64(&tm);
 
 					//run count of the connection
 					[messageData setClientHash:		[NSNumber numberWithUnsignedLong:[theConnection clientHash]]];
 					[messageData setRunCount:		[NSNumber numberWithInt:[theConnection reconnectionCount]]];
-					
-					[messageData setTimestamp:		[NSNumber numberWithUnsignedLongLong:timetoint64(&tm)]];
+
+					[messageData setTimestamp:		[NSNumber numberWithUnsignedLongLong:tm64]];
 					[messageData setTag:			[aMessage tag]];
 					[messageData setFilename:		[aMessage filename]];
 					[messageData setFunctionName:	[aMessage functionName]];
@@ -572,9 +578,44 @@ didReceiveMessages:(NSArray *)theMessages
 					
 					[messageData setPortraitHeight: [NSNumber numberWithFloat:[aMessage portraitHeight]]];
 					[messageData setLandscapeHeight:[NSNumber numberWithFloat:[aMessage landscapeHeight]]];
-
+					
 					dataSaveSize += [messageData rawDataSize];
 					
+					//now store datas
+					switch ([aMessage contentsType]) {
+						case kMessageData:{
+							
+							// filepath is made of 'client hash'/'run count'/'timestamp.data'
+							NSString *filepath = \
+								[NSString stringWithFormat:@"%lx/%d/%llx.data"
+								 ,[theConnection clientHash]
+								 ,[theConnection reconnectionCount]
+								 ,tm64];
+							
+							[[self dataStorage]
+							 writeData:[aMessage message]
+							 toPath:filepath];
+
+							break;
+						}
+							
+						case kMessageImage:{
+							
+							NSString *filepath = \
+								[NSString stringWithFormat:@"%lx/%d/%llx.image"
+								 ,[theConnection clientHash]
+								 ,[theConnection reconnectionCount]
+								 ,tm64];
+
+							[[self dataStorage]
+							 writeData:[aMessage message]
+							 toPath:filepath];
+							
+							break;
+						}
+						default:
+							break;
+					}
 				}
 				
 			}

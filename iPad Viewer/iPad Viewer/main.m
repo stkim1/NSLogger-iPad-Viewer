@@ -34,12 +34,16 @@
 #import "LoggerTransportManager.h"
 #import "LoggerPreferenceManager.h"
 #import "LoggerDataManager.h"
+#import "LoggerDataStorage.h"
 
 int main(int argc, char *argv[])
 {
     @autoreleasepool {
 
+		LoggerDataStorage *dataStorage = [LoggerDataStorage sharedDataStorage];
 		LoggerDataManager *dataManager = [LoggerDataManager sharedDataManager];
+		[dataManager setDataStorage:dataStorage];
+		
 		LoggerPreferenceManager *prefManager = [LoggerPreferenceManager sharedPrefManager];
 		LoggerTransportManager *transportManager = [LoggerTransportManager sharedTransportManager];
 		[transportManager setPrefManager:prefManager];

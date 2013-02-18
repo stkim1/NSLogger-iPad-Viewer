@@ -30,7 +30,7 @@
 
 
 #import "LoggerDataEntry.h"
-#import "NullStringChecker.h"
+#import "NullStringCheck.h"
 
 @interface LoggerDataEntry()
 static void _split_dir_only(char**, const char*);

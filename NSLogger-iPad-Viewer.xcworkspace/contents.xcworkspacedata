@@ -4,7 +4,4 @@
    <FileRef
       location = "group:iPad Viewer/iPad Viewer.xcodeproj">
    </FileRef>
-   <FileRef
-      location = "group:LoggerStorage/LoggerStorage.xcodeproj">
-   </FileRef>
 </Workspace>
