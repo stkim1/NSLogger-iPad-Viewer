@@ -172,6 +172,8 @@ UIColor *defaultTagAndLevelColor = nil;
 {
 	_messageData = aMessageData;
 
+	[aMessageData readMessageData:NULL];
+	
 	[self setNeedsDisplay];
 }
 

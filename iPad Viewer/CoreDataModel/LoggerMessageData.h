@@ -36,6 +36,7 @@
 
 @property (nonatomic, retain) NSNumber * clientHash;
 @property (nonatomic, retain) NSNumber * contentsType;
+@property (nonatomic, retain) NSString * dataFilepath;
 @property (nonatomic, retain) NSString * filename;
 @property (nonatomic, retain) NSString * functionName;
 @property (nonatomic, retain) NSString * imageSize;
@@ -53,5 +54,6 @@
 @property (nonatomic, retain) NSNumber * timestamp;
 @property (nonatomic, retain) NSNumber * type;
 
+-(void)readMessageData:(void (^)(NSData *data))aDataReadBlock;
 -(unsigned long)rawDataSize;
 @end

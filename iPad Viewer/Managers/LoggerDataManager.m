@@ -579,10 +579,9 @@ didReceiveMessages:(NSArray *)theMessages
 					[messageData setPortraitHeight: [NSNumber numberWithFloat:[aMessage portraitHeight]]];
 					[messageData setLandscapeHeight:[NSNumber numberWithFloat:[aMessage landscapeHeight]]];
 					
-					dataSaveSize += [messageData rawDataSize];
-					
 					//now store datas
-					switch ([aMessage contentsType]) {
+					switch ([aMessage contentsType])
+					{
 						case kMessageData:{
 							
 							// filepath is made of 'client hash'/'run count'/'timestamp.data'
@@ -591,6 +590,9 @@ didReceiveMessages:(NSArray *)theMessages
 								 ,[theConnection clientHash]
 								 ,[theConnection reconnectionCount]
 								 ,tm64];
+							
+							// data filepath
+							[messageData setDataFilepath:filepath];
 							
 							[[self dataStorage]
 							 writeData:[aMessage message]
@@ -607,6 +609,9 @@ didReceiveMessages:(NSArray *)theMessages
 								 ,[theConnection reconnectionCount]
 								 ,tm64];
 
+							// data filepath
+							[messageData setDataFilepath:filepath];
+							
 							[[self dataStorage]
 							 writeData:[aMessage message]
 							 toPath:filepath];
@@ -616,6 +621,10 @@ didReceiveMessages:(NSArray *)theMessages
 						default:
 							break;
 					}
+					
+					
+					dataSaveSize += [messageData rawDataSize];
+
 				}
 				
 			}

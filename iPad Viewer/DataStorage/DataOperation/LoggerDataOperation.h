@@ -44,11 +44,13 @@ typedef void (^callback_t)(LoggerDataOperation *dataOperation, int error, NSData
 	dispatch_queue_t				_queue_io_handler;
 	dispatch_queue_t				_queue_callback;
 	callback_t						_callback;
+	unsigned int					_dependencyCount;
 }
 @property (nonatomic, readonly) NSString						*path;
 @property (nonatomic, readonly) dispatch_queue_t			 	queue_io_handler;
 @property (nonatomic, readonly) dispatch_queue_t			 	queue_callback;
 @property (nonatomic, readonly) callback_t					 	callback;
+@property (nonatomic, readwrite) unsigned int					dependencyCount;
 -(id)initWithBasepath:(NSString *)aBasepath
 			 filePath:(NSString *)aFilepath
 	   callback_queue:(dispatch_queue_t)a_callback_queue

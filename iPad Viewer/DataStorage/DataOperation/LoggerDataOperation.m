@@ -45,6 +45,9 @@
 	self = [super init];
 	if(self)
 	{
+		
+		_dependencyCount = 0;
+
 		_path = [[NSString stringWithFormat:@"%@%@",aBasepath,aFilepath] retain];
 		
 		/*
@@ -66,8 +69,8 @@
 
 -(void)dealloc
 {
-//	NSLog(@"%@ dealloced",NSStringFromClass([self class]));
-	
+	MTLogAssert(@"%@ dealloced",NSStringFromClass([self class]));
+
 	[_path release],_path = nil;
 	dispatch_release(_queue_callback),_queue_callback = NULL;
 	[_callback release], _callback = NULL;

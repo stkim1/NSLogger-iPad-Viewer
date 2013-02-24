@@ -30,11 +30,10 @@
 
 #import <Foundation/Foundation.h>
 
-
 @interface LoggerDataEntry : NSObject
 @property (nonatomic, readonly) NSString			*filepath;
 @property (nonatomic, readonly) NSString			*dirOfFilepath;
-@property (nonatomic, readonly) NSMutableArray		*operationQueue;
+@property (nonatomic, readonly) NSMutableArray		*dataOperations;
 @property (nonatomic, retain)	NSData				*data;
 
 -(id)initWithFilepath:(NSString *)aFilepath;

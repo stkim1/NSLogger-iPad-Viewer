@@ -30,11 +30,13 @@
 
 
 #import "LoggerMessageData.h"
+#import "LoggerDataStorage.h"
 
 @implementation LoggerMessageData
 
 @dynamic clientHash;
 @dynamic contentsType;
+@dynamic dataFilepath;
 @dynamic filename;
 @dynamic functionName;
 @dynamic imageSize;
@@ -58,6 +60,7 @@
 	
 	size += 4;// client hash
 	size += 2;// contentsType
+	size += [[self dataFilepath] length];
 	size += [[self filename] length];
 	size += [[self functionName] length];
 	size += [[self imageSize] length];
@@ -76,4 +79,19 @@
 	return size;
 	
 }
+
+-(void)readMessageData:(void (^)(NSData *data))aDataReadBlock
+{
+	//now store datas
+	if([[self contentsType] shortValue] == kMessageString)
+		return;
+	
+	[[LoggerDataStorage sharedDataStorage]
+	 readDataFromPath:[self dataFilepath]
+	 forResult:^(NSData *aData) {
+		 MTLogInfo(@"%s read done",__PRETTY_FUNCTION__);
+	 }];
+}
+
+
 @end

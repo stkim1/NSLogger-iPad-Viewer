@@ -41,13 +41,12 @@ static void _split_dir_only(char**, const char*);
 	NSString						*_filepath;
 	char							*_fpath_dir_part;
 	NSString						*_dirOfFilepath;
-	NSMutableArray					*_operationQueue;
-
+	NSMutableArray					*_dataOperations;
 	NSData							*_data;
 }
 @synthesize filepath = _filepath;
 @synthesize dirOfFilepath = _dirOfFilepath;
-@synthesize operationQueue = _operationQueue;
+@synthesize dataOperations = _dataOperations;
 @synthesize data = _data;
 
 -(id)initWithFilepath:(NSString *)aFilepath
@@ -60,13 +59,12 @@ static void _split_dir_only(char**, const char*);
 		assert(!IS_NULL_STRING(aFilepath));
 
 		_filepath = [aFilepath retain];
-		_operationQueue = [[NSMutableArray alloc] initWithCapacity:0];
 		
 		// split diretory part from file path
 		_fpath_dir_part = NULL;
 		_split_dir_only(&_fpath_dir_part,[aFilepath UTF8String]);
 
-NSLog(@"fpath_path %s(%p)[%zd]",_fpath_dir_part,_fpath_dir_part,strlen(_fpath_dir_part));
+MTLogInfo(@"fpath_path %s(%p)[%zd]",_fpath_dir_part,_fpath_dir_part,strlen(_fpath_dir_part));
 		
 		// this is an error. should never happpen
 		assert(_fpath_dir_part != NULL);
@@ -88,6 +86,8 @@ NSLog(@"fpath_path %s(%p)[%zd]",_fpath_dir_part,_fpath_dir_part,strlen(_fpath_di
 				 encoding:NSASCIIStringEncoding
 				 freeWhenDone:NO];
 		}
+		
+		_dataOperations = [[NSMutableArray alloc] initWithCapacity:0];
 
 	}
 	return self;
@@ -108,9 +108,9 @@ NSLog(@"fpath_path %s(%p)[%zd]",_fpath_dir_part,_fpath_dir_part,strlen(_fpath_di
 		free(_fpath_dir_part),_fpath_dir_part = NULL;
 	}
 
-	[_operationQueue removeAllObjects];
-	[_operationQueue release],_operationQueue = nil;
-
+	[_dataOperations removeAllObjects];
+	[_dataOperations release],_dataOperations = nil;
+	
 	self.data = nil;
 
 	[super dealloc];

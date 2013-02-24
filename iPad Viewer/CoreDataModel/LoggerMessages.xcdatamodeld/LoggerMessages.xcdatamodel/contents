@@ -22,6 +22,7 @@
     <entity name="LoggerMessageData" representedClassName="LoggerMessageData" syncable="YES">
         <attribute name="clientHash" attributeType="Integer 32" defaultValueString="0" indexed="YES" syncable="YES"/>
         <attribute name="contentsType" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="dataFilepath" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="filename" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="functionName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="imageSize" optional="YES" attributeType="String" syncable="YES"/>
@@ -42,6 +43,6 @@
     <elements>
         <element name="LoggerClientData" positionX="477" positionY="189" width="128" height="165"/>
         <element name="LoggerConnectionStatusData" positionX="270" positionY="306" width="128" height="150"/>
-        <element name="LoggerMessageData" positionX="268" positionY="-69" width="128" height="315"/>
+        <element name="LoggerMessageData" positionX="268" positionY="-69" width="128" height="330"/>
     </elements>
 </model>
