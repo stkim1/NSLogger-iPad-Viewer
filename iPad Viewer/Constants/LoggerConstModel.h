@@ -30,11 +30,13 @@
  */
 
 // LoggerMessage types
-enum {
+enum LoggerMessageType{
 	kMessageString = 0,
 	kMessageData,
 	kMessageImage
 };
+
+typedef enum LoggerMessageType LoggerMessageType;
 
 // transport status key value
 extern NSString * const kShowTransportStatusNotification;

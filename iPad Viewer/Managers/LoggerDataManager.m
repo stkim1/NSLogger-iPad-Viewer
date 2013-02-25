@@ -596,7 +596,8 @@ didReceiveMessages:(NSArray *)theMessages
 							
 							[[self dataStorage]
 							 writeData:[aMessage message]
-							 toPath:filepath];
+							 toPath:filepath
+							 forType:kMessageData];
 
 							break;
 						}
@@ -611,10 +612,11 @@ didReceiveMessages:(NSArray *)theMessages
 
 							// data filepath
 							[messageData setDataFilepath:filepath];
-							
+
 							[[self dataStorage]
 							 writeData:[aMessage message]
-							 toPath:filepath];
+							 toPath:filepath
+							 forType:kMessageImage];
 							
 							break;
 						}

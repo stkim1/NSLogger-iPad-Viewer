@@ -69,7 +69,7 @@
 
 -(void)dealloc
 {
-	MTLogAssert(@"%@ dealloced",NSStringFromClass([self class]));
+	//MTLogAssert(@"%@ dealloc : %@",NSStringFromClass([self class]),_path);
 
 	[_path release],_path = nil;
 	dispatch_release(_queue_callback),_queue_callback = NULL;

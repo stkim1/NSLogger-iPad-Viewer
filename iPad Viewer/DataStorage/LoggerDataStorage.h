@@ -29,12 +29,19 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "LoggerConstModel.h"
 
 @interface LoggerDataStorage : NSObject
 
 +(LoggerDataStorage *)sharedDataStorage;
 
--(void)writeData:(NSData *)aData toPath:(NSString *)aFilepath;
--(void)readDataFromPath:(NSString *)aPath forResult:(void (^)(NSData *aData))aResultHandler;
+-(void)writeData:(NSData *)aData
+		  toPath:(NSString *)aFilepath
+		 forType:(LoggerMessageType)aType;
+
+-(void)readDataFromPath:(NSString *)aPath
+				forType:(LoggerMessageType)aType
+			 withResult:(void (^)(NSData *aData))aResultHandler;
+
 -(void)deleteWholePath:(NSString *)aPath;
 @end

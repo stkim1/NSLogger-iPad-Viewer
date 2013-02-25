@@ -38,23 +38,38 @@ static void _split_dir_only(char**, const char*);
 
 @implementation LoggerDataEntry
 {
+	LoggerMessageType				_dataType;
 	NSString						*_filepath;
 	char							*_fpath_dir_part;
 	NSString						*_dirOfFilepath;
 	NSMutableArray					*_dataOperations;
 	NSData							*_data;
 }
+@synthesize dataType = _dataType;
 @synthesize filepath = _filepath;
 @synthesize dirOfFilepath = _dirOfFilepath;
 @synthesize dataOperations = _dataOperations;
 @synthesize data = _data;
 
--(id)initWithFilepath:(NSString *)aFilepath
+// This function come from ephemient of stackoverflow
+//http://stackoverflow.com/questions/1575278/function-to-split-a-filepath-into-path-and-file/1575314#1575314
+void
+_split_dir_only(char** p, const char *pf)
+{
+    char *slash = (char *)pf, *next;
+    while ((next = strpbrk(slash + 1, "\\/"))) slash = next;
+    if (pf != slash) slash++;
+    *p = strndup(pf, slash - pf);
+}
+
+-(id)initWithFilepath:(NSString *)aFilepath type:(LoggerMessageType)aType
 {
 	self = [super init];
 
 	if(self)
 	{
+		_dataType = aType;
+		
 		// should never pass a null string
 		assert(!IS_NULL_STRING(aFilepath));
 
@@ -64,7 +79,7 @@ static void _split_dir_only(char**, const char*);
 		_fpath_dir_part = NULL;
 		_split_dir_only(&_fpath_dir_part,[aFilepath UTF8String]);
 
-MTLogInfo(@"fpath_path %s(%p)[%zd]",_fpath_dir_part,_fpath_dir_part,strlen(_fpath_dir_part));
+		//MTLogInfo(@"fpath_path %s(%p)[%zd]",_fpath_dir_part,_fpath_dir_part,strlen(_fpath_dir_part));
 		
 		// this is an error. should never happpen
 		assert(_fpath_dir_part != NULL);
@@ -93,9 +108,10 @@ MTLogInfo(@"fpath_path %s(%p)[%zd]",_fpath_dir_part,_fpath_dir_part,strlen(_fpat
 	return self;
 }
 
-
 -(void)dealloc
-{	
+{
+	MTLogError(@"%@ dealloc : [%p] %@",NSStringFromClass([self class]),self,_filepath);
+	
 	[_filepath release],_filepath = nil;
 
 	if(_dirOfFilepath != nil)
@@ -111,20 +127,17 @@ MTLogInfo(@"fpath_path %s(%p)[%zd]",_fpath_dir_part,_fpath_dir_part,strlen(_fpat
 	[_dataOperations removeAllObjects];
 	[_dataOperations release],_dataOperations = nil;
 	
-	self.data = nil;
+	if(_data != nil)
+	{
+		[_data release],_data = nil;
+	}
 
 	[super dealloc];
 }
 
-// This function come from ephemient of stackoverflow
-//http://stackoverflow.com/questions/1575278/function-to-split-a-filepath-into-path-and-file/1575314#1575314
-void
-_split_dir_only(char** p, const char *pf)
+-(NSInteger)totalDataLength
 {
-    char *slash = (char *)pf, *next;
-    while ((next = strpbrk(slash + 1, "\\/"))) slash = next;
-    if (pf != slash) slash++;
-    *p = strndup(pf, slash - pf);
+	return ([_filepath length] + [_dirOfFilepath length] + [_data length]);
 }
 
 @end

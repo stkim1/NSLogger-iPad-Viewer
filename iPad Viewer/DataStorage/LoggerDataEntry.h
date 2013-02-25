@@ -29,12 +29,16 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "LoggerConstModel.h"
+#import <mach/mach_time.h>
 
 @interface LoggerDataEntry : NSObject
+@property (nonatomic, readonly) LoggerMessageType	dataType;
 @property (nonatomic, readonly) NSString			*filepath;
 @property (nonatomic, readonly) NSString			*dirOfFilepath;
 @property (nonatomic, readonly) NSMutableArray		*dataOperations;
 @property (nonatomic, retain)	NSData				*data;
 
--(id)initWithFilepath:(NSString *)aFilepath;
+-(id)initWithFilepath:(NSString *)aFilepath type:(LoggerMessageType)aType;
+-(NSInteger)totalDataLength;
 @end

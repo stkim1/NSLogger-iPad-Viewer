@@ -82,13 +82,16 @@
 
 -(void)readMessageData:(void (^)(NSData *data))aDataReadBlock
 {
-	//now store datas
-	if([[self contentsType] shortValue] == kMessageString)
-		return;
 	
+	LoggerMessageType type = [[self contentsType] shortValue];
+	//now store datas
+	if(type != kMessageImage)
+		return;
+
 	[[LoggerDataStorage sharedDataStorage]
 	 readDataFromPath:[self dataFilepath]
-	 forResult:^(NSData *aData) {
+	 forType:type
+	 withResult:^(NSData *aData) {
 		 MTLogInfo(@"%s read done",__PRETTY_FUNCTION__);
 	 }];
 }

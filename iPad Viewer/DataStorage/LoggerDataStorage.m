@@ -42,6 +42,7 @@
 #import "LoggerFakeRead.h"
 #import "LoggerFakeWrite.h"
 
+#define DATA_CACHE_PURGE_THRESHOLD	10000
 
 @interface LoggerDataStorage()
 @property (nonatomic, readonly) dispatch_queue_t		lowPriorityOperationQueue;
@@ -57,7 +58,18 @@
 @property (nonatomic, retain)	NSString				*basepath;
 @property (nonatomic, readonly) int						cpuCount;
 
--(void)_enqueueWriteOperationForData:(NSData *)aData toPath:(NSString *)aFilepath;
+-(void)_purgeDataEntryCache;
+-(void)_cacheDataEntry:(LoggerDataEntry *)aDataEntry forKey:(NSString *)aKey;
+-(void)_uncacheDataEntryForKey:(NSString *)aKey;
+
+-(void)_enqueueWriteOperationForData:(NSData *)aData
+							  toPath:(NSString *)aFilepath
+							 forType:(LoggerMessageType)aType;
+
+-(void)_enqueueReadOperationForFile:(NSString *)aFilepath
+							forType:(LoggerMessageType)aType
+						 withResult:(void (^)(NSData *aData))aResultHandler;
+
 -(void)_dequeueOperation:(LoggerDataOperation *)anOperation;
 @end
 
@@ -76,6 +88,7 @@
 
 	// this is the cache pool that contains binary data
 	NSMutableDictionary		*_dataEntryCache;
+	unsigned int			_dataEntryCacheSize;
 	
 	// data operation queue
 	NSMutableArray			*_operationPool;
@@ -148,6 +161,9 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 			
 			_basepath = [targetPath retain];
 
+			
+			_dataEntryCache = 0;
+
 			_dataEntryCache = \
 				[[NSMutableDictionary alloc] initWithCapacity:0];
 			
@@ -193,8 +209,12 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 	[super dealloc];
 }
 
-
--(void)writeData:(NSData *)aData toPath:(NSString *)aFilepath
+//------------------------------------------------------------------------------
+#pragma mark - Write/Read/Delete operation
+//------------------------------------------------------------------------------
+-(void)writeData:(NSData *)aData
+		  toPath:(NSString *)aFilepath
+		 forType:(LoggerMessageType)aType
 {
 	MTLogVerify(@"%s data # %d path %@",__PRETTY_FUNCTION__,[aData length],aFilepath);
 	
@@ -205,14 +225,14 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 		return;
 
 	dispatch_async([self highPriorityOperationQueue], ^{
-		[self _enqueueWriteOperationForData:aData toPath:aFilepath];
+		[self _enqueueWriteOperationForData:aData toPath:aFilepath forType:aType];
 	});
 }
 
--(void)readDataFromPath:(NSString *)aPath forResult:(void (^)(NSData *aData))aResultHandler
-{
-	MTLogVerify(@"%s aPath %@",__PRETTY_FUNCTION__,aPath);
-	
+-(void)readDataFromPath:(NSString *)aPath
+				forType:(LoggerMessageType)aType
+			 withResult:(void (^)(NSData *aData))aResultHandler
+{	
 	if(IS_NULL_STRING(aPath))
 	{
 		aResultHandler(nil);
@@ -223,9 +243,9 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 		
 		LoggerDataEntry *entry = [[self dataEntryCache] objectForKey:aPath];
 		
-		if(entry != nil && [entry data] != nil)
+		if(entry != nil)// && [entry data] != nil)
 		{
-			MTLogInfo(@"[READ] Cache Found %@ success YES",aPath);
+			MTLogVerify(@"[READ] Cache Found %@ success YES",aPath);
 			
 			NSData *cachedData = [entry data];
 			aResultHandler(cachedData);
@@ -233,9 +253,11 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 			return;
 		}
 
+		MTLogError(@"[READ] Cache NOT Found %@",aPath);
+
 		// cannot find an entry from cache. find it from file system
 		dispatch_async([self highPriorityOperationQueue], ^{
-			[self _enqueueReadOperationForFile:aPath result:aResultHandler];
+			[self _enqueueReadOperationForFile:aPath forType:aType withResult:aResultHandler];
 		});
 		
 	});
@@ -245,23 +267,82 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 {
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - Cache Operation
+//------------------------------------------------------------------------------
+
+-(void)_purgeDataEntryCache
+{
+	MTLogAssert(@"let's start purging entry cache");
+	dispatch_async([self lowPriorityOperationQueue], ^{
+		NSMutableArray *purgeList = \
+			[[NSMutableArray alloc] initWithCapacity:0];
+
+		unsigned int totalPurgedDataSize = 0;
+
+		for (NSString *key in _dataEntryCache)
+		{
+			LoggerDataEntry *entry = [_dataEntryCache objectForKey:key];
+			#warning cache policy should be revised!!!!
+			if([[entry dataOperations] count] == 0)
+			{
+				[purgeList addObject:key];
+				totalPurgedDataSize += [entry totalDataLength];
+			}
+		}
+
+		// remove purge list
+		[_dataEntryCache removeObjectsForKeys:purgeList];
+		[purgeList release],purgeList = nil;
+		_dataEntryCacheSize -= totalPurgedDataSize;
+	});
+}
+
+-(void)_cacheDataEntry:(LoggerDataEntry *)aDataEntry forKey:(NSString *)aKey
+{
+	[[self dataEntryCache] setObject:aDataEntry forKey:aKey];
+
+	_dataEntryCacheSize += [aDataEntry totalDataLength];
+	
+	MTLogVerify(@"** CACHE SIZE ** %u",_dataEntryCacheSize);
+	
+	if(DATA_CACHE_PURGE_THRESHOLD <= _dataEntryCacheSize )
+	{
+		// start purging cache
+		[self _purgeDataEntryCache];
+	}
+}
+
+-(void)_uncacheDataEntryForKey:(NSString *)aKey
+{
+	LoggerDataEntry *entry = [[self dataEntryCache] objectForKey:aKey];
+	_dataEntryCacheSize -= [entry totalDataLength];
+
+	MTLogVerify(@"** CACHE SIZE ** %u",_dataEntryCacheSize);
+	
+	[[self dataEntryCache] removeObjectForKey:aKey];
+}
+
+
 
 //------------------------------------------------------------------------------
 #pragma mark - Dequeue/Enqueue operations
 //------------------------------------------------------------------------------
 -(void)_enqueueWriteOperationForData:(NSData *)aData
 							  toPath:(NSString *)aFilepath
+							 forType:(LoggerMessageType)aType
 {
 	assert(dispatch_get_current_queue() == [self highPriorityOperationQueue]);
 
 	__block unsigned int dependencyCount = 0;
 	
 	LoggerDataEntry *dataEntry = \
-		[[LoggerDataEntry alloc] initWithFilepath:aFilepath];
+		[[LoggerDataEntry alloc] initWithFilepath:aFilepath type:aType];
+	
 	[dataEntry setData:aData];
 
 	// set cache entry for filepath
-	[[self dataEntryCache] setObject:dataEntry forKey:aFilepath];
+	[self _cacheDataEntry:dataEntry forKey:aFilepath];
 	
 #ifdef CHECK_OPERATION_DEPENDENCY
 	// check operation dependency
@@ -297,8 +378,14 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 			 }
 
 			 [[dataEntry dataOperations] removeObject:dataOperation];
-			 [self _dequeueOperation:dataOperation];
+
+			 // remove data type data entry from cache immediately after saved
+			 if([dataEntry dataType] == kMessageData)
+			 {
+				 [self _uncacheDataEntryForKey:aFilepath];
+			 }
 			 
+			 [self _dequeueOperation:dataOperation];
 		 }];
 
 	[writeOperation setDependencyCount:dependencyCount];
@@ -325,17 +412,18 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 
 
 -(void)_enqueueReadOperationForFile:(NSString *)aFilepath
-							 result:(void (^)(NSData *aData))aResultHandler
+							forType:(LoggerMessageType)aType
+						 withResult:(void (^)(NSData *aData))aResultHandler
 {
 	assert(dispatch_get_current_queue() == [self highPriorityOperationQueue]);
 	
 	__block unsigned int dependencyCount = 0;
 	
-	LoggerDataEntry *dataEntry =
-		[[LoggerDataEntry alloc] initWithFilepath:aFilepath];
+	LoggerDataEntry *dataEntry =\
+		[[LoggerDataEntry alloc] initWithFilepath:aFilepath type:aType];
 	
 	// set cache entry for filepath
-	[[self dataEntryCache] setObject:dataEntry forKey:aFilepath];
+	[self _cacheDataEntry:dataEntry forKey:aFilepath];
 	
 #ifdef CHECK_OPERATION_DEPENDENCY
 	// check operation dependency
@@ -357,18 +445,31 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 		  filePath:[dataEntry filepath]
 		  callback_queue:[self highPriorityOperationQueue]
 		  callback:^(LoggerDataOperation *dataOperation, int error, NSData *data) {
-			  MTLogInfo(@"[READ] Cache NOT Found %@ success %@ error %d",aFilepath,(!error?@"YES":@"NO"),error);
+			  //MTLogInfo(@"[READ] File read %@ success %@ error %d",aFilepath,(!error?@"YES":@"NO"),error);
 			  if(error == 0)
 			  {
-				  [dataEntry setData:data];
-				  // handle success
-				  aResultHandler(data);
-				  [[dataEntry dataOperations] removeObject:dataOperation];
+				  if([dataEntry dataType] == kMessageImage)
+				  {
+					  [dataEntry setData:data];
+					  // handle success
+					  aResultHandler(data);
+					  [[dataEntry dataOperations] removeObject:dataOperation];
+				  }
+				  else
+				  {
+					  // handle success
+					  aResultHandler(data);
+					  
+					  // if data is not image, remove from cache as soon as possible
+					  [self _uncacheDataEntryForKey:aFilepath];
+				  }
 			  }
 			  else
 			  {
 				  // if read operation fails, remove datacache
-				  [[self dataEntryCache] removeObjectForKey:aFilepath];
+				  MTLogError(@"read file error. remove data cache");
+				  aResultHandler(nil);
+				  [self _uncacheDataEntryForKey:aFilepath];
 			  }
 			  
 			  [self _dequeueOperation:dataOperation];
@@ -388,18 +489,15 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 	{
 		[[self readOperationSlot] addObject:readOperation];
 		[readOperation executeOnQueue:[self operationDispatcherQueue]];
-		MTLogInfo(@"[READ] en-slot<%d>\n(%@)"
+
+		MTLogVerify(@"[READ] en-slot<%d>\n(%@)"
 				  ,[[self readOperationSlot] count]
 				  ,[readOperation path]);
 	}
-	
+
 	[dataEntry release],dataEntry = nil;
 	[readOperation release],readOperation = nil;
 }
-
-
-
-
 
 
 //------------------------------------------------------------------------------
@@ -438,6 +536,8 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 				 
 				 // check operation dependency, remove dependency count by one
 #ifdef CHECK_OPERATION_DEPENDENCY
+				 
+				 
 #endif
 				/* condition for finding the next operation is...
 				 * 1) next target is not found

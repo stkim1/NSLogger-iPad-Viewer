@@ -64,7 +64,7 @@
 {
     [super viewDidLoad];
 	[self setDataManager:[LoggerDataManager sharedDataManager]];
-	
+
 #if 0
 	assert([self.dataManager messageDisplayContext] != nil);
 	
