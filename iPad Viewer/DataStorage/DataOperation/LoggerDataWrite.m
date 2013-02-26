@@ -38,9 +38,7 @@
 
 @interface LoggerDataWrite()
 @property (nonatomic, readonly) NSData		*data;
-@property (nonatomic, readonly) NSString	*basepath;
-@property (nonatomic, readonly) NSString	*filepath;
-@property (nonatomic, readonly) NSString	*dirPartOfFilepath;
+
 static int make_mul_level_dir(char *);
 static int check_dir_stat(const char *);
 @end
@@ -48,14 +46,9 @@ static int check_dir_stat(const char *);
 @implementation LoggerDataWrite
 {
 	NSData			*_data;
-	NSString		*_basepath;
-	NSString		*_filepath;
-	NSString		*_dirPartOfFilepath;
+
 }
 @synthesize data = _data;
-@synthesize basepath = _basepath;
-@synthesize filepath = _filepath;
-@synthesize dirPartOfFilepath = _dirPartOfFilepath;
 
 int
 check_dir_stat(const char *path)
@@ -176,6 +169,19 @@ make_mul_level_dir(char *path)
 	return (retval);
 }
 
+-(id)initWithBasepath:(NSString *)aBasepath
+			 filePath:(NSString *)aFilepath
+		dirOfFilepath:(NSString *)aDirOfFilepath
+	   callback_queue:(dispatch_queue_t)a_callback_queue
+			 callback:(callback_t)a_callback_block
+{
+	NSException* initException =
+		[NSException
+		 exceptionWithName:@"LoggerDataWrite"
+		 reason:@"Inherited method not supported. Use InitWithData:"
+		 userInfo:nil];
+	@throw initException;
+}
 
 -(id)initWithData:(NSData *)aData
 		 basepath:(NSString *)aBasepath
@@ -188,20 +194,13 @@ dirPartOfFilepath:(NSString *)aDirPartOfFilepath
 		[super
 		 initWithBasepath:aBasepath
 		 filePath:aFilepath
+		 dirOfFilepath:aDirPartOfFilepath
 		 callback_queue:a_callback_queue
 		 callback:a_callback_block];
 
 	if(self)
 	{
 		_data = [aData retain];
-		_basepath = [aBasepath retain];
-		_filepath = [aFilepath retain];
-		
-		if(aDirPartOfFilepath != nil)
-		{
-			_dirPartOfFilepath = [aDirPartOfFilepath retain];
-		}
-
 	}
 	return self;
 }
@@ -209,14 +208,6 @@ dirPartOfFilepath:(NSString *)aDirPartOfFilepath
 -(void)dealloc
 {
 	[_data release],_data = nil;
-	[_basepath release],_basepath = nil;
-	[_filepath release],_filepath = nil;
-	
-	if(_dirPartOfFilepath != nil)
-	{
-		[_dirPartOfFilepath release],_dirPartOfFilepath = nil;
-	}
-
 	[super dealloc];
 }
 
@@ -301,7 +292,7 @@ NSLog(@"make target dir error");
 		// everything is green-lighted to proceed from this point on
 		
 
-		int fd = open([[self path] UTF8String]
+		int fd = open([[self absTargetFilePath] UTF8String]
 					  ,O_WRONLY|O_CREAT
 					  ,S_IRUSR|S_IWUSR);
 		

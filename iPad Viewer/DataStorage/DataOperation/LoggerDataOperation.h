@@ -40,19 +40,31 @@ typedef void (^callback_t)(LoggerDataOperation *dataOperation, int error, NSData
 
 @interface LoggerDataOperation : NSObject
 {
-	NSString						*_path;
+	NSString						*_basepath;
+	NSString						*_filepath;
+	NSString						*_dirPartOfFilepath;
+	NSString						*_absTargetFilePath;
+
 	dispatch_queue_t				_queue_io_handler;
 	dispatch_queue_t				_queue_callback;
 	callback_t						_callback;
+	
+	BOOL							_executing;
 	unsigned int					_dependencyCount;
 }
-@property (nonatomic, readonly) NSString						*path;
-@property (nonatomic, readonly) dispatch_queue_t			 	queue_io_handler;
-@property (nonatomic, readonly) dispatch_queue_t			 	queue_callback;
-@property (nonatomic, readonly) callback_t					 	callback;
-@property (nonatomic, readwrite) unsigned int					dependencyCount;
+@property (nonatomic, readonly) NSString						*basepath;
+@property (nonatomic, readonly) NSString						*filepath;
+@property (nonatomic, readonly) NSString						*dirPartOfFilepath; // directory part of path
+@property (nonatomic, readonly) NSString						*absTargetFilePath; // target file path
+@property (nonatomic, readonly) dispatch_queue_t			 	queue_io_handler;	// io handling queue
+@property (nonatomic, readonly) dispatch_queue_t			 	queue_callback;		// callback queue
+@property (nonatomic, readonly) callback_t					 	callback;			// callback
+@property (nonatomic, getter=isExecuting, readwrite) BOOL		executing;			// execution indicator
+@property (nonatomic, readwrite) unsigned int					dependencyCount;	// # operations this op is dependent
+
 -(id)initWithBasepath:(NSString *)aBasepath
 			 filePath:(NSString *)aFilepath
+		dirOfFilepath:(NSString *)aDirOfFilepath
 	   callback_queue:(dispatch_queue_t)a_callback_queue
 			 callback:(callback_t)a_callback_block;
 -(void)executeOnQueue:(dispatch_queue_t)aQueue;

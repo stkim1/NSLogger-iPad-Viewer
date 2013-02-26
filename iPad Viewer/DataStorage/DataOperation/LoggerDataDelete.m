@@ -34,6 +34,7 @@
 #include <errno.h>
 
 @implementation LoggerDataDelete
+
 -(void)executeOnQueue:(dispatch_queue_t)aQueue
 {
 	dispatch_async(aQueue,^{
@@ -43,7 +44,7 @@
 		int fts_options =  FTS_PHYSICAL | FTS_NOCHDIR | FTS_XDEV ;
 		
 		// fts_open requires a null-terminated array of paths.
-		const char * fts_paths[2] = {[[self path] UTF8String],NULL};
+		const char * fts_paths[2] = {[[self absTargetFilePath] UTF8String],NULL};
 		
 		errno = 0;
 		FTS* ftsp = fts_open((char * const *)fts_paths, fts_options, NULL);
@@ -79,7 +80,7 @@
 		}
 
 		errno = 0;
-		if(rmdir([[self path] UTF8String]) != 0)
+		if(rmdir([[self absTargetFilePath] UTF8String]) != 0)
 		{
 			int error_no = errno;
 			dispatch_async([self queue_callback],^{

@@ -35,7 +35,7 @@
 -(void)executeOnQueue:(dispatch_queue_t)aQueue
 {
 	dispatch_async(aQueue,^{
-		int fd = open([[self path] UTF8String],O_RDONLY);
+		int fd = open([[self absTargetFilePath] UTF8String],O_RDONLY);
 		
 		dispatch_io_t channel_data_read = \
 			dispatch_io_create(DISPATCH_IO_RANDOM

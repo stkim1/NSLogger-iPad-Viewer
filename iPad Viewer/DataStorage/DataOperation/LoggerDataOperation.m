@@ -32,24 +32,36 @@
 #import "LoggerDataOperation.h"
 
 @implementation LoggerDataOperation
-@synthesize path = _path;
+
+@synthesize basepath = _basepath;
+@synthesize filepath = _filepath;
+@synthesize dirPartOfFilepath = _dirPartOfFilepath;
+@synthesize absTargetFilePath = _absTargetFilePath;
+
 @synthesize callback = _callback;
 @synthesize queue_io_handler = _queue_io_handler;
 @synthesize queue_callback = _queue_callback;
+@synthesize executing = _executing;
+@synthesize dependencyCount = _dependencyCount;
+
 
 -(id)initWithBasepath:(NSString *)aBasepath
 			 filePath:(NSString *)aFilepath
+		dirOfFilepath:(NSString *)aDirOfFilepath
 	   callback_queue:(dispatch_queue_t)a_callback_queue
 			 callback:(callback_t)a_callback_block
 {
 	self = [super init];
 	if(self)
 	{
-		
 		_dependencyCount = 0;
+		_executing = NO;
 
-		_path = [[NSString stringWithFormat:@"%@%@",aBasepath,aFilepath] retain];
-		
+		_basepath = [aBasepath retain];
+		_filepath = [aFilepath retain];
+		_dirPartOfFilepath = [aDirOfFilepath retain];
+		_absTargetFilePath = [[NSString alloc] initWithFormat:@"%@%@",aBasepath,aFilepath];
+
 		/*
 		 If multiple subsystems of your application share a dispatch object,
 		 each subsystem should call dispatch_retain to register its interest
@@ -71,7 +83,10 @@
 {
 	//MTLogAssert(@"%@ dealloc : %@",NSStringFromClass([self class]),_path);
 
-	[_path release],_path = nil;
+	[_basepath release],_basepath = nil;
+	[_filepath release],_filepath = nil;
+	[_dirPartOfFilepath release],_dirPartOfFilepath = nil;
+	[_absTargetFilePath release],_absTargetFilePath = nil;
 	dispatch_release(_queue_callback),_queue_callback = NULL;
 	[_callback release], _callback = NULL;
 	_queue_io_handler = NULL;

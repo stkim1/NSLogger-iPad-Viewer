@@ -42,6 +42,8 @@
 #import "LoggerFakeRead.h"
 #import "LoggerFakeWrite.h"
 
+#define CHECK_OPERATION_DEPENDENCY
+
 #define DATA_CACHE_PURGE_THRESHOLD	10000
 
 @interface LoggerDataStorage()
@@ -58,17 +60,27 @@
 @property (nonatomic, retain)	NSString				*basepath;
 @property (nonatomic, readonly) int						cpuCount;
 
+
 -(void)_purgeDataEntryCache;
 -(void)_cacheDataEntry:(LoggerDataEntry *)aDataEntry forKey:(NSString *)aKey;
 -(void)_uncacheDataEntryForKey:(NSString *)aKey;
+
+static inline
+unsigned int _write_dependency_count(NSArray*, LoggerDataWrite*);
 
 -(void)_enqueueWriteOperationForData:(NSData *)aData
 							  toPath:(NSString *)aFilepath
 							 forType:(LoggerMessageType)aType;
 
+static inline
+unsigned int _read_dependency_count(NSArray*, LoggerDataRead*);
+
 -(void)_enqueueReadOperationForFile:(NSString *)aFilepath
 							forType:(LoggerMessageType)aType
 						 withResult:(void (^)(NSData *aData))aResultHandler;
+
+static inline
+unsigned int _delete_dependency_count(NSArray*, LoggerDataDelete*);
 
 -(void)_dequeueOperation:(LoggerDataOperation *)anOperation;
 @end
@@ -328,13 +340,53 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 //------------------------------------------------------------------------------
 #pragma mark - Dequeue/Enqueue operations
 //------------------------------------------------------------------------------
+static inline
+unsigned int _write_dependency_count(NSArray *pool, LoggerDataWrite *operation)
+{
+	__block unsigned int dependencies = 0;
+
+	// check operation dependency
+	if([pool count])
+	{
+		[pool enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop)
+		{
+			// delete-write dependency
+			LoggerDataOperation *dataOp =  (LoggerDataOperation *)obj;
+			if([dataOp isKindOfClass:[LoggerDataDelete class]])
+			{
+				if(strcmp(dataOp.dirPartOfFilepath.UTF8String,operation.dirPartOfFilepath.UTF8String) == 0)
+				{
+					dependencies++;
+					return;
+				}
+			}
+			
+			//read-write dependency
+			if([dataOp isKindOfClass:[LoggerDataRead class]])
+			{
+				if(strcmp(dataOp.filepath.UTF8String,operation.filepath.UTF8String) == 0)
+				{
+					dependencies++;
+					return;
+				}
+			}
+			
+		}];
+
+	}
+
+	MTLogVerify(@"total write dependency count %u",dependencies);
+	
+	return dependencies;
+}
+
 -(void)_enqueueWriteOperationForData:(NSData *)aData
 							  toPath:(NSString *)aFilepath
 							 forType:(LoggerMessageType)aType
 {
 	assert(dispatch_get_current_queue() == [self highPriorityOperationQueue]);
 
-	__block unsigned int dependencyCount = 0;
+	unsigned int dependencyCount = 0;
 	
 	LoggerDataEntry *dataEntry = \
 		[[LoggerDataEntry alloc] initWithFilepath:aFilepath type:aType];
@@ -343,20 +395,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 
 	// set cache entry for filepath
 	[self _cacheDataEntry:dataEntry forKey:aFilepath];
-	
-#ifdef CHECK_OPERATION_DEPENDENCY
-	// check operation dependency
-	if([[self operationPool] count])
-	{
-		[[self operationPool]
-		 enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-			if([obj isKindOfClass:[LoggerDataDelete class]])
-			{
-			}
-		 }];
-		
-	}
-#endif
 
 	LoggerFakeWrite	*writeOperation = \
 		[[LoggerFakeWrite alloc]
@@ -367,7 +405,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 		 callback_queue:[self highPriorityOperationQueue]
 		 callback:^(LoggerDataOperation *dataOperation, int error, NSData *data) {
 			 MTLogInfo(@"%@ success %@ error %d",[dataEntry filepath],(!error?@"YES":@"NO"),error);
-			 
+
 			 // handle success
 			 if(error == 0)
 			 {
@@ -387,7 +425,11 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 			 
 			 [self _dequeueOperation:dataOperation];
 		 }];
-
+	
+#ifdef CHECK_OPERATION_DEPENDENCY
+	dependencyCount = _write_dependency_count([self operationPool], writeOperation);
+#endif
+	
 	[writeOperation setDependencyCount:dependencyCount];
 
 	// add this operation to dataOperation of anEntry
@@ -400,16 +442,55 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 	if(!dependencyCount && [[self writeOperationSlot] count] < [self cpuCount])
 	{
 		[[self writeOperationSlot] addObject:writeOperation];
+		[writeOperation setExecuting:YES];
 		[writeOperation executeOnQueue:[self operationDispatcherQueue]];
 		MTLogInfo(@"[WRITE] en-slot<%d>\n(%@)"
 				  ,[[self writeOperationSlot] count]
-				  ,[writeOperation path]);
+				  ,[writeOperation absTargetFilePath]);
 	}
 
 	[dataEntry release],dataEntry = nil;
 	[writeOperation release],writeOperation = nil;
 }
 
+static inline
+unsigned int _read_dependency_count(NSArray *pool, LoggerDataRead *operation)
+{
+	__block unsigned int dependencies = 0;
+	
+	// check operation dependency
+	if([pool count])
+	{
+		[pool enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop)
+		 {
+			 // delete-read dependency
+			 LoggerDataOperation *dataOp =  (LoggerDataOperation *)obj;
+			 if([dataOp isKindOfClass:[LoggerDataDelete class]])
+			 {
+				 if(strcmp(dataOp.dirPartOfFilepath.UTF8String,operation.dirPartOfFilepath.UTF8String) == 0)
+				 {
+					 dependencies++;
+					 return;
+				 }
+			 }
+			 
+			 //write-read dependency
+			 if([dataOp isKindOfClass:[LoggerDataRead class]])
+			 {
+				 if(strcmp(dataOp.filepath.UTF8String,operation.filepath.UTF8String) == 0)
+				 {
+					 dependencies++;
+					 return;
+				 }
+			 }
+		 }];
+		
+	}
+
+	MTLogVerify(@"total read dependency count %u",dependencies);
+	
+	return dependencies;
+}
 
 -(void)_enqueueReadOperationForFile:(NSString *)aFilepath
 							forType:(LoggerMessageType)aType
@@ -417,67 +498,59 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 {
 	assert(dispatch_get_current_queue() == [self highPriorityOperationQueue]);
 	
-	__block unsigned int dependencyCount = 0;
+	unsigned int dependencyCount = 0;
 	
 	LoggerDataEntry *dataEntry =\
 		[[LoggerDataEntry alloc] initWithFilepath:aFilepath type:aType];
 	
 	// set cache entry for filepath
 	[self _cacheDataEntry:dataEntry forKey:aFilepath];
-	
-#ifdef CHECK_OPERATION_DEPENDENCY
-	// check operation dependency
-	if([[self operationPool] count])
-	{
-		[[self operationPool]
-		 enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-			 if([obj isKindOfClass:[LoggerDataDelete class]])
-			 {
-			 }
-		 }];
 		
-	}
-#endif
-	
 	LoggerFakeRead	*readOperation = \
 		[[LoggerFakeRead alloc]
-		  initWithBasepath:[self basepath]
-		  filePath:[dataEntry filepath]
-		  callback_queue:[self highPriorityOperationQueue]
-		  callback:^(LoggerDataOperation *dataOperation, int error, NSData *data) {
-			  //MTLogInfo(@"[READ] File read %@ success %@ error %d",aFilepath,(!error?@"YES":@"NO"),error);
-			  if(error == 0)
-			  {
-				  if([dataEntry dataType] == kMessageImage)
-				  {
-					  [dataEntry setData:data];
-					  // handle success
-					  aResultHandler(data);
-					  [[dataEntry dataOperations] removeObject:dataOperation];
-				  }
-				  else
-				  {
-					  // handle success
-					  aResultHandler(data);
-					  
-					  // if data is not image, remove from cache as soon as possible
-					  [self _uncacheDataEntryForKey:aFilepath];
-				  }
-			  }
-			  else
-			  {
-				  // if read operation fails, remove datacache
-				  MTLogError(@"read file error. remove data cache");
-				  aResultHandler(nil);
-				  [self _uncacheDataEntryForKey:aFilepath];
-			  }
-			  
-			  [self _dequeueOperation:dataOperation];
+		 initWithBasepath:[self basepath]
+		 filePath:[dataEntry filepath]
+		 dirOfFilepath:[dataEntry dirOfFilepath]
+		 callback_queue:[self highPriorityOperationQueue]
+		 callback:^(LoggerDataOperation *dataOperation, int error, NSData *data) {
+			//MTLogInfo(@"[READ] File read %@ success %@ error %d",aFilepath,(!error?@"YES":@"NO"),error);
+			if(error == 0)
+			{
+				if([dataEntry dataType] == kMessageImage)
+				{
+					[dataEntry setData:data];
+					// handle success
+					aResultHandler(data);
+					[[dataEntry dataOperations] removeObject:dataOperation];
+				}
+				else
+				{
+					// handle success
+					aResultHandler(data);
 
-		  }];
+					// if data is not image, remove from cache as soon as possible
+					[self _uncacheDataEntryForKey:aFilepath];
+				}
+			}
+			else
+			{
+				// if read operation fails, remove datacache
+				MTLogError(@"read file error. remove data cache");
+				aResultHandler(nil);
+				[self _uncacheDataEntryForKey:aFilepath];
+			}
+
+			[self _dequeueOperation:dataOperation];
+
+		 }];
+
+#ifdef CHECK_OPERATION_DEPENDENCY
+	dependencyCount = _read_dependency_count([self operationPool], readOperation);
+#endif
 	
 	[readOperation setDependencyCount:dependencyCount];
 	
+
 	// add this operation to dataOperation of anEntry
 	[[dataEntry dataOperations] addObject:readOperation];
 	
@@ -488,15 +561,36 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 	if(!dependencyCount && [[self readOperationSlot] count] < [self cpuCount])
 	{
 		[[self readOperationSlot] addObject:readOperation];
+		[readOperation setExecuting:YES];
 		[readOperation executeOnQueue:[self operationDispatcherQueue]];
 
 		MTLogVerify(@"[READ] en-slot<%d>\n(%@)"
 				  ,[[self readOperationSlot] count]
-				  ,[readOperation path]);
+				  ,[readOperation absTargetFilePath]);
 	}
 
 	[dataEntry release],dataEntry = nil;
 	[readOperation release],readOperation = nil;
+}
+
+static inline
+unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation)
+{
+	__block unsigned int dependencies = 0;
+	
+	// check operation dependency
+	if([pool count])
+	{
+		[pool enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop)
+		 {
+			 if([obj isKindOfClass:[LoggerDataDelete class]])
+			 {
+			 }
+		 }];
+		
+	}
+	
+	return dependencies;
 }
 
 
@@ -511,14 +605,13 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 		[anOperation retain];
 		
 		// remove the operation from exec slot
-		if([anOperation isKindOfClass:[LoggerDataWrite class]] ||
-		   [anOperation isKindOfClass:[LoggerDataDelete class]])
+		if([anOperation isKindOfClass:[LoggerDataRead class]])
 		{
-			[[self writeOperationSlot] removeObject:anOperation];
+			[[self readOperationSlot] removeObject:anOperation];
 		}
 		else
 		{
-			[[self readOperationSlot] removeObject:anOperation];
+			[[self writeOperationSlot] removeObject:anOperation];
 		}
 		
 		// remove from pool
@@ -542,19 +635,15 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 				/* condition for finding the next operation is...
 				 * 1) next target is not found
 				 * 2) operation's dependency is 0
-				 * 3) an operatin is not contained in read slot
-				 * 4) an operatin is not contained in write slot
+				 * 3) an operatin is not executing
 				 */
 
-				if(nextOperation == nil && !dataOp.dependencyCount)
+				if(nextOperation == nil &&
+				   ![dataOp isExecuting] &&
+				   ([dataOp dependencyCount] == 0))
 				{
-			
-				   if(![[self readOperationSlot] containsObject:obj] &&
-					  ![[self writeOperationSlot] containsObject:obj])
-					{
-						MTLogInfo(@"nextOperation found");
-						nextOperation = [dataOp retain];
-					}
+					MTLogInfo(@"nextOperation found");
+					nextOperation = [dataOp retain];
 				}
 			 }];
 		}
@@ -576,11 +665,10 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 					[nextOperation executeOnQueue:[self operationDispatcherQueue]];
 					MTLogInfo(@"[WRITE] en-slot<%d>\n(%@)"
 							  ,[[self writeOperationSlot] count]
-							  ,[nextOperation path]);
+							  ,[nextOperation absTargetFilePath]);
 				}
 				
 			}
-			
 			
 			if([nextOperation isKindOfClass:[LoggerDataRead class]])
 			{
@@ -590,7 +678,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 					[nextOperation executeOnQueue:[self operationDispatcherQueue]];
 					MTLogInfo(@"[READ] en-slot<%d>\n(%@)"
 							  ,[[self readOperationSlot] count]
-							  ,[nextOperation path]);
+							  ,[nextOperation absTargetFilePath]);
 				}
 			}
 
