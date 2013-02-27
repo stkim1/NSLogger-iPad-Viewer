@@ -178,7 +178,7 @@ make_mul_level_dir(char *path)
 	NSException* initException =
 		[NSException
 		 exceptionWithName:@"LoggerDataWrite"
-		 reason:@"Inherited method not supported. Use InitWithData:"
+		 reason:@"Inherited method not supported. Use InitWithData:basepath:filePath:dirPartOfFilepath:callback_queue:callback:"
 		 userInfo:nil];
 	@throw initException;
 }

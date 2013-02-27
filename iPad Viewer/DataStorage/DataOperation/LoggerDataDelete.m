@@ -34,6 +34,51 @@
 #include <errno.h>
 
 @implementation LoggerDataDelete
+-(id)initWithBasepath:(NSString *)aBasepath
+			 filePath:(NSString *)aFilepath
+		dirOfFilepath:(NSString *)aDirOfFilepath
+	   callback_queue:(dispatch_queue_t)a_callback_queue
+			 callback:(callback_t)a_callback_block
+{
+	NSException* initException =
+		[NSException
+		 exceptionWithName:@"LoggerDataDelete"
+		 reason:@"Inherited method not supported. Use initWithBasepath:dirOfFilepath:callback_queue:callback"
+		 userInfo:nil];
+	@throw initException;
+}
+
+-(id)initWithBasepath:(NSString *)aBasepath
+		dirOfFilepath:(NSString *)aDirOfFilepath
+	   callback_queue:(dispatch_queue_t)a_callback_queue
+			 callback:(callback_t)a_callback_block
+{
+	self = [super init];
+	if(self)
+	{
+		_dependencyCount = 0;
+		_executing = NO;
+
+		_basepath = [aBasepath retain];
+		_dirPartOfFilepath = [aDirOfFilepath retain];
+		_absTargetFilePath = [[NSString alloc] initWithFormat:@"%@%@",aBasepath,aDirOfFilepath];
+		
+		/*
+		 If multiple subsystems of your application share a dispatch object,
+		 each subsystem should call dispatch_retain to register its interest
+		 in the object. The object is deallocated only when all subsystems
+		 have released their interest in the dispatch source.
+		 */
+		_queue_callback = a_callback_queue;
+		dispatch_retain(_queue_callback);
+		
+		_callback = [a_callback_block copy];
+
+		_queue_io_handler =\
+			dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0);
+	}
+	return self;
+}
 
 -(void)executeOnQueue:(dispatch_queue_t)aQueue
 {

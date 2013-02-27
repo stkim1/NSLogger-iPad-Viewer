@@ -338,7 +338,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Dequeue/Enqueue operations
+#pragma mark - Enqueue operations
 //------------------------------------------------------------------------------
 static inline
 unsigned int _write_dependency_count(NSArray *pool, LoggerDataWrite *operation)
@@ -350,8 +350,15 @@ unsigned int _write_dependency_count(NSArray *pool, LoggerDataWrite *operation)
 	{
 		[pool enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop)
 		{
-			// delete-write dependency
+
 			LoggerDataOperation *dataOp =  (LoggerDataOperation *)obj;
+
+			// if dataOp is same class, don't count it.
+			if([dataOp class] == [LoggerDataWrite class])
+				return;
+			
+			// delete-write dependency
+			//if([dataOp class] == [LoggerDataDelete class]])
 			if([dataOp isKindOfClass:[LoggerDataDelete class]])
 			{
 				if(strcmp(dataOp.dirPartOfFilepath.UTF8String,operation.dirPartOfFilepath.UTF8String) == 0)
@@ -463,8 +470,13 @@ unsigned int _read_dependency_count(NSArray *pool, LoggerDataRead *operation)
 	{
 		[pool enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop)
 		 {
-			 // delete-read dependency
 			 LoggerDataOperation *dataOp =  (LoggerDataOperation *)obj;
+			 
+			 // if dataOp is same class, don't count it.
+			 if([dataOp class] == [LoggerDataRead class])
+				 return;
+
+			 // delete-read dependency
 			 if([dataOp isKindOfClass:[LoggerDataDelete class]])
 			 {
 				 if(strcmp(dataOp.dirPartOfFilepath.UTF8String,operation.dirPartOfFilepath.UTF8String) == 0)
@@ -583,14 +595,78 @@ unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation
 	{
 		[pool enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop)
 		 {
-			 if([obj isKindOfClass:[LoggerDataDelete class]])
+			 LoggerDataOperation *dataOp =  (LoggerDataOperation *)obj;
+			 
+			 // read,write-delete dependency
+			 if(![dataOp isKindOfClass:[LoggerDataDelete class]])
 			 {
+				 if(strcmp(dataOp.dirPartOfFilepath.UTF8String,operation.dirPartOfFilepath.UTF8String) == 0)
+				 {
+					 dependencies++;
+					 return;
+				 }
 			 }
 		 }];
-		
 	}
+
+	MTLogVerify(@"total dependencies %d",dependencies);
 	
 	return dependencies;
+}
+
+
+-(void)_enqueueDeleteOperationForDir:(NSString *)aDirPath
+{
+	assert(dispatch_get_current_queue() == [self lowPriorityOperationQueue]);
+
+	unsigned int dependencyCount = 0;
+	
+	LoggerFakeDelete *deleteOperation = \
+		[[LoggerFakeDelete alloc]
+		 initWithBasepath:[self basepath]
+		 dirOfFilepath:aDirPath
+		 callback_queue:[self highPriorityOperationQueue]
+		 callback:^(LoggerDataOperation *dataOperation, int error, NSData *data) {
+
+			 MTLogVerify(@"DataManager Delete %@ success %@ error %d"
+						,[dataOperation dirPartOfFilepath]
+						,(!error?@"YES":@"NO"),error);
+
+			 if(error == 0)
+			 {
+				 // handle success
+			 }
+			 else
+			 {
+				 // handle error here
+			 }
+			 
+			 [self _dequeueOperation:dataOperation];
+ 
+		 }];
+
+#ifdef CHECK_OPERATION_DEPENDENCY
+	dependencyCount = _delete_dependency_count([self operationPool], deleteOperation);
+#endif
+	
+	[deleteOperation setDependencyCount:dependencyCount];
+
+	#warning we need to check if there is an op with same dir.
+	[[self operationPool] addObject:deleteOperation];
+
+	// if there is no dependency and write op slot is available, execute this operation
+	if(!dependencyCount && [[self writeOperationSlot] count] < [self cpuCount])
+	{
+		[[self writeOperationSlot] addObject:deleteOperation];
+		[deleteOperation setExecuting:YES];
+		[deleteOperation executeOnQueue:[self operationDispatcherQueue]];
+		MTLogInfo(@"[WRITE] en-slot<%d>\n(%@)"
+				  ,[[self writeOperationSlot] count]
+				  ,[deleteOperation absTargetFilePath]);
+	}
+
+	[deleteOperation release],deleteOperation = nil;
+
 }
 
 
@@ -622,30 +698,50 @@ unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation
 		
 		if([[self operationPool] count])
 		{
-			[[self operationPool]
-			 enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-
-				 LoggerDataOperation *dataOp = (LoggerDataOperation *)obj;
-				 
+			for(LoggerDataOperation *dataOp in [self operationPool])
+			{
 				 // check operation dependency, remove dependency count by one
 #ifdef CHECK_OPERATION_DEPENDENCY
-				 
-				 
+				if([dataOp class] != [anOperation class])
+				{
+					if([anOperation isKindOfClass:[LoggerDataDelete class]])
+					{
+						if(strcmp(dataOp.dirPartOfFilepath.UTF8String,anOperation.dirPartOfFilepath.UTF8String) == 0)
+						{
+							unsigned int dependency = [dataOp dependencyCount];
+							dependency--;
+							[dataOp setDependencyCount:dependency];
+							
+							MTLogVerify(@"dependency reduction %d",dependency);
+						}
+					}
+					else
+					{
+						if(strcmp(dataOp.filepath.UTF8String, anOperation.filepath.UTF8String) == 0)
+						{
+							unsigned int dependency = [dataOp dependencyCount];
+							dependency--;
+							[dataOp setDependencyCount:dependency];
+
+							MTLogVerify(@"dependency reduction %d",dependency);
+						}
+					}
+				}
 #endif
 				/* condition for finding the next operation is...
-				 * 1) next target is not found
-				 * 2) operation's dependency is 0
-				 * 3) an operatin is not executing
-				 */
+				* 1) next target is not found
+				* 2) operation's dependency is 0
+				* 3) an operatin is not executing
+				*/
 
 				if(nextOperation == nil &&
-				   ![dataOp isExecuting] &&
-				   ([dataOp dependencyCount] == 0))
+					![dataOp isExecuting] &&
+					([dataOp dependencyCount] == 0))
 				{
 					MTLogInfo(@"nextOperation found");
 					nextOperation = [dataOp retain];
 				}
-			 }];
+			}
 		}
 
 		// now operation is done with its job. release it

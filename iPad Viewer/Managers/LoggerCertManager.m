@@ -80,7 +80,7 @@ static const UInt8 kKeychainCertificateID[] = "NSLogger SSL\0";
 	SecIdentityRef			identityRef			= NULL;
 	SecCertificateRef		certificateRef		= NULL;
 	
-    CredentialImportStatus  status;
+    CredentialImportStatus  status				= kCredentialImportStatusFailed;
 	CFStringRef				identityLabel		= NULL;
 	
 	NSDictionary			*identitySearchQuery = nil;

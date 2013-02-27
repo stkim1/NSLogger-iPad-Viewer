@@ -80,6 +80,7 @@ CGColorRef CreateCGColorFromUIColor(UIColor * color)
 
     return colorRef;
 #else
+#warning wrong retain count!
     return [color CGColor];
 #endif
 

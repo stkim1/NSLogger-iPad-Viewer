@@ -31,4 +31,8 @@
 #import "LoggerDataOperation.h"
 
 @interface LoggerDataDelete : LoggerDataOperation
+-(id)initWithBasepath:(NSString *)aBasepath
+		dirOfFilepath:(NSString *)aDirOfFilepath
+	   callback_queue:(dispatch_queue_t)a_callback_queue
+			 callback:(callback_t)a_callback_block;
 @end

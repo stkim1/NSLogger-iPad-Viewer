@@ -177,10 +177,9 @@
 	NSFetchRequest *request = [[NSFetchRequest alloc] init];
 
 	NSEntityDescription *entity =\
-	[NSEntityDescription
-	 entityForName:@"LoggerMessageData"
-	 inManagedObjectContext:
-	 [[self dataManager] messageDisplayContext]];
+		[NSEntityDescription
+		 entityForName:@"LoggerMessageData"
+		 inManagedObjectContext:[[self dataManager] messageDisplayContext]];
 #warning possible bug introduction. watchout
 	[request setShouldRefreshRefetchedObjects:NO];
 	[request setEntity:entity];
@@ -232,7 +231,6 @@
 	[frc release],frc = nil;
 	[sortBySequence release],sortBySequence = nil;
 	[sortByTimestamp release],sortByTimestamp = nil;
-	[entity release],entity = nil;
 	[request release],request = nil;
 }
 
