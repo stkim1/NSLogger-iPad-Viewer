@@ -277,6 +277,9 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 
 -(void)deleteWholePath:(NSString *)aPath
 {
+	dispatch_async([self lowPriorityOperationQueue], ^{
+		[self _enqueueDeleteOperationForDir:aPath];
+	});
 }
 
 //------------------------------------------------------------------------------
@@ -591,7 +594,7 @@ unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation
 		 }];
 	}
 
-	MTLogVerify(@"total dependencies %d",dependencies);
+	MTLogVerify(@"total DELETE dependencies %d",dependencies);
 	
 	return dependencies;
 }
@@ -681,7 +684,7 @@ unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation
 #ifdef CHECK_OPERATION_DEPENDENCY
 			if([dataOp class] != [anOperation class])
 			{
-				if([anOperation isKindOfClass:[LoggerDataDelete class]])
+				if([dataOp isKindOfClass:[LoggerDataDelete class]] || [anOperation isKindOfClass:[LoggerDataDelete class]])
 				{
 					if(strcmp(dataOp.dirPartOfFilepath.UTF8String,anOperation.dirPartOfFilepath.UTF8String) == 0)
 					{
@@ -744,7 +747,7 @@ unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation
 //------------------------------------------------------------------------------
 -(void)_dispatchOperation:(LoggerDataOperation *)anOperation
 {
-	assert(dispatch_get_current_queue() == [self highPriorityOperationQueue]);
+	//assert(dispatch_get_current_queue() == [self highPriorityOperationQueue]);
 
 	if([anOperation isKindOfClass:[LoggerDataRead class]])
 	{

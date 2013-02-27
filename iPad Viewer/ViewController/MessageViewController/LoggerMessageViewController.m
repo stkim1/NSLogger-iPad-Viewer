@@ -41,6 +41,7 @@
 
 @interface LoggerMessageViewController ()
 @property (nonatomic, retain) NSFetchedResultsController	*messageFetchResultController;
+@property (nonatomic, retain) NSDictionary *clientInfo;
 @end
 
 @implementation LoggerMessageViewController
@@ -50,15 +51,6 @@
 }
 @synthesize messageFetchResultController = _messageFetchResultController;
 @synthesize tableView = _tableView;
-
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
 
 - (void)viewDidLoad
 {
@@ -130,9 +122,6 @@
 	 selector:@selector(deleteMessages:)
 	 name:kShowClientDisconnectedNotification
 	 object:nil];
-	
-	
-	
 #endif
 }
 
@@ -164,6 +153,9 @@
 	
 	uLong clientHash = [[userInfo objectForKey:kClientHash] integerValue];
 	int32_t runCount = [[userInfo objectForKey:kClientRunCount] integerValue];
+
+	self.clientInfo = nil;
+	self.clientInfo = userInfo;
 	
 	assert([self.dataManager messageDisplayContext] != nil);
 		
@@ -195,14 +187,14 @@
 		 ,runCount]];
 	
 	NSSortDescriptor *sortByTimestamp = \
-	[[NSSortDescriptor alloc]
-	 initWithKey:@"timestamp"
-	 ascending:NO];
+		[[NSSortDescriptor alloc]
+		 initWithKey:@"timestamp"
+		 ascending:NO];
 	
 	NSSortDescriptor *sortBySequence = \
-	[[NSSortDescriptor alloc]
-	 initWithKey:@"sequence"
-	 ascending:NO];
+		[[NSSortDescriptor alloc]
+		 initWithKey:@"sequence"
+		 ascending:NO];
 	
 	[request setSortDescriptors:@[sortBySequence,sortByTimestamp]];
 	
@@ -211,11 +203,11 @@
 	[NSFetchedResultsController deleteCacheWithName:cacheName];
 	
 	NSFetchedResultsController *frc = \
-	[[NSFetchedResultsController alloc]
-	 initWithFetchRequest:request
-	 managedObjectContext:[[self dataManager] messageDisplayContext]
-	 sectionNameKeyPath:nil//@"uniqueID"
-	 cacheName:cacheName];
+		[[NSFetchedResultsController alloc]
+		 initWithFetchRequest:request
+		 managedObjectContext:[[self dataManager] messageDisplayContext]
+		 sectionNameKeyPath:nil//@"uniqueID"
+		 cacheName:cacheName];
 	
 
 	[frc setDelegate:self];
@@ -256,6 +248,24 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+
+-(IBAction)deletePath:(id)sender
+{
+	if(_clientInfo == nil)
+		return;
+
+	uLong clientHash = [[self.clientInfo objectForKey:kClientHash] integerValue];
+	int32_t runCount = [[self.clientInfo objectForKey:kClientRunCount] integerValue];
+
+	NSString *targetDir = [[NSString alloc] initWithFormat:@"%lx/%d/",clientHash,runCount];
+	[[LoggerDataStorage sharedDataStorage]
+	 deleteWholePath:targetDir];
+	[targetDir release],targetDir = nil;
+	
+}
+
+
 
 //------------------------------------------------------------------------------
 #pragma mark - UITableViewDataSource Delegate Methods

@@ -39,4 +39,5 @@
 ,NSFetchedResultsControllerDelegate>
 @property (nonatomic, assign) LoggerDataManager			*dataManager;
 @property (nonatomic, assign) IBOutlet UITableView		*tableView;
+-(IBAction)deletePath:(id)sender;
 @end
