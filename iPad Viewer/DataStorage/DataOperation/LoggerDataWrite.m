@@ -320,7 +320,7 @@ NSLog(@"make target dir error");
 				dispatch_data_create([_data bytes]
 									 ,[_data length]
 									 ,[self queue_io_handler]
-									 ,DISPATCH_DATA_DESTRUCTOR_FREE);
+									 ,^{/* You are not the owner of data. DO NOTHING!*/});
 
 			dispatch_io_write(channel_data_save
 							  ,0

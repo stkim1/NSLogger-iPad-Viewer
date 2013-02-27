@@ -83,6 +83,8 @@ static inline
 unsigned int _delete_dependency_count(NSArray*, LoggerDataDelete*);
 
 -(void)_dequeueOperation:(LoggerDataOperation *)anOperation;
+
+-(void)_dispatchOperation:(LoggerDataOperation *)anOperation;
 @end
 
 @implementation LoggerDataStorage
@@ -228,8 +230,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 		  toPath:(NSString *)aFilepath
 		 forType:(LoggerMessageType)aType
 {
-	MTLogVerify(@"%s data # %d path %@",__PRETTY_FUNCTION__,[aData length],aFilepath);
-	
 	if(IS_NULL_STRING(aFilepath))
 		return;
 
@@ -285,7 +285,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 
 -(void)_purgeDataEntryCache
 {
-	MTLogAssert(@"let's start purging entry cache");
+	MTLogAssert(@"--- CACHE PURGING---");
 	dispatch_async([self lowPriorityOperationQueue], ^{
 		NSMutableArray *purgeList = \
 			[[NSMutableArray alloc] initWithCapacity:0];
@@ -313,11 +313,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 -(void)_cacheDataEntry:(LoggerDataEntry *)aDataEntry forKey:(NSString *)aKey
 {
 	[[self dataEntryCache] setObject:aDataEntry forKey:aKey];
-
 	_dataEntryCacheSize += [aDataEntry totalDataLength];
-	
-	MTLogVerify(@"** CACHE SIZE ** %u",_dataEntryCacheSize);
-	
 	if(DATA_CACHE_PURGE_THRESHOLD <= _dataEntryCacheSize )
 	{
 		// start purging cache
@@ -329,9 +325,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 {
 	LoggerDataEntry *entry = [[self dataEntryCache] objectForKey:aKey];
 	_dataEntryCacheSize -= [entry totalDataLength];
-
-	MTLogVerify(@"** CACHE SIZE ** %u",_dataEntryCacheSize);
-	
 	[[self dataEntryCache] removeObjectForKey:aKey];
 }
 
@@ -445,15 +438,10 @@ unsigned int _write_dependency_count(NSArray *pool, LoggerDataWrite *operation)
 	// add operation to pool
 	[[self operationPool] addObject:writeOperation];
 	
-	// if there is no dependency and write op slot is available, execute this operation
-	if(!dependencyCount && [[self writeOperationSlot] count] < [self cpuCount])
+	// if there is no dependency, try to dispatch the operation
+	if(dependencyCount == 0)
 	{
-		[[self writeOperationSlot] addObject:writeOperation];
-		[writeOperation setExecuting:YES];
-		[writeOperation executeOnQueue:[self operationDispatcherQueue]];
-		MTLogInfo(@"[WRITE] en-slot<%d>\n(%@)"
-				  ,[[self writeOperationSlot] count]
-				  ,[writeOperation absTargetFilePath]);
+		[self _dispatchOperation:writeOperation];
 	}
 
 	[dataEntry release],dataEntry = nil;
@@ -525,7 +513,7 @@ unsigned int _read_dependency_count(NSArray *pool, LoggerDataRead *operation)
 		 dirOfFilepath:[dataEntry dirOfFilepath]
 		 callback_queue:[self highPriorityOperationQueue]
 		 callback:^(LoggerDataOperation *dataOperation, int error, NSData *data) {
-			//MTLogInfo(@"[READ] File read %@ success %@ error %d",aFilepath,(!error?@"YES":@"NO"),error);
+			MTLogInfo(@"[READ] File read %@ success %@ error %d",aFilepath,(!error?@"YES":@"NO"),error);
 			if(error == 0)
 			{
 				if([dataEntry dataType] == kMessageImage)
@@ -569,16 +557,10 @@ unsigned int _read_dependency_count(NSArray *pool, LoggerDataRead *operation)
 	// add operation to pool
 	[[self operationPool] addObject:readOperation];
 	
-	// if there is no dependency and write op slot is available, execute this operation
-	if(!dependencyCount && [[self readOperationSlot] count] < [self cpuCount])
+	// if there is no dependency, try to dispatch the operation
+	if(dependencyCount == 0)
 	{
-		[[self readOperationSlot] addObject:readOperation];
-		[readOperation setExecuting:YES];
-		[readOperation executeOnQueue:[self operationDispatcherQueue]];
-
-		MTLogVerify(@"[READ] en-slot<%d>\n(%@)"
-				  ,[[self readOperationSlot] count]
-				  ,[readOperation absTargetFilePath]);
+		[self _dispatchOperation:readOperation];
 	}
 
 	[dataEntry release],dataEntry = nil;
@@ -654,15 +636,10 @@ unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation
 	#warning we need to check if there is an op with same dir.
 	[[self operationPool] addObject:deleteOperation];
 
-	// if there is no dependency and write op slot is available, execute this operation
-	if(!dependencyCount && [[self writeOperationSlot] count] < [self cpuCount])
+	// if there is no dependency, try to dispatch the operation
+	if(dependencyCount == 0)
 	{
-		[[self writeOperationSlot] addObject:deleteOperation];
-		[deleteOperation setExecuting:YES];
-		[deleteOperation executeOnQueue:[self operationDispatcherQueue]];
-		MTLogInfo(@"[WRITE] en-slot<%d>\n(%@)"
-				  ,[[self writeOperationSlot] count]
-				  ,[deleteOperation absTargetFilePath]);
+		[self _dispatchOperation:deleteOperation];
 	}
 
 	[deleteOperation release],deleteOperation = nil;
@@ -675,112 +652,125 @@ unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation
 //------------------------------------------------------------------------------
 -(void)_dequeueOperation:(LoggerDataOperation *)anOperation
 {
-	dispatch_async([self highPriorityOperationQueue], ^{
-
-		// first retain the operation for a while
-		[anOperation retain];
-		
-		// remove the operation from exec slot
-		if([anOperation isKindOfClass:[LoggerDataRead class]])
+	assert(dispatch_get_current_queue() == [self highPriorityOperationQueue]);
+	
+	// first retain the operation for a while
+	[anOperation retain];
+	
+	// remove the operation from exec slot
+	if([anOperation isKindOfClass:[LoggerDataRead class]])
+	{
+		[[self readOperationSlot] removeObject:anOperation];
+	}
+	else
+	{
+		[[self writeOperationSlot] removeObject:anOperation];
+	}
+	
+	// remove from pool
+	[[self operationPool] removeObject:anOperation];
+	
+	// search next operation & check dependent operations
+	__block LoggerDataOperation *nextOperation = nil;
+	
+	if([[self operationPool] count])
+	{
+		for(LoggerDataOperation *dataOp in [self operationPool])
 		{
-			[[self readOperationSlot] removeObject:anOperation];
-		}
-		else
-		{
-			[[self writeOperationSlot] removeObject:anOperation];
-		}
-		
-		// remove from pool
-		[[self operationPool] removeObject:anOperation];
-		
-		// search next operation & check dependent operations
-		__block LoggerDataOperation *nextOperation = nil;
-		
-		if([[self operationPool] count])
-		{
-			for(LoggerDataOperation *dataOp in [self operationPool])
-			{
-				 // check operation dependency, remove dependency count by one
+			 // check operation dependency, remove dependency count by one
 #ifdef CHECK_OPERATION_DEPENDENCY
-				if([dataOp class] != [anOperation class])
+			if([dataOp class] != [anOperation class])
+			{
+				if([anOperation isKindOfClass:[LoggerDataDelete class]])
 				{
-					if([anOperation isKindOfClass:[LoggerDataDelete class]])
+					if(strcmp(dataOp.dirPartOfFilepath.UTF8String,anOperation.dirPartOfFilepath.UTF8String) == 0)
 					{
-						if(strcmp(dataOp.dirPartOfFilepath.UTF8String,anOperation.dirPartOfFilepath.UTF8String) == 0)
-						{
-							unsigned int dependency = [dataOp dependencyCount];
-							dependency--;
-							[dataOp setDependencyCount:dependency];
-							
-							MTLogVerify(@"dependency reduction %d",dependency);
-						}
-					}
-					else
-					{
-						if(strcmp(dataOp.filepath.UTF8String, anOperation.filepath.UTF8String) == 0)
-						{
-							unsigned int dependency = [dataOp dependencyCount];
-							dependency--;
-							[dataOp setDependencyCount:dependency];
-
-							MTLogVerify(@"dependency reduction %d",dependency);
-						}
+						unsigned int dependency = [dataOp dependencyCount];
+						dependency--;
+						[dataOp setDependencyCount:dependency];
+						
+						MTLogVerify(@"%@ dependency reduction %d",NSStringFromClass([dataOp class]),dependency);
 					}
 				}
+				else
+				{
+					if(strcmp(dataOp.filepath.UTF8String, anOperation.filepath.UTF8String) == 0)
+					{
+						unsigned int dependency = [dataOp dependencyCount];
+						dependency--;
+						[dataOp setDependencyCount:dependency];
+
+						MTLogVerify(@"%@ dependency reduction %d",NSStringFromClass([dataOp class]),dependency);
+					}
+				}
+			}
 #endif
-				/* condition for finding the next operation is...
-				* 1) next target is not found
-				* 2) operation's dependency is 0
-				* 3) an operatin is not executing
-				*/
+			/* condition for finding the next operation is...
+			* 1) next target is not found
+			* 2) operation's dependency is 0
+			* 3) an operatin is not executing
+			*/
 
-				if(nextOperation == nil &&
-					![dataOp isExecuting] &&
-					([dataOp dependencyCount] == 0))
-				{
-					MTLogInfo(@"nextOperation found");
-					nextOperation = [dataOp retain];
-				}
+			if(nextOperation == nil &&
+				![dataOp isExecuting] &&
+				([dataOp dependencyCount] == 0))
+			{
+				MTLogInfo(@"nextOperation found");
+				nextOperation = [dataOp retain];
 			}
 		}
+	}
 
-		// now operation is done with its job. release it
-		[anOperation release];
-		
-		// if there is no dependency and read|write op slot is available,
-		// execute this operation
-		if(nextOperation != nil)
-		{
-			if([nextOperation isKindOfClass:[LoggerDataWrite class]] ||
-			   [nextOperation isKindOfClass:[LoggerDataDelete class]])
-			{
+	// now operation is done with its job. release it
+	[anOperation release];
+	
 
-				if([[self writeOperationSlot] count] < [self cpuCount])
-				{
-					[[self writeOperationSlot] addObject:nextOperation];
-					[nextOperation executeOnQueue:[self operationDispatcherQueue]];
-					MTLogInfo(@"[WRITE] en-slot<%d>\n(%@)"
-							  ,[[self writeOperationSlot] count]
-							  ,[nextOperation absTargetFilePath]);
-				}
-				
-			}
-			
-			if([nextOperation isKindOfClass:[LoggerDataRead class]])
-			{
-				if([[self readOperationSlot] count] < [self cpuCount])
-				{
-					[[self readOperationSlot] addObject:nextOperation];
-					[nextOperation executeOnQueue:[self operationDispatcherQueue]];
-					MTLogInfo(@"[READ] en-slot<%d>\n(%@)"
-							  ,[[self readOperationSlot] count]
-							  ,[nextOperation absTargetFilePath]);
-				}
-			}
+	MTLogVerify(@"------------------ operation pool size %u ------------------",[[self operationPool] count]);
 
-			[nextOperation release],nextOperation = nil;
-		}
-	});
+	
+	// if there is no dependency and read|write op slot is available,
+	// execute the next operation
+	if((nextOperation != nil) && (nextOperation.dependencyCount == 0))
+	{
+
+		[self _dispatchOperation:nextOperation];
+
+		[nextOperation release],nextOperation = nil;
+	}
 }
+
+//------------------------------------------------------------------------------
+#pragma mark - Dequeue operations
+//------------------------------------------------------------------------------
+-(void)_dispatchOperation:(LoggerDataOperation *)anOperation
+{
+	assert(dispatch_get_current_queue() == [self highPriorityOperationQueue]);
+
+	if([anOperation isKindOfClass:[LoggerDataRead class]])
+	{
+		if([[self readOperationSlot] count] < [self cpuCount])
+		{
+			[[self readOperationSlot] addObject:anOperation];
+			[anOperation setExecuting:YES];
+			[anOperation executeOnQueue:[self operationDispatcherQueue]];
+			MTLogInfo(@"[READ] en-slot<%d>\n(%@)"
+					  ,[[self readOperationSlot] count]
+					  ,[anOperation absTargetFilePath]);
+		}
+	}
+	else
+	{
+		if([[self writeOperationSlot] count] < [self cpuCount])
+		{
+			[[self writeOperationSlot] addObject:anOperation];
+			[anOperation setExecuting:YES];
+			[anOperation executeOnQueue:[self operationDispatcherQueue]];
+			MTLogInfo(@"[WRITE] en-slot<%d>\n(%@)"
+					  ,[[self writeOperationSlot] count]
+					  ,[anOperation absTargetFilePath]);
+		}
+	}
+}
+
 
 @end
