@@ -12,5 +12,5 @@ DETAILED DOCUMENTS, EXAMPLES, AND DEMOS TO BE ADDED SOON(™)
 
 
 
-_VER. 0.1.4_<br/>
-_Updated : Feb. 9, 2013_
+_VER. 0.1.5_<br/>
+_Updated : Feb. 28, 2013_
