@@ -37,11 +37,6 @@
 #import "LoggerDataEntry.h"
 #import "SynthesizeSingleton.h"
 
-
-#import "LoggerFakeDelete.h"
-#import "LoggerFakeRead.h"
-#import "LoggerFakeWrite.h"
-
 #define CHECK_OPERATION_DEPENDENCY
 
 #define DATA_CACHE_PURGE_THRESHOLD	10000
@@ -399,8 +394,8 @@ unsigned int _write_dependency_count(NSArray *pool, LoggerDataWrite *operation)
 	// set cache entry for filepath
 	[self _cacheDataEntry:dataEntry forKey:aFilepath];
 
-	LoggerFakeWrite	*writeOperation = \
-		[[LoggerFakeWrite alloc]
+	LoggerDataWrite	*writeOperation = \
+		[[LoggerDataWrite alloc]
 		 initWithData:[dataEntry data]
 		 basepath:[self basepath]
 		 filePath:[dataEntry filepath]
@@ -429,9 +424,8 @@ unsigned int _write_dependency_count(NSArray *pool, LoggerDataWrite *operation)
 			 [self _dequeueOperation:dataOperation];
 		 }];
 	
-#ifdef CHECK_OPERATION_DEPENDENCY
+	// check operation dependency
 	dependencyCount = _write_dependency_count([self operationPool], writeOperation);
-#endif
 	
 	[writeOperation setDependencyCount:dependencyCount];
 
@@ -509,8 +503,8 @@ unsigned int _read_dependency_count(NSArray *pool, LoggerDataRead *operation)
 	// set cache entry for filepath
 	[self _cacheDataEntry:dataEntry forKey:aFilepath];
 		
-	LoggerFakeRead	*readOperation = \
-		[[LoggerFakeRead alloc]
+	LoggerDataRead	*readOperation = \
+		[[LoggerDataRead alloc]
 		 initWithBasepath:[self basepath]
 		 filePath:[dataEntry filepath]
 		 dirOfFilepath:[dataEntry dirOfFilepath]
@@ -547,9 +541,9 @@ unsigned int _read_dependency_count(NSArray *pool, LoggerDataRead *operation)
 
 		 }];
 
-#ifdef CHECK_OPERATION_DEPENDENCY
+	// check operation dependency
 	dependencyCount = _read_dependency_count([self operationPool], readOperation);
-#endif
+
 	
 	[readOperation setDependencyCount:dependencyCount];
 	
@@ -606,8 +600,8 @@ unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation
 
 	unsigned int dependencyCount = 0;
 	
-	LoggerFakeDelete *deleteOperation = \
-		[[LoggerFakeDelete alloc]
+	LoggerDataDelete *deleteOperation = \
+		[[LoggerDataDelete alloc]
 		 initWithBasepath:[self basepath]
 		 dirOfFilepath:aDirPath
 		 callback_queue:[self highPriorityOperationQueue]
@@ -630,9 +624,8 @@ unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation
  
 		 }];
 
-#ifdef CHECK_OPERATION_DEPENDENCY
+	// check operation dependency
 	dependencyCount = _delete_dependency_count([self operationPool], deleteOperation);
-#endif
 	
 	[deleteOperation setDependencyCount:dependencyCount];
 
@@ -680,8 +673,7 @@ unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation
 	{
 		for(LoggerDataOperation *dataOp in [self operationPool])
 		{
-			 // check operation dependency, remove dependency count by one
-#ifdef CHECK_OPERATION_DEPENDENCY
+			 // check operation dependency, reduce dependency count by one
 			if([dataOp class] != [anOperation class])
 			{
 				if([dataOp isKindOfClass:[LoggerDataDelete class]] || [anOperation isKindOfClass:[LoggerDataDelete class]])
@@ -707,7 +699,7 @@ unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation
 					}
 				}
 			}
-#endif
+
 			/* condition for finding the next operation is...
 			* 1) next target is not found
 			* 2) operation's dependency is 0
@@ -718,7 +710,6 @@ unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation
 				![dataOp isExecuting] &&
 				([dataOp dependencyCount] == 0))
 			{
-				MTLogInfo(@"nextOperation found");
 				nextOperation = [dataOp retain];
 			}
 		}
@@ -727,9 +718,7 @@ unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation
 	// now operation is done with its job. release it
 	[anOperation release];
 	
-
-	MTLogVerify(@"------------------ operation pool size %u ------------------",[[self operationPool] count]);
-
+	MTLogVerify(@"------------------ OPERATION POOL SIZE %u ------------------",[[self operationPool] count]);
 	
 	// if there is no dependency and read|write op slot is available,
 	// execute the next operation
