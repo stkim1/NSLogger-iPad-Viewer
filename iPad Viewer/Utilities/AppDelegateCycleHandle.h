@@ -32,6 +32,7 @@
 
 @protocol AppDelegateCycleHandle <NSObject>
 
+@required
 // when app did start
 -(void)appStarted;
 

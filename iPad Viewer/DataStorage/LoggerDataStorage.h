@@ -30,8 +30,9 @@
 
 #import <Foundation/Foundation.h>
 #import "LoggerConstModel.h"
+#import "AppDelegateCycleHandle.h"
 
-@interface LoggerDataStorage : NSObject
+@interface LoggerDataStorage : NSObject <AppDelegateCycleHandle>
 
 +(LoggerDataStorage *)sharedDataStorage;
 

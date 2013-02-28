@@ -219,6 +219,34 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 }
 
 //------------------------------------------------------------------------------
+#pragma mark - App life cycle handlers
+//------------------------------------------------------------------------------
+
+// when app did start
+-(void)appStarted
+{
+	
+}
+
+// app resigned from activity (power button, home button clicked)
+-(void)appResignActive
+{
+	
+}
+
+// app becomes active again
+-(void)appBecomeActive
+{
+	
+}
+
+// app will terminate
+-(void)appWillTerminate
+{
+	
+}
+
+//------------------------------------------------------------------------------
 #pragma mark - Write/Read/Delete operation
 //------------------------------------------------------------------------------
 -(void)writeData:(NSData *)aData

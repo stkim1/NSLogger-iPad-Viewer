@@ -200,7 +200,8 @@
 	
 	NSString *cacheName = [NSString stringWithFormat:@"Cache-%lx",clientHash];
 	
-	[NSFetchedResultsController deleteCacheWithName:cacheName];
+	//[NSFetchedResultsController deleteCacheWithName:cacheName];
+	[NSFetchedResultsController deleteCacheWithName:nil];
 	
 	NSFetchedResultsController *frc = \
 		[[NSFetchedResultsController alloc]
