@@ -37,9 +37,11 @@
 #import "LoggerClientHeight.h"
 #import "LoggerMarkerHeight.h"
 
+//#define SUPPORT_LADNSACPE_DISPLAY
+
 @class LoggerConnection;
 
-@interface LoggerMessage : NSObject <NSCopying>
+@interface LoggerMessage : NSObject
 {
 	struct timeval				timestamp;		// full timestamp (seconds & microseconds)
     

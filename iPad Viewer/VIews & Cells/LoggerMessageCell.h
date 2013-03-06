@@ -47,9 +47,11 @@ extern NSString * const kMessageCellReuseID;
 	UIView					*_messageView;		// a view which draws content of message
 	UITableView				*_hostTableView;	// a tableview hosting this cell
 	LoggerMessageData		*_messageData;		// *NOT RETAINED* : this comes from CoreData
+	UIImage					*_imageData;
 }
 @property (nonatomic, assign) UITableView				*hostTableView;
-@property (nonatomic, readonly) LoggerMessageData		*messageData;
+@property (nonatomic, retain) LoggerMessageData			*messageData;
+@property (nonatomic, retain) UIImage					*imageData;
 
 + (UIColor *)colorForTag:(NSString *)tag;
 
@@ -66,4 +68,7 @@ extern NSString * const kMessageCellReuseID;
 
 - (void)drawMessageInRect:(CGRect)aDrawRect
 	 highlightedTextColor:(UIColor *)aHighlightedTextColor;
+
+-(void)setImagedata:(NSData *)anImageData forRect:(CGRect)aRect;
+
 @end

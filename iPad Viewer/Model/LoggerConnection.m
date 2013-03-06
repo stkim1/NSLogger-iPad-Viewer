@@ -204,7 +204,11 @@ char sConnectionAssociatedObjectKey = 1;
 			[m textRepresentation];
 			[m image];
 			[m portraitHeight];
+
+			// for now, landscape display is not supported
+#ifdef SUPPORT_LADNSACPE_DISPLAY
 			[m landscapeHeight];
+#endif
 		}
 
 		if(LoggerCheckDelegate(delegate

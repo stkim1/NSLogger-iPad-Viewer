@@ -37,15 +37,19 @@ extern UIFont	*measureTagAndLevelFont;
 extern UIFont	*measureMonospacedFont;
 
 @implementation LoggerMarkerHeight
-+ (CGFloat)heightForMessage:(LoggerMessage *)aMessage onWidth:(CGFloat)aWidth
++ (CGFloat)heightForMessage:(LoggerMessage *)aMessage
+					onWidth:(CGFloat)aWidth
+			  withMaxHeight:(CGFloat)aMaxHeight
 {
+/*
 	CGFloat minimumHeight = \
 		[LoggerMessageHeight
 		 minimumHeightForCellOnWidth:aWidth];
-	
+*/
+
 	UIFont *monospacedFont   = measureMonospacedFont;
 	
-	CGSize sz = CGSizeMake(aWidth, minimumHeight);
+	CGSize sz = CGSizeMake(aWidth, aMaxHeight);
 	
 	sz.width -= 8;
 	sz.height -= 4;

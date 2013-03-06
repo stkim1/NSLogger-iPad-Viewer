@@ -41,7 +41,8 @@
 + (CGFloat)heightForFileLineFunctionOnWidth:(CGFloat)aWidth;
 
 + (CGFloat)heightForMessage:(LoggerMessage *)aMessage
-					onWidth:(CGFloat)aWidth;
+					onWidth:(CGFloat)aWidth
+			  withMaxHeight:(CGFloat)aMaxHeight;
 
 + (CGFloat)heightForFileLineFunctionOfMessage:(LoggerMessage *)aMessage
 									  onWidth:(CGFloat)aWidth;

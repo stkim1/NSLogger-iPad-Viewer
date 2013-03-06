@@ -112,15 +112,18 @@ UIFont	*measureMonospacedFont = nil;
 	return _defaultFileLineFunctionHeight;
 }
 
-+ (CGFloat)heightForMessage:(LoggerMessage *)aMessage onWidth:(CGFloat)aWidth
++ (CGFloat)heightForMessage:(LoggerMessage *)aMessage
+					onWidth:(CGFloat)aWidth
+			  withMaxHeight:(CGFloat)aMaxHeight
 {
+
 	CGFloat minimumHeight = \
 		[LoggerMessageHeight
 		 minimumHeightForCellOnWidth:aWidth];
 
 	UIFont *monospacedFont   = measureMonospacedFont;
 	
-	CGSize sz = CGSizeMake(aWidth, minimumHeight);
+	CGSize sz = CGSizeMake(aWidth, aMaxHeight);
 
 	sz.width -= TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + 8;
 	sz.height -= 4;
@@ -159,12 +162,14 @@ UIFont	*measureMonospacedFont = nil;
 			CGSize imgSize = aMessage.imageSize;
 			CGFloat ratio = fmaxf(1.0f, fmaxf(imgSize.width / sz.width, imgSize.height / (sz.height / 2.0f)));
 			sz.height = ceilf(imgSize.height / ratio);
+
+MTLogVerify(@"---- image size %@ ---- cell size %@ --- ratio %5.2f",NSStringFromCGSize(imgSize),NSStringFromCGSize(sz),ratio);
 			break;
 		}
 		default:
 			break;
 	}
-	
+		
 	// return calculated cell height
 	return fmaxf(sz.height + 6, minimumHeight);
 }

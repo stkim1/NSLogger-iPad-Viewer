@@ -31,9 +31,18 @@
 
 #import "LoggerMessageData.h"
 #import "LoggerDataStorage.h"
+#import "LoggerMessageCell.h"
+
+@interface LoggerMessageData()
+-(LoggerMessageCell *)messageCell;
+-(void)setMessageCell:(LoggerMessageCell *)aCell;
+@end
 
 @implementation LoggerMessageData
-
+{
+	LoggerMessageCell		*_targetCell;
+	BOOL					_isReadImageTriggered;
+}
 @dynamic clientHash;
 @dynamic contentsType;
 @dynamic dataFilepath;
@@ -80,20 +89,99 @@
 	
 }
 
--(void)readMessageData:(void (^)(NSData *data))aDataReadBlock
+-(LoggerMessageCell *)messageCell
 {
+	return _targetCell;
+}
+
+-(void)setMessageCell:(LoggerMessageCell *)aCell
+{
+	if(_targetCell != aCell)
+	{
+		[aCell retain];
+		[_targetCell release],_targetCell = nil;
+		_targetCell = aCell;
+	}
+}
+
+-(void)didTurnIntoFault
+{
+	if(_targetCell != nil && !_isReadImageTriggered)
+	{
+		MTLogError(@"%s this really shouldn't happen",__PRETTY_FUNCTION__);
+		[_targetCell release],_targetCell = nil;
+	}
+
+	[super didTurnIntoFault];
+}
+
+-(void)dealloc
+{
+	if(_targetCell != nil && !_isReadImageTriggered)
+	{
+		MTLogError(@"%s this really shouldn't happen",__PRETTY_FUNCTION__);
+		[_targetCell release],_targetCell = nil;
+	}
 	
-	LoggerMessageType type = [[self contentsType] shortValue];
+	[super dealloc];
+}
+
+
+-(LoggerMessageType)dataType
+{
+	LoggerMessageType type = (LoggerMessageType)[[self contentsType] shortValue];
+	return type;
+}
+
+
+-(void)imageForCell:(LoggerMessageCell *)aCell
+{
+
+	LoggerMessageType type = [self dataType];
+
 	//now store datas
 	if(type != kMessageImage)
 		return;
 
-	[[LoggerDataStorage sharedDataStorage]
-	 readDataFromPath:[self dataFilepath]
-	 forType:type
-	 withResult:^(NSData *aData) {
-		 MTLogInfo(@"%s read done",__PRETTY_FUNCTION__);
-	 }];
+	MTLogVerify(@"%s %p %@",__PRETTY_FUNCTION__,aCell,[self dataFilepath]);
+	
+	[self setMessageCell:aCell];
+	
+	if(!_isReadImageTriggered)
+	{
+		_isReadImageTriggered = YES;
+
+		[[LoggerDataStorage sharedDataStorage]
+		 readDataFromPath:[self dataFilepath]
+		 forType:type
+		 withResult:^(NSData *aData) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+
+				MTLogAssert(@"%s read done # of cells : %p, image : %@",__PRETTY_FUNCTION__, [self messageCell], [self dataFilepath]);
+				if(aData != nil && [aData length])
+				{
+					[[self messageCell] setImagedata:aData forRect:CGRectZero];
+				}
+				// release the cell after use
+				[self setMessageCell:nil];
+				_isReadImageTriggered = NO;
+
+			});
+		 }];
+	}
+}
+
+-(void)cancelImageForCell:(LoggerMessageCell *)aCell
+{
+	LoggerMessageType type = [self dataType];
+	
+	//now store datas
+	if(type != kMessageImage)
+		return;
+
+	MTLogError(@"%s %p",__PRETTY_FUNCTION__,aCell);
+	
+	[self setMessageCell:nil];
 }
 
 

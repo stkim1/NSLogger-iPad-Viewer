@@ -37,6 +37,9 @@
 	dispatch_async(aQueue,^{
 		int fd = open([[self absTargetFilePath] UTF8String],O_RDONLY);
 		
+		MTLogVerify(@"%s %@",__PRETTY_FUNCTION__,[self absTargetFilePath]);
+
+		
 		dispatch_io_t channel_data_read = \
 			dispatch_io_create(DISPATCH_IO_RANDOM
 							   ,fd
@@ -56,43 +59,58 @@
 		{
 			dispatch_io_set_low_water(channel_data_read, 1);
 			dispatch_io_set_high_water(channel_data_read, SIZE_MAX);
-			
+			__block dispatch_data_t lead = NULL;
 			dispatch_io_read(channel_data_read
 							 ,0
 							 ,SIZE_MAX
 							 ,[self queue_io_handler]
 							 ,^(bool done, dispatch_data_t data, int error) {
-								 if(done)
+								 if(lead == NULL)
 								 {
-									 if(!error)
-									 {
-										 const void *buffer = NULL;
-										 size_t size = 0;
-										 dispatch_data_t new_data_file __attribute__((unused)) = nil;
-										 __block NSData *dataRead = nil;
-										 
-										 new_data_file = \
-											 dispatch_data_create_map(data, &buffer, &size);
-										 
-										 //NSData is thread safe
-										 dataRead = \
-											 [[NSData alloc]
-											  initWithBytesNoCopy:(void *)(buffer)
-											  length:size
-											  freeWhenDone:YES];
-
-										 dispatch_async([self queue_callback],^{
-											 self.callback(self,error,dataRead);
-										 });
-
-										 [dataRead release];
-									 }
-									 else
-									 {
-										 dispatch_async([self queue_callback],^{
-											 self.callback(self,error,nil);
-										 });
-									 }
+									 lead = data;
+									 dispatch_retain(lead);
+								 }
+								 else
+								 {
+									 dispatch_data_t concat = dispatch_data_create_concat(lead,data);
+									 dispatch_release(lead);
+									 lead = concat;
+								 }
+								 
+								 if(!done) return;
+								 
+								 if(!error)
+								 {
+									 const void *buffer = NULL;
+									 size_t size = 0;
+									 
+									 dispatch_data_t new_data_file =\
+									 dispatch_data_create_map(lead, &buffer, &size);
+									 
+									 MTLog(@"======= data read size %zd ======= ",size);
+									 //NSData is thread safe
+									 NSData *dataRead = \
+										 [[NSData alloc]
+										  initWithBytesNoCopy:(void *)(buffer)
+										  length:size
+										  freeWhenDone:YES];
+									 
+									 dispatch_async([self queue_callback],^{
+										 self.callback(self,error,dataRead);
+									 });
+									 
+									 [dataRead release];
+									 dispatch_release(new_data_file);
+								 }
+								 else
+								 {
+									 dispatch_async([self queue_callback],^{
+										 self.callback(self,error,nil);
+									 });
+								 }
+								 
+								 if(lead != NULL){
+									 dispatch_release(lead);
 								 }
 							 });
 			dispatch_io_close(channel_data_read, 0);

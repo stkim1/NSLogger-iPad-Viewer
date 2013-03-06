@@ -278,17 +278,25 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 		
 		LoggerDataEntry *entry = [[self dataEntryCache] objectForKey:aPath];
 		
-		if(entry != nil)// && [entry data] != nil)
+		if(entry != nil)
 		{
-			MTLogVerify(@"[READ] Cache Found %@ success YES",aPath);
-			
-			NSData *cachedData = [entry data];
-			aResultHandler(cachedData);
-			
-			return;
+			if([entry data] != nil)
+			{
+				MTLogVerify(@"[READ] Cache Found %@ success YES",aPath);
+				
+				NSData *cachedData = [entry data];
+				aResultHandler(cachedData);
+				
+				return;
+			}
+			else
+			{
+				MTLogAssert(@"this should never happen ! %@",aPath);
+				return;
+			}
 		}
 
-		MTLogError(@"[READ] Cache NOT Found %@",aPath);
+		//MTLogError(@"[READ] Cache NOT Found %@",aPath);
 
 		// cannot find an entry from cache. find it from file system
 		dispatch_async([self highPriorityOperationQueue], ^{
@@ -530,7 +538,7 @@ unsigned int _read_dependency_count(NSArray *pool, LoggerDataRead *operation)
 	
 	// set cache entry for filepath
 	[self _cacheDataEntry:dataEntry forKey:aFilepath];
-		
+
 	LoggerDataRead	*readOperation = \
 		[[LoggerDataRead alloc]
 		 initWithBasepath:[self basepath]

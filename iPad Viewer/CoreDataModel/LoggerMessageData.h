@@ -32,6 +32,8 @@
 #import <CoreData/CoreData.h>
 #include "LoggerConstModel.h"
 
+@class LoggerMessageCell;
+
 @interface LoggerMessageData : NSManagedObject
 
 @property (nonatomic, retain) NSNumber * clientHash;
@@ -54,6 +56,8 @@
 @property (nonatomic, retain) NSNumber * timestamp;
 @property (nonatomic, retain) NSNumber * type;
 
--(void)readMessageData:(void (^)(NSData *data))aDataReadBlock;
+-(LoggerMessageType)dataType;
+-(void)imageForCell:(LoggerMessageCell *)aCell;
+-(void)cancelImageForCell:(LoggerMessageCell *)aCell;
 -(unsigned long)rawDataSize;
 @end

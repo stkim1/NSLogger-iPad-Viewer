@@ -56,15 +56,6 @@
 	return self;
 }
 
-// -----------------------------------------------------------------------------
-#pragma mark NSCopying
-// -----------------------------------------------------------------------------
-- (id)copyWithZone:(NSZone *)zone
-{
-	// Used only for displaying, we can afford not providing a real copy here
-    return [self retain];
-}
-
 - (void)dealloc
 {
 	[tag release];
@@ -242,28 +233,38 @@
 			case LOGMSG_TYPE_BLOCKEND:
 				height = [LoggerMessageHeight
 						  heightForMessage:self
-						  onWidth:MSG_CELL_PORTRAIT_WIDTH];
+						  onWidth:MSG_CELL_PORTRAIT_WIDTH
+						  withMaxHeight:MSG_CELL_PORTRAIT_MAX_HEIGHT];
 				break;
 			case LOGMSG_TYPE_CLIENTINFO:
 			case LOGMSG_TYPE_DISCONNECT:
 				height = [LoggerClientHeight
 						  heightForMessage:self
-						  onWidth:MSG_CELL_PORTRAIT_WIDTH];
+						  onWidth:MSG_CELL_PORTRAIT_WIDTH
+						  withMaxHeight:MSG_CELL_PORTRAIT_MAX_HEIGHT];
 				break;
 			case LOGMSG_TYPE_MARK:
 				height = [LoggerMarkerHeight
 						  heightForMessage:self
-						  onWidth:MSG_CELL_PORTRAIT_WIDTH];
+						  onWidth:MSG_CELL_PORTRAIT_WIDTH
+						  withMaxHeight:MSG_CELL_PORTRAIT_MAX_HEIGHT];
 				break;
 		}
 		_portraitHeight = height;
 	}
+
+	if(contentsType == kMessageImage)
+	{
+		MTLogVerify(@"------ cell height %f-----",_portraitHeight);
+	}
+
 	return _portraitHeight;
 }
 
 
 -(CGFloat)landscapeHeight
 {
+#ifdef SUPPORT_LADNSACPE_DISPLAY
 	if(_landscapeHeight == 0)
 	{
 		CGFloat height = 0;
@@ -291,6 +292,8 @@
 		}
 		_landscapeHeight = height;
 	}
+#endif
+
 	return _landscapeHeight;
 }
 

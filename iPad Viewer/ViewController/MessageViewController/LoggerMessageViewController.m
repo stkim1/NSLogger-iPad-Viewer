@@ -200,8 +200,8 @@
 	
 	NSString *cacheName = [NSString stringWithFormat:@"Cache-%lx",clientHash];
 	
-	//[NSFetchedResultsController deleteCacheWithName:cacheName];
-	[NSFetchedResultsController deleteCacheWithName:nil];
+	[NSFetchedResultsController deleteCacheWithName:cacheName];
+	//[NSFetchedResultsController deleteCacheWithName:nil];
 	
 	NSFetchedResultsController *frc = \
 		[[NSFetchedResultsController alloc]
@@ -263,7 +263,6 @@
 	[[LoggerDataStorage sharedDataStorage]
 	 deleteWholePath:targetDir];
 	[targetDir release],targetDir = nil;
-	
 }
 
 

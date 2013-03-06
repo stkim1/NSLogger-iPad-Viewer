@@ -52,7 +52,9 @@ UIColor *defaultTagAndLevelColor = nil;
 @end
 
 @implementation LoggerMessageCell
+@synthesize hostTableView = _hostTableView;
 @synthesize messageData = _messageData;
+@synthesize imageData = _imageData;
 
 +(void)initialize
 {
@@ -131,8 +133,11 @@ UIColor *defaultTagAndLevelColor = nil;
 
 -(void)dealloc
 {
-	_messageData = nil;
+	MTLogVerify(@"%@ dealloc",self);
 	self.hostTableView = nil;
+	self.messageData = nil;
+	self.imageData = nil;
+
 	[super dealloc];
 }
 
@@ -153,6 +158,13 @@ UIColor *defaultTagAndLevelColor = nil;
 	[_messageView setNeedsDisplay];
 }
 
+- (void)setNeedsDisplayInRect:(CGRect)rect
+{
+	[super setNeedsDisplayInRect:rect];
+	[_messageView setNeedsDisplayInRect:rect];
+}
+
+
 #if 0
 - (void)setNeedsLayout
 {
@@ -160,6 +172,21 @@ UIColor *defaultTagAndLevelColor = nil;
 	[_messageView setNeedsLayout];
 }
 #endif
+
+-(void)prepareForReuse
+{
+	[super prepareForReuse];
+	
+	
+	if([self.messageData dataType] == kMessageImage)
+	{
+		MTLogInfo(@"prepareForReuse");
+		[_messageData cancelImageForCell:self];
+	}
+
+	self.imageData = nil;
+	self.messageData = nil;
+}
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {
@@ -170,10 +197,37 @@ UIColor *defaultTagAndLevelColor = nil;
 -(void)setupForIndexpath:(NSIndexPath *)anIndexPath
 			 messageData:(LoggerMessageData *)aMessageData
 {
-	_messageData = aMessageData;
+	self.messageData = aMessageData;
+	self.imageData = nil;
 
-	[aMessageData readMessageData:NULL];
+	if([aMessageData dataType] == kMessageImage)
+	{
+		[aMessageData imageForCell:self];
+	}
+	else
+	{
+		[self setNeedsDisplay];
+	}
+}
+
+// draw image data from ManagedObject model (LoggerMessage)
+-(void)setImagedata:(NSData *)anImageData forRect:(CGRect)aRect
+{
+	// in case this cell is detached from tableview,
+	if(self.superview == nil)
+	{
+		return;
+	}
 	
+	UIImage *image = [[UIImage alloc] initWithData:anImageData];
+	self.imageData = image;
+	[image release],image = nil;
+	
+	
+	MTLogVerify(@"image size %@",NSStringFromCGSize([self.imageData size]));
+	
+	
+	//[self setNeedsDisplayInRect:aRect];
 	[self setNeedsDisplay];
 }
 
@@ -397,8 +451,8 @@ UIColor *defaultTagAndLevelColor = nil;
 	[[UIColor blackColor] set];
 
 	UIFont *monospacedFont = displayMonospacedFont;
-	
-	switch([_messageData.contentsType shortValue])
+
+	switch([_messageData dataType])
 	{
 		case kMessageString:{
 			// in case the message text is empty, use the function name as message text
@@ -479,7 +533,18 @@ UIColor *defaultTagAndLevelColor = nil;
 			break;
 		}
 		case kMessageImage: {
-		// do nothing yet
+			if(_imageData != nil)
+			{
+				
+				CGRect r = CGRectInset(aDrawRect, 0, 1);
+				CGSize srcSize = [_imageData size];
+				CGFloat ratio = fmaxf(1.0f, fmaxf(srcSize.width / CGRectGetWidth(r), srcSize.height / CGRectGetHeight(r)));
+				CGSize newSize = CGSizeMake(floorf(srcSize.width / ratio), floorf(srcSize.height / ratio));
+				//CGRect imageRect = (CGRect){{CGRectGetMinX(r),CGRectGetMinY(r) + CGRectGetHeight(r)},newSize};
+				CGRect imageRect = (CGRect){{CGRectGetMinX(r),CGRectGetMinY(r)},newSize};
+				[self.imageData drawInRect:imageRect];
+				self.imageData = nil;
+			}
 		}
 	}
 	
@@ -545,7 +610,6 @@ UIColor *defaultTagAndLevelColor = nil;
 				   CGRectGetHeight(cellFrame));
 
 	[self drawThreadIDAndTagInRect:drawRect highlightedTextColor:nil];
-	
 	
 	
 	// Draw message
