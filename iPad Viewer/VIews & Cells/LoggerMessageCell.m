@@ -204,10 +204,8 @@ UIColor *defaultTagAndLevelColor = nil;
 	{
 		[aMessageData imageForCell:self];
 	}
-	else
-	{
-		[self setNeedsDisplay];
-	}
+
+	[self setNeedsDisplay];
 }
 
 // draw image data from ManagedObject model (LoggerMessage)
@@ -222,10 +220,6 @@ UIColor *defaultTagAndLevelColor = nil;
 	UIImage *image = [[UIImage alloc] initWithData:anImageData];
 	self.imageData = image;
 	[image release],image = nil;
-	
-	
-	MTLogVerify(@"image size %@",NSStringFromCGSize([self.imageData size]));
-	
 	
 	//[self setNeedsDisplayInRect:aRect];
 	[self setNeedsDisplay];

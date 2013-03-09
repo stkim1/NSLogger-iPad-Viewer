@@ -81,24 +81,22 @@
 								 
 								 if(!error)
 								 {
-									 const void *buffer = NULL;
+									 void *buffer = NULL;
 									 size_t size = 0;
 									 
 									 dispatch_data_t new_data_file =\
-									 dispatch_data_create_map(lead, &buffer, &size);
+									 dispatch_data_create_map(lead, (const void **)(&buffer), &size);
 									 
-									 MTLog(@"======= data read size %zd ======= ",size);
 									 //NSData is thread safe
-									 NSData *dataRead = \
-										 [[NSData alloc]
-										  initWithBytesNoCopy:(void *)(buffer)
-										  length:size
-										  freeWhenDone:YES];
+									 NSData *dataRead =\
+										[[NSData alloc]
+										 initWithBytes:(const void *)(buffer)
+										 length:size];
 									 
 									 dispatch_async([self queue_callback],^{
 										 self.callback(self,error,dataRead);
 									 });
-									 
+
 									 [dataRead release];
 									 dispatch_release(new_data_file);
 								 }

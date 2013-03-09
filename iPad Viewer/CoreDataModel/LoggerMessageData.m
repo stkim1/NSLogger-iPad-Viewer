@@ -156,7 +156,6 @@
 		 forType:type
 		 withResult:^(NSData *aData) {
 			dispatch_async(dispatch_get_main_queue(), ^{
-
 				MTLogAssert(@"%s read done # of cells : %p, image : %@",__PRETTY_FUNCTION__, [self messageCell], [self dataFilepath]);
 				if(aData != nil && [aData length])
 				{
@@ -165,7 +164,6 @@
 				// release the cell after use
 				[self setMessageCell:nil];
 				_isReadImageTriggered = NO;
-
 			});
 		 }];
 	}

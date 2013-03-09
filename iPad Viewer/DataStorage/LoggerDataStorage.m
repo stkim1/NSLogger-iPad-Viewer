@@ -39,7 +39,7 @@
 
 #define CHECK_OPERATION_DEPENDENCY
 
-#define DATA_CACHE_PURGE_THRESHOLD	10000
+#define DATA_CACHE_PURGE_THRESHOLD	128000
 
 @interface LoggerDataStorage()
 @property (nonatomic, readonly) dispatch_queue_t		lowPriorityOperationQueue;
@@ -560,10 +560,10 @@ unsigned int _read_dependency_count(NSArray *pool, LoggerDataRead *operation)
 				{
 					// handle success
 					aResultHandler(data);
-
 					// if data is not image, remove from cache as soon as possible
 					[self _uncacheDataEntryForKey:aFilepath];
 				}
+
 			}
 			else
 			{
