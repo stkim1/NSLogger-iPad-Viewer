@@ -4,4 +4,7 @@
    <FileRef
       location = "group:iPad Viewer/iPad Viewer.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:UIProtoWork/UIProtoWork.xcodeproj">
+   </FileRef>
 </Workspace>
