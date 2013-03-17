@@ -50,6 +50,9 @@
 //Gesture properties
 #define kDefaultMinimumPressDuration 0.2
 
+//------------------------------------------------------------------------------
+#pragma mark - KLNoteViewController
+//------------------------------------------------------------------------------
 @interface KLNoteViewController ()
 - (void)configureDefaultSettings;
 
@@ -61,29 +64,40 @@
 
 @implementation KLNoteViewController
 
-- (id)initWithCoder:(NSCoder *)aDecoder {
+- (id)initWithCoder:(NSCoder *)aDecoder
+{
 	self = [super initWithCoder:aDecoder];
-	if (!self) {
+	if (!self)
+	{
 		return nil;
 	}
-
 	[self configureDefaultSettings];
-
 	return self;
 }
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
 	self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-	if (!self) {
+	if (!self)
+	{
 		return nil;
 	}
-
 	[self configureDefaultSettings];
-
 	return self;
 }
 
-- (void)configureDefaultSettings {
+-(void)dealloc
+{
+	self.cardShadowColor = nil;
+	self.controllerCards = nil;
+	
+	[super dealloc];
+}
+
+
+
+- (void)configureDefaultSettings
+{
 	self.cardNavigationBarClass          = [UINavigationBar class];
 
 	self.cardMinimizedScalingFactor      = kDefaultMinimizedScalingFactor;
@@ -116,7 +130,8 @@
 	                                        UIViewAutoresizingFlexibleWidth);
 }
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
 
 	//Populate the navigation controllers to the controller stack
 	[self reloadData];
@@ -130,7 +145,9 @@
 
 #pragma Drawing Methods - Used to position and present the navigation controllers on screen
 
-- (CGFloat)defaultVerticalOriginForControllerCard:(KLControllerCard *)controllerCard atIndex:(NSInteger)index {
+- (CGFloat)defaultVerticalOriginForControllerCard:(KLControllerCard *)controllerCard
+										  atIndex:(NSInteger)index
+{
 	//Sum up the shrunken size of each of the cards appearing before the current index
 	CGFloat originOffset = 0;
 	for (int i = 0; i < index; i++) {
@@ -143,27 +160,39 @@
 	return self.cardVerticalOrigin + originOffset;
 }
 
-- (CGFloat)scalingFactorForIndex:(NSInteger)index {
+- (CGFloat)scalingFactorForIndex:(NSInteger)index
+{
 	//Items should get progressively smaller based on their index in the navigation controller array
 	return powf(self.cardMinimizedScalingFactor, (totalCards - index));
 }
 
-- (void)reloadData {
+- (void)reloadData
+{
 	//Get the number of navigation  controllers to expect
 	totalCards = [self numberOfControllerCardsInNoteView:self];
 
 	//For each expected controller grab from the instantiating class and populate into local controller stack
 	NSMutableArray *navigationControllers = [[NSMutableArray alloc] initWithCapacity:totalCards];
-	for (NSInteger count = 0; count < totalCards; count++) {
-		UIViewController *viewController             = [self noteView:self viewControllerForRowAtIndexPath:[NSIndexPath indexPathForRow:count inSection:0]];
+	for (NSInteger count = 0; count < totalCards; count++)
+	{
+		UIViewController *viewController =\
+			[self
+			 noteView:self
+			 viewControllerForRowAtIndexPath:
+				[NSIndexPath indexPathForRow:count inSection:0]];
 
-		UINavigationController *navigationController = [[UINavigationController alloc] initWithNavigationBarClass:self.cardNavigationBarClass
-		                                                                                             toolbarClass:[UIToolbar class]];
+		UINavigationController *navigationController = \
+			[[UINavigationController alloc]
+			 initWithNavigationBarClass:self.cardNavigationBarClass
+			 toolbarClass:[UIToolbar class]];
 		[navigationController pushViewController:viewController animated:NO];
 
-		KLControllerCard *noteContainer = [[KLControllerCard alloc] initWithNoteViewController:self
-		                                                                  navigationController:navigationController
-		                                                                                 index:count];
+		KLControllerCard *noteContainer = \
+			[[KLControllerCard alloc]
+			 initWithNoteViewController:self
+			 navigationController:navigationController
+			 index:count];
+		
 		[noteContainer setDelegate:self];
 		[navigationControllers addObject:noteContainer];
 
@@ -179,76 +208,95 @@
 	self.controllerCards = [NSArray arrayWithArray:navigationControllers];
 }
 
-- (void)reloadDataAnimated:(BOOL)animated {
+- (void)reloadDataAnimated:(BOOL)animated
+{
 	if (animated) {
-		[UIView animateWithDuration:self.cardReloadHideAnimationDuration animations:^{
-		         for (KLControllerCard * card in self.controllerCards) {
-		                 [card setState:KLControllerCardStateHiddenBottom animated:NO];
+		[UIView
+		 animateWithDuration:self.cardReloadHideAnimationDuration
+		 animations:^{
+			 for (KLControllerCard * card in self.controllerCards)
+			 {
+				 [card setState:KLControllerCardStateHiddenBottom animated:NO];
 			 }
 		 } completion:^(BOOL finished) {
-		         [self reloadData];
-		         [self reloadInputViews];
-		         for (KLControllerCard * card in self.controllerCards) {
-		                 [card setState:KLControllerCardStateHiddenBottom animated:NO];
+			 [self reloadData];
+			 [self reloadInputViews];
+			 for (KLControllerCard * card in self.controllerCards)
+			 {
+				 [card setState:KLControllerCardStateHiddenBottom animated:NO];
 			 }
-		         [UIView animateWithDuration:self.cardReloadShowAnimationDuration animations:^{
-		          for (KLControllerCard * card in self.controllerCards) {
-		                  [card setState:KLControllerCardStateDefault animated:NO];
-			  }
-		  }];
+			 
+			 [UIView
+			  animateWithDuration:self.cardReloadShowAnimationDuration
+			  animations:^{
+				 for (KLControllerCard * card in self.controllerCards)
+				 {
+					 [card setState:KLControllerCardStateDefault animated:NO];
+				 }
+			  }];
 		 }];
 	}
-	else  {
+	else
+	{
 		[self reloadData];
 	}
 }
-- (void)reloadInputViews {
+
+- (void)reloadInputViews
+{
 	[super reloadInputViews];
 
 	//First remove all of the navigation controllers from the view to avoid redrawing over top of views
 	[self removeNavigationContainersFromSuperView];
 
 	//Add the navigation controllers to the view
-	for (KLControllerCard *container in self.controllerCards) {
+	for (KLControllerCard *container in self.controllerCards)
+	{
 		[self.view addSubview:container];
 	}
 }
 
 #pragma mark - Manage KLControllerCard helpers
 
-- (void)removeNavigationContainersFromSuperView {
-	for (KLControllerCard *navigationContainer in self.controllerCards) {
+- (void)removeNavigationContainersFromSuperView
+{
+	for (KLControllerCard *navigationContainer in self.controllerCards)
+	{
 		[navigationContainer.navigationController willMoveToParentViewController:nil]; // 1
 		[navigationContainer removeFromSuperview];    // 2
 	}
 }
 
-- (NSIndexPath *)indexPathForControllerCard:(KLControllerCard *)navigationContainer {
+- (NSIndexPath *)indexPathForControllerCard:(KLControllerCard *)navigationContainer
+{
 	NSInteger rowNumber = [self.controllerCards indexOfObject:navigationContainer];
-
 	return [NSIndexPath indexPathForRow:rowNumber inSection:0];
 }
 
-- (NSArray *)controllerCardAboveCard:(KLControllerCard *)card {
+- (NSArray *)controllerCardAboveCard:(KLControllerCard *)card
+{
 	NSInteger index = [self.controllerCards indexOfObject:card];
-
-	return [self.controllerCards filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL (KLControllerCard * controllerCard, NSDictionary * bindings) {
-	                                                                  NSInteger currentIndex = [self.controllerCards indexOfObject:controllerCard];
-
-	                                                                  //Only return cards with an index less than the one being compared to
-	                                                                  return index > currentIndex;
-								  }]];
+	return
+		[self.controllerCards
+		 filteredArrayUsingPredicate:
+			[NSPredicate predicateWithBlock:^BOOL (KLControllerCard * controllerCard, NSDictionary * bindings) {
+				NSInteger currentIndex = [self.controllerCards indexOfObject:controllerCard];
+				//Only return cards with an index less than the one being compared to
+				return index > currentIndex;
+		}]];
 }
 
-- (NSArray *)controllerCardBelowCard:(KLControllerCard *)card {
+- (NSArray *)controllerCardBelowCard:(KLControllerCard *)card
+{
 	NSInteger index = [self.controllerCards indexOfObject:card];
-
-	return [self.controllerCards filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL (KLControllerCard * controllerCard, NSDictionary * bindings) {
-	                                                                  NSInteger currentIndex = [self.controllerCards indexOfObject:controllerCard];
-
-	                                                                  //Only return cards with an index greater than the one being compared to
-	                                                                  return index < currentIndex;
-								  }]];
+	return
+		[self.controllerCards
+		 filteredArrayUsingPredicate:
+			[NSPredicate predicateWithBlock:^BOOL (KLControllerCard * controllerCard, NSDictionary * bindings) {
+				NSInteger currentIndex = [self.controllerCards indexOfObject:controllerCard];
+				//Only return cards with an index greater than the one being compared to
+				return index < currentIndex;
+		}]];
 }
 
 #pragma mark - KLNoteViewController Data Source methods
@@ -329,6 +377,10 @@
 
 @end
 
+
+//------------------------------------------------------------------------------
+#pragma mark - KLControllerCard
+//------------------------------------------------------------------------------
 @interface KLControllerCard ()
 - (void)shrinkCardToScaledSize:(BOOL)animated;
 - (void)expandCardToFullSize:(BOOL)animated;
@@ -336,9 +388,13 @@
 
 @implementation KLControllerCard
 
-- (id)initWithNoteViewController:(KLNoteViewController *)noteView navigationController:(UINavigationController *)navigationController index:(NSInteger)_index {
+- (id)initWithNoteViewController:(KLNoteViewController *)noteView
+			navigationController:(UINavigationController *)navigationController
+						   index:(NSInteger)_index
+{
 
-	if (self = [super init]) {
+	if (self = [super init])
+	{
 		self.noteViewController   = noteView;
 		self.navigationController = navigationController;
 
@@ -357,24 +413,35 @@
 		//Configure navigation controller to have rounded edges while maintaining shadow
 		[self.navigationController.view.layer setCornerRadius:self.noteViewController.cardCornerRadius];
 		[self.navigationController.view setClipsToBounds:YES];
+		
 		//Add Pan Gesture
-		UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self
-		                                                                             action:@selector(didPerformPanGesture:)];
+		UIPanGestureRecognizer *panGesture =\
+			[[UIPanGestureRecognizer alloc]
+			 initWithTarget:self
+			 action:@selector(didPerformPanGesture:)];
+		
 		//Add the gesture to the navigation bar
-		if (self.noteViewController.cardPanGestureScope == KLControllerCardPanGestureScopeNavigationControllerView) {
+		if (self.noteViewController.cardPanGestureScope == KLControllerCardPanGestureScopeNavigationControllerView)
+		{
 			[self.navigationController.view addGestureRecognizer:panGesture];
 		}
-		else {
+		else
+		{
 			[self.navigationController.navigationBar addGestureRecognizer:panGesture];
 		}
 
 		panGesture.delegate = self;
 
 		//Add long touch recognizer
-		if (self.noteViewController.cardEnablePressGesture) {
-			UILongPressGestureRecognizer *pressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self
-			                                                                                           action:@selector(didPerformLongPress:)];
+		if (self.noteViewController.cardEnablePressGesture)
+		{
+			UILongPressGestureRecognizer *pressGesture = \
+				[[UILongPressGestureRecognizer alloc]
+				 initWithTarget:self
+				 action:@selector(didPerformLongPress:)];
+			
 			[pressGesture setMinimumPressDuration:self.noteViewController.cardMinimumPressDuration];
+			
 			//Add the gesture to the navigation bar
 			[self.navigationController.navigationBar addGestureRecognizer:pressGesture];
 
@@ -382,28 +449,46 @@
 		}
 
 		//Initialize the state to default
-		[self setState:KLControllerCardStateDefault
-		      animated:NO];
+		[self
+		 setState:KLControllerCardStateDefault
+		 animated:NO];
 	}
 	return self;
 }
 
+-(void)dealloc
+{
+	self.navigationController = nil;
+	self.noteViewController = nil;
+	self.delegate = nil;
+	[super dealloc];
+}
+
+
 #pragma mark - UIGestureRecognizer action handlers
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer
+shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
 	return YES;
 }
 
-- (void)didPerformLongPress:(UILongPressGestureRecognizer *)recognizer {
-
-	if (self.state == KLControllerCardStateDefault && recognizer.state == UIGestureRecognizerStateEnded) {
+- (void)didPerformLongPress:(UILongPressGestureRecognizer *)recognizer
+{
+	if (self.state == KLControllerCardStateDefault && recognizer.state == UIGestureRecognizerStateEnded)
+	{
 		//Go to full size
 		[self setState:KLControllerCardStateFullScreen animated:YES];
 	}
 }
 
-- (void)redrawShadow {
-	if (self.noteViewController.cardShadowEnabled) {
-		UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:[self bounds] cornerRadius:self.noteViewController.cardCornerRadius];
+- (void)redrawShadow
+{
+	if (self.noteViewController.cardShadowEnabled)
+	{
+		UIBezierPath *path = \
+			[UIBezierPath
+			 bezierPathWithRoundedRect:[self bounds]
+			 cornerRadius:self.noteViewController.cardCornerRadius];
 
 		[self.layer setShadowOpacity:self.noteViewController.cardShadowOpacity];
 		[self.layer setShadowOffset:self.noteViewController.cardShadowOffset];
@@ -413,32 +498,42 @@
 	}
 }
 
-- (void)didPerformPanGesture:(UIPanGestureRecognizer *)recognizer {
+- (void)didPerformPanGesture:(UIPanGestureRecognizer *)recognizer
+{
 	CGPoint location    = [recognizer locationInView:self.noteViewController.view];
 	CGPoint translation = [recognizer translationInView:self];
-	if (recognizer.state == UIGestureRecognizerStateBegan) {
+	
+	if (recognizer.state == UIGestureRecognizerStateBegan)
+	{
 		//Begin animation
-		if (self.state == KLControllerCardStateFullScreen) {
+		if (self.state == KLControllerCardStateFullScreen)
+		{
 			//Shrink to regular size
 			[self shrinkCardToScaledSize:YES];
 		}
 		//Save the offet to add to the height
 		self.panOriginOffset = [recognizer locationInView:self].y;
 	}
-	else if (recognizer.state == UIGestureRecognizerStateChanged) {
+	else if (recognizer.state == UIGestureRecognizerStateChanged)
+	{
 		//Check if panning downwards and move other cards
-		if (translation.y > 0) {
+		if (translation.y > 0)
+		{
 			//Panning downwards from Full screen state
-			if (self.state == KLControllerCardStateFullScreen && self.frame.origin.y < originY) {
+			if (self.state == KLControllerCardStateFullScreen && self.frame.origin.y < originY)
+			{
 				//Notify delegate so it can update the coordinates of the other cards unless user has travelled past the origin y coordinate
-				if ([self.delegate respondsToSelector:@selector(controllerCard:didUpdatePanPercentage:)]) {
+				if ([self.delegate respondsToSelector:@selector(controllerCard:didUpdatePanPercentage:)])
+				{
 					[self.delegate controllerCard:self didUpdatePanPercentage:[self percentageDistanceTravelled]];
 				}
 			}
 			//Panning downwards from default state
-			else if (self.state == KLControllerCardStateDefault && self.frame.origin.y > originY) {
+			else if (self.state == KLControllerCardStateDefault && self.frame.origin.y > originY)
+			{
 				//Implements behavior such that when originating at the default position and scrolling down, all other cards below the scrolling card move down at the same rate
-				if ([self.delegate respondsToSelector:@selector(controllerCard:didUpdatePanPercentage:)]) {
+				if ([self.delegate respondsToSelector:@selector(controllerCard:didUpdatePanPercentage:)])
+				{
 					[self.delegate controllerCard:self didUpdatePanPercentage:[self percentageDistanceTravelled]];
 				}
 			}
@@ -447,137 +542,176 @@
 		//Track the movement of the users finger during the swipe gesture
 		[self setYCoordinate:location.y - self.panOriginOffset];
 	}
-	else if (recognizer.state == UIGestureRecognizerStateEnded) {
+	else if (recognizer.state == UIGestureRecognizerStateEnded)
+	{
 		//Check if it should return to the origin location
-		if ([self shouldReturnToState:self.state fromPoint:[recognizer translationInView:self]]) {
+		if ([self shouldReturnToState:self.state fromPoint:[recognizer translationInView:self]])
+		{
 			[self setState:self.state animated:YES];
 		}
-		else  {
+		else
+		{
 			//Toggle state between full screen and default if it doesnt return to the current state
-			[self setState:self.state == KLControllerCardStateFullScreen ? KLControllerCardStateDefault:KLControllerCardStateFullScreen
-			      animated:YES];
+			[self
+			 setState:self.state == KLControllerCardStateFullScreen ? KLControllerCardStateDefault:KLControllerCardStateFullScreen
+			 animated:YES];
 		}
 	}
 }
 
 #pragma mark - Handle resizing of card
 
-- (void)shrinkCardToScaledSize:(BOOL)animated {
+- (void)shrinkCardToScaledSize:(BOOL)animated
+{
 
 	//Set the scaling factor if not already set
-	if (!scalingFactor) {
+	if (!scalingFactor)
+	{
 		scalingFactor = [self.noteViewController scalingFactorForIndex:index];
 	}
+	
 	//If animated then animate the shrinking else no animation
-	if (animated) {
-		[UIView animateWithDuration:self.noteViewController.cardAnimationDuration
-		                 animations:^{
-		         //Slightly recursive to reduce duplicate code
-		         [self shrinkCardToScaledSize:NO];
+	if (animated)
+	{
+		[UIView
+		 animateWithDuration:self.noteViewController.cardAnimationDuration
+		 animations:^{
+			 //Slightly recursive to reduce duplicate code
+			 [self shrinkCardToScaledSize:NO];
 		 }];
 	}
-	else  {
+	else
+	{
 		[self setTransform:CGAffineTransformMakeScale(scalingFactor, scalingFactor)];
 	}
 }
 
-- (void)expandCardToFullSize:(BOOL)animated {
-
+- (void)expandCardToFullSize:(BOOL)animated
+{
 	//Set the scaling factor if not already set
-	if (!scalingFactor) {
+	if (!scalingFactor)
+	{
 		scalingFactor = [self.noteViewController scalingFactorForIndex:index];
 	}
+	
 	//If animated then animate the shrinking else no animation
-	if (animated) {
-		[UIView animateWithDuration:self.noteViewController.cardAnimationDuration
-		                 animations:^{
-		         //Slightly recursive to reduce duplicate code
-		         [self expandCardToFullSize:NO];
+	if (animated)
+	{
+		[UIView
+		 animateWithDuration:self.noteViewController.cardAnimationDuration
+		 animations:^{
+			 //Slightly recursive to reduce duplicate code
+			 [self expandCardToFullSize:NO];
 		 }];
 	}
-	else  {
-		[self setTransform:CGAffineTransformMakeScale(self.noteViewController.cardMaximizedScalingFactor, self.noteViewController.cardMaximizedScalingFactor)];
+	else
+	{
+		[self
+		 setTransform:
+			CGAffineTransformMakeScale(self.noteViewController.cardMaximizedScalingFactor, self.noteViewController.cardMaximizedScalingFactor)];
 	}
 }
 
 #pragma mark - Handle state changes for card
 
-- (void)setState:(KLControllerCardState)state animated:(BOOL)animated {
-	if (animated) {
-		[UIView animateWithDuration:self.noteViewController.cardAnimationDuration animations:^{
-		         [self setState:state animated:NO];
+- (void)setState:(KLControllerCardState)state
+		animated:(BOOL)animated
+{
+	if (animated)
+	{
+		[UIView
+		 animateWithDuration:self.noteViewController.cardAnimationDuration animations:^{
+			[self setState:state animated:NO];
 		 } completion:^(BOOL finished) {
-		         if (state == KLControllerCardStateFullScreen) {
-		                 // Fix scaling bug when expand to full size
-		                 self.frame = self.noteViewController.view.bounds;
-		                 self.navigationController.view.frame = self.frame;
-		                 self.navigationController.view.layer.cornerRadius = 0;
+			 if (state == KLControllerCardStateFullScreen)
+			 {
+				// Fix scaling bug when expand to full size
+				self.frame = self.noteViewController.view.bounds;
+				self.navigationController.view.frame = self.frame;
+				self.navigationController.view.layer.cornerRadius = 0;
 			 }
 		 }];
 		return;
 	}
 
 	// Set corner radius
-	[self.navigationController.view.layer setCornerRadius:self.noteViewController.cardCornerRadius];
+	[self.navigationController.view.layer
+	 setCornerRadius:self.noteViewController.cardCornerRadius];
 
 	//Full Screen State
-	if (state == KLControllerCardStateFullScreen) {
+	if (state == KLControllerCardStateFullScreen)
+	{
 		[self expandCardToFullSize:animated];
 		[self setYCoordinate:0];
 	}
 	//Default State
-	else if (state == KLControllerCardStateDefault) {
+	else if (state == KLControllerCardStateDefault)
+	{
 		[self shrinkCardToScaledSize:animated];
 		[self setYCoordinate:originY];
 	}
 	//Hidden State - Bottom
-	else if (state == KLControllerCardStateHiddenBottom) {
+	else if (state == KLControllerCardStateHiddenBottom)
+	{
 		//Move it off screen and far enough down that the shadow does not appear on screen
 		[self setYCoordinate:self.noteViewController.view.frame.size.height + abs (self.noteViewController.cardShadowOffset.height) * 3];
 	}
 	//Hidden State - Top
-	else if (state == KLControllerCardStateHiddenTop) {
+	else if (state == KLControllerCardStateHiddenTop)
+	{
 		[self setYCoordinate:0];
 	}
 
 	//Notify the delegate of the state change (even if state changed to self)
 	KLControllerCardState lastState = self.state;
+
 	//Update to the new state
 	[self setState:state];
+
 	//Notify the delegate
-	if ([self.delegate respondsToSelector:@selector(controllerCard:didChangeToDisplayState:fromDisplayState:)]) {
-		[self.delegate controllerCard:self
-		      didChangeToDisplayState:state fromDisplayState:lastState];
+	if ([self.delegate respondsToSelector:@selector(controllerCard:didChangeToDisplayState:fromDisplayState:)])
+	{
+		[self.delegate
+		 controllerCard:self
+		 didChangeToDisplayState:state
+		 fromDisplayState:lastState];
 	}
 }
 
 #pragma mark - Various data helpers
 
-- (CGPoint)origin {
+- (CGPoint)origin
+{
 	return CGPointMake(0, originY);
 }
 
-- (CGFloat)percentageDistanceTravelled {
+- (CGFloat)percentageDistanceTravelled
+{
 	return self.frame.origin.y / originY;
 }
 
 //Boolean for determining if the movement was sufficient to warrent changing states
-- (BOOL)shouldReturnToState:(KLControllerCardState)state fromPoint:(CGPoint)point {
-	if (state == KLControllerCardStateFullScreen) {
+- (BOOL)shouldReturnToState:(KLControllerCardState)state fromPoint:(CGPoint)point
+{
+	if (state == KLControllerCardStateFullScreen)
+	{
 		return ABS(point.y) < self.navigationController.navigationBar.frame.size.height;
 	}
-	else if (state == KLControllerCardStateDefault) {
+	else if (state == KLControllerCardStateDefault)
+	{
 		return point.y > -self.navigationController.navigationBar.frame.size.height;
 	}
 
 	return NO;
 }
 
-- (void)setYCoordinate:(CGFloat)yValue {
+- (void)setYCoordinate:(CGFloat)yValue
+{
 	[self setFrame:CGRectMake(self.frame.origin.x, yValue, self.frame.size.width, self.frame.size.height)];
 }
 
-- (void)setFrame:(CGRect)frame {
+- (void)setFrame:(CGRect)frame
+{
 	[super setFrame:frame];
 	[self redrawShadow];
 }

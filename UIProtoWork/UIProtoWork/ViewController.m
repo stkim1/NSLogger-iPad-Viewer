@@ -30,16 +30,26 @@
 
 #import "ViewController.h"
 
-@interface ViewController ()
-
-@end
-
 @implementation ViewController
+-(void)dealloc
+{
+	self.viewControllerData = nil;
+	[super dealloc];
+}
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
+	self.viewControllerData = [NSMutableArray arrayWithCapacity:6];
+	
+	for(int i = 0; i < 6;i++)
+	{
+		UIViewController *vc = [UIViewController new];
+		[self.viewControllerData addObject:vc];
+		[vc release];
+	}
+   
+	[super viewDidLoad];
+	// Do any additional setup after loading the view, typically from a nib.	
 }
 
 - (void)didReceiveMemoryWarning
@@ -47,5 +57,24 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+- (NSInteger)numberOfControllerCardsInNoteView:(KLNoteViewController*) noteView
+{
+    return  [self.viewControllerData count];
+}
+
+- (UIViewController *)noteView:(KLNoteViewController*)noteView
+viewControllerForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return [self.viewControllerData objectAtIndex:indexPath.row];
+}
+
+-(void) noteViewController:(KLNoteViewController*) noteViewController
+   didUpdateControllerCard:(KLControllerCard*)controllerCard
+			toDisplayState:(KLControllerCardState) toState
+		  fromDisplayState:(KLControllerCardState) fromState
+{
+}
+
 
 @end

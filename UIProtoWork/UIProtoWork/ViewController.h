@@ -29,7 +29,8 @@
  */
 
 #import <UIKit/UIKit.h>
+#import "KLNoteViewController.h"
 
-@interface ViewController : UIViewController
-
+@interface ViewController : KLNoteViewController
+@property (nonatomic, strong) NSMutableArray* viewControllerData;
 @end
