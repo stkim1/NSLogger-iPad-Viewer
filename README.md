@@ -1,20 +1,19 @@
-NSLogger-iPad-Viewer
-==
+#NSLogger-iPad-Viewer
+
 
 NSLogger viewer app on iPad
 
 Derived from [Florent Pillet's NSLogger](https://github.com/fpillet/NSLogger), NSLogger iPad Viewer lets you collect an application's log to an iPad.
 
-Status
--
+##Status
+
 UI work in progress.
 
-Documents
--
+##Documents
 DETAILED DOCUMENTS, EXAMPLES, AND DEMOS TO BE ADDED SOON(™)
 
-Screen Shots
--
+##Screen Shots
+
 
 ###iPad Viwer (13/03/10)
 <img width="480" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ios_13_03_10.png" />
@@ -23,9 +22,13 @@ Screen Shots
 <img width="480" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/sim_13_03_17.png" />
 
 
+##License
+[Modified BSD](https://github.com/stkim1/NSLogger-iPad-Viewer/blob/master/LICENSE) <br/>
+1. Non-commercial.<br/>
+2. No App Store of Apple Inc.
 
-Vendors
--
+
+##Vendors
 [NSLogger](https://github.com/fpillet/NSLogger)<br/>
 [KLNoteViewController](https://github.com/KieranLafferty/KLNoteViewController)<br/>
 [KGNoise](https://github.com/kgn/KGNoise)
