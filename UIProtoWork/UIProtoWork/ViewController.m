@@ -29,6 +29,8 @@
  */
 
 #import "ViewController.h"
+#import "LoggerViewController.h"
+#import "KGNoise.h"
 
 @implementation ViewController
 -(void)dealloc
@@ -37,13 +39,30 @@
 	[super dealloc];
 }
 
+-(void)loadView
+{
+	CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
+	CGRect viewFrame = (CGRect){CGPointZero,appFrame.size};
+	
+	KGNoiseRadialGradientView *noiseView = \
+		[[KGNoiseRadialGradientView alloc]
+		 initWithFrame:viewFrame];
+    noiseView.backgroundColor = [UIColor colorWithRed:0.814 green:0.798 blue:0.747 alpha:1.000];
+    noiseView.alternateBackgroundColor = [UIColor colorWithRed:1.000 green:0.986 blue:0.945 alpha:1.000];
+    noiseView.noiseOpacity = 0.3;
+	
+    [self setView:noiseView];
+	[noiseView release],noiseView = nil;
+}
+
+
 - (void)viewDidLoad
 {
 	self.viewControllerData = [NSMutableArray arrayWithCapacity:6];
-	
+
 	for(int i = 0; i < 6;i++)
 	{
-		UIViewController *vc = [UIViewController new];
+		LoggerViewController *vc = [LoggerViewController new];
 		[self.viewControllerData addObject:vc];
 		[vc release];
 	}
@@ -74,6 +93,7 @@ viewControllerForRowAtIndexPath:(NSIndexPath *)indexPath
 			toDisplayState:(KLControllerCardState) toState
 		  fromDisplayState:(KLControllerCardState) fromState
 {
+
 }
 
 

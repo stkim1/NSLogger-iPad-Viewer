@@ -58,13 +58,13 @@ NS_ENUM(NSUInteger, KGLinearGradientDirection){
 };
 
 @interface KGNoiseLinearGradientView : KGNoiseView
-@property (strong, nonatomic) UIColor *alternateBackgroundColor;
-@property (nonatomic) enum KGLinearGradientDirection gradientDirection;
+@property (nonatomic,strong) UIColor *alternateBackgroundColor;
+@property (nonatomic,assign) enum KGLinearGradientDirection gradientDirection;
 @end
 
 //------------------------------------------------------------------------------
 #pragma mark - KGNoiseRadialGradientView
 //------------------------------------------------------------------------------
 @interface KGNoiseRadialGradientView : KGNoiseView
-@property (strong, nonatomic) UIColor *alternateBackgroundColor;
+@property (nonatomic,strong) UIColor *alternateBackgroundColor;
 @end

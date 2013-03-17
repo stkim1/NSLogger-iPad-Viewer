@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		04389FF616F584E100531E7A /* LoggerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 04389FF516F584E100531E7A /* LoggerViewController.m */; };
 		04520B1F16F4C4FF006047C3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04520B1E16F4C4FF006047C3 /* UIKit.framework */; };
 		04520B2116F4C4FF006047C3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04520B2016F4C4FF006047C3 /* Foundation.framework */; };
 		04520B2316F4C4FF006047C3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04520B2216F4C4FF006047C3 /* CoreGraphics.framework */; };
@@ -23,6 +24,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		04389FF416F584E100531E7A /* LoggerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerViewController.h; sourceTree = "<group>"; };
+		04389FF516F584E100531E7A /* LoggerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerViewController.m; sourceTree = "<group>"; };
 		04520B1B16F4C4FF006047C3 /* UIProtoWork.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UIProtoWork.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		04520B1E16F4C4FF006047C3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		04520B2016F4C4FF006047C3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -96,6 +99,8 @@
 				04520B3716F4C4FF006047C3 /* ViewController.m */,
 				04520B3916F4C4FF006047C3 /* ViewController.xib */,
 				04520B2516F4C4FF006047C3 /* Supporting Files */,
+				04389FF416F584E100531E7A /* LoggerViewController.h */,
+				04389FF516F584E100531E7A /* LoggerViewController.m */,
 			);
 			path = UIProtoWork;
 			sourceTree = "<group>";
@@ -212,6 +217,7 @@
 				04520B3816F4C4FF006047C3 /* ViewController.m in Sources */,
 				04520B4816F4CC55006047C3 /* KGNoise.m in Sources */,
 				04520B4916F4CC55006047C3 /* KLNoteViewController.m in Sources */,
+				04389FF616F584E100531E7A /* LoggerViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -73,8 +73,8 @@ didUpdatePanPercentage:(CGFloat)percentage;
 	NSInteger index;
 }
 @property (nonatomic, strong) UINavigationController *navigationController;
-@property (nonatomic, strong) KLNoteViewController *noteViewController;
-@property (nonatomic, strong) id<KLControllerCardDelegate> delegate;
+@property (nonatomic, assign) KLNoteViewController *noteViewController;
+@property (nonatomic, assign) id<KLControllerCardDelegate> delegate;
 @property (nonatomic, assign) CGPoint origin;
 @property (nonatomic, assign) CGFloat panOriginOffset;
 @property (nonatomic, assign) KLControllerCardState state;

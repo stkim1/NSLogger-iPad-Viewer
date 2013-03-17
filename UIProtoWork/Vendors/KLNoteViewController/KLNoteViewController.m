@@ -150,9 +150,10 @@
 {
 	//Sum up the shrunken size of each of the cards appearing before the current index
 	CGFloat originOffset = 0;
-	for (int i = 0; i < index; i++) {
+	for (int i = 0; i < index; i++)
+	{
 		CGFloat scalingFactor = [self scalingFactorForIndex:i];
-//        NSLog(@"%@", controllerCard.navigationController.navigationBar);
+//		NSLog(@"%@", controllerCard.navigationController.navigationBar);
 		originOffset += scalingFactor * controllerCard.navigationController.navigationBar.frame.size.height * self.cardNavigationBarOverlap;
 	}
 
