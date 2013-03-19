@@ -14,7 +14,6 @@ DETAILED DOCUMENTS, EXAMPLES, AND DEMOS TO BE ADDED SOON(™)
 
 ##Screen Shots
 
-
 ###iPad Viwer (13/03/10)
 <img width="480" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ios_13_03_10.png" />
 
@@ -59,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ************************** THE CODE IS BASED ON ******************************
 
-<a href="https://github.com/fpillet/NSLogger">NSLogger</a> Copyright (c) 2010-2011, Florent Pillet All rights reserved. 
+<a href="https://github.com/fpillet/NSLogger">NSLogger</a> Copyright (c) 2010-2012, Florent Pillet All rights reserved. 
 <a href="https://github.com/KieranLafferty/KLNoteViewController">KLNoteViewController</a> Copyright (c) 2012 Kieran Lafferty All rights reserved. 
 <a href="https://github.com/kgn/KGNoise">KGNoise</a> Copyright (c) 2012 David Keegan (http://davidkeegan.com) All rights reserved
 <a href="http://www.cocoawithlove.com/">Cocoa With Love</a> Copyright (c) 2007, 2008, 2010 Matt Gallagher. All rights reserved </pre>
