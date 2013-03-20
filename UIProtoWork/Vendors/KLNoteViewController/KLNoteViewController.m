@@ -211,7 +211,8 @@
 
 - (void)reloadDataAnimated:(BOOL)animated
 {
-	if (animated) {
+	if (animated)
+	{
 		[UIView
 		 animateWithDuration:self.cardReloadHideAnimationDuration
 		 animations:^{
@@ -307,38 +308,52 @@
 	return [self.dataSource numberOfControllerCardsInNoteView:self];
 }
 
-- (UIViewController *)noteView:(KLNoteViewController *)noteView viewControllerForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (UIViewController *)noteView:(KLNoteViewController *)noteView viewControllerForRowAtIndexPath:(NSIndexPath *)indexPath
+{
 	return [self.dataSource noteView:noteView viewControllerForRowAtIndexPath:indexPath];
 }
 
 #pragma mark - Delegate implementation for KLControllerCard
 
-- (void)controllerCard:(KLControllerCard *)controllerCard didChangeToDisplayState:(KLControllerCardState)toState fromDisplayState:(KLControllerCardState)fromState {
+- (void)controllerCard:(KLControllerCard *)controllerCard
+didChangeToDisplayState:(KLControllerCardState)toState
+	  fromDisplayState:(KLControllerCardState)fromState
+{
 
-	if (fromState == KLControllerCardStateDefault && toState == KLControllerCardStateFullScreen) {
+	if (fromState == KLControllerCardStateDefault && toState == KLControllerCardStateFullScreen)
+	{
 
 		//For all cards above the current card move them
-		for (KLControllerCard *currentCard in [self controllerCardAboveCard : controllerCard]) {
+		for (KLControllerCard *currentCard in [self controllerCardAboveCard : controllerCard])
+		{
 			[currentCard setState:KLControllerCardStateHiddenTop animated:YES];
 		}
-		for (KLControllerCard *currentCard in [self controllerCardBelowCard : controllerCard]) {
+		
+		for (KLControllerCard *currentCard in [self controllerCardBelowCard : controllerCard])
+		{
 			[currentCard setState:KLControllerCardStateHiddenBottom animated:YES];
 		}
 	}
-	else if (fromState == KLControllerCardStateFullScreen && toState == KLControllerCardStateDefault) {
+	else if (fromState == KLControllerCardStateFullScreen && toState == KLControllerCardStateDefault)
+	{
 		//For all cards above the current card move them back to default state
-		for (KLControllerCard *currentCard in [self controllerCardAboveCard : controllerCard]) {
+		for (KLControllerCard *currentCard in [self controllerCardAboveCard : controllerCard])
+		{
 			[currentCard setState:KLControllerCardStateDefault animated:YES];
 		}
+		
 		//For all cards below the current card move them back to default state
-		for (KLControllerCard *currentCard in [self controllerCardBelowCard : controllerCard]) {
+		for (KLControllerCard *currentCard in [self controllerCardBelowCard : controllerCard])
+		{
 			[currentCard setState:KLControllerCardStateHiddenBottom animated:NO];
 			[currentCard setState:KLControllerCardStateDefault animated:YES];
 		}
 	}
-	else if (fromState == KLControllerCardStateDefault && toState == KLControllerCardStateDefault) {
+	else if (fromState == KLControllerCardStateDefault && toState == KLControllerCardStateDefault)
+	{
 		//If the current state is default and the user does not travel far enough to kick into a new state, then  return all cells back to their default state
-		for (KLControllerCard *cardBelow in [self controllerCardBelowCard : controllerCard]) {
+		for (KLControllerCard *cardBelow in [self controllerCardBelowCard : controllerCard])
+		{
 			[cardBelow setState:KLControllerCardStateDefault animated:YES];
 		}
 	}
@@ -351,8 +366,10 @@
 
 }
 
-- (void)noteViewController:(KLNoteViewController *)noteViewController didUpdateControllerCard:(KLControllerCard *)controllerCard toDisplayState:(KLControllerCardState)toState fromDisplayState:(KLControllerCardState)fromState {
-	if ([self.delegate respondsToSelector:@selector(noteViewController:didUpdateControllerCard:toDisplayState:fromDisplayState:)]) {
+- (void)noteViewController:(KLNoteViewController *)noteViewController didUpdateControllerCard:(KLControllerCard *)controllerCard toDisplayState:(KLControllerCardState)toState fromDisplayState:(KLControllerCardState)fromState
+{
+	if ([self.delegate respondsToSelector:@selector(noteViewController:didUpdateControllerCard:toDisplayState:fromDisplayState:)])
+	{
 		[self.delegate noteViewController:self
 		          didUpdateControllerCard:controllerCard
 		                   toDisplayState:toState
@@ -360,15 +377,20 @@
 	}
 }
 
-- (void)controllerCard:(KLControllerCard *)controllerCard didUpdatePanPercentage:(CGFloat)percentage {
-	if (controllerCard.state == KLControllerCardStateFullScreen) {
-		for (KLControllerCard *currentCard in [self controllerCardAboveCard : controllerCard]) {
+- (void)controllerCard:(KLControllerCard *)controllerCard didUpdatePanPercentage:(CGFloat)percentage
+{
+	if (controllerCard.state == KLControllerCardStateFullScreen)
+	{
+		for (KLControllerCard *currentCard in [self controllerCardAboveCard : controllerCard])
+		{
 			CGFloat yCoordinate = (CGFloat) currentCard.origin.y * [controllerCard percentageDistanceTravelled];
 			[currentCard setYCoordinate:yCoordinate];
 		}
 	}
-	else if (controllerCard.state == KLControllerCardStateDefault) {
-		for (KLControllerCard *currentCard in [self controllerCardBelowCard : controllerCard]) {
+	else if (controllerCard.state == KLControllerCardStateDefault)
+	{
+		for (KLControllerCard *currentCard in [self controllerCardBelowCard : controllerCard])
+		{
 			CGFloat deltaDistance = controllerCard.frame.origin.y - controllerCard.origin.y;
 			CGFloat yCoordinate   = currentCard.origin.y + deltaDistance;
 			[currentCard setYCoordinate:yCoordinate];

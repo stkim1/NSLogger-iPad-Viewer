@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0407C09B16F979EC00365A3A /* LoggerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0407C09A16F979EC00365A3A /* LoggerViewController.xib */; };
+		0407C0A416F990FD00365A3A /* center_panel_bg.png in Resources */ = {isa = PBXBuildFile; fileRef = 0407C0A316F990FD00365A3A /* center_panel_bg.png */; };
 		04389FF616F584E100531E7A /* LoggerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 04389FF516F584E100531E7A /* LoggerViewController.m */; };
 		04520B1F16F4C4FF006047C3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04520B1E16F4C4FF006047C3 /* UIKit.framework */; };
 		04520B2116F4C4FF006047C3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04520B2016F4C4FF006047C3 /* Foundation.framework */; };
@@ -18,12 +20,14 @@
 		04520B3316F4C4FF006047C3 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 04520B3216F4C4FF006047C3 /* Default@2x.png */; };
 		04520B3516F4C4FF006047C3 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 04520B3416F4C4FF006047C3 /* Default-568h@2x.png */; };
 		04520B3816F4C4FF006047C3 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 04520B3716F4C4FF006047C3 /* ViewController.m */; };
-		04520B3B16F4C4FF006047C3 /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 04520B3916F4C4FF006047C3 /* ViewController.xib */; };
 		04520B4816F4CC55006047C3 /* KGNoise.m in Sources */ = {isa = PBXBuildFile; fileRef = 04520B4416F4CC55006047C3 /* KGNoise.m */; };
 		04520B4916F4CC55006047C3 /* KLNoteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 04520B4716F4CC55006047C3 /* KLNoteViewController.m */; };
+		047BECDA16F94D96004C9B87 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 047BECD916F94D96004C9B87 /* QuartzCore.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0407C09A16F979EC00365A3A /* LoggerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LoggerViewController.xib; sourceTree = "<group>"; };
+		0407C0A316F990FD00365A3A /* center_panel_bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = center_panel_bg.png; sourceTree = "<group>"; };
 		04389FF416F584E100531E7A /* LoggerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerViewController.h; sourceTree = "<group>"; };
 		04389FF516F584E100531E7A /* LoggerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerViewController.m; sourceTree = "<group>"; };
 		04520B1B16F4C4FF006047C3 /* UIProtoWork.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UIProtoWork.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -41,11 +45,11 @@
 		04520B3416F4C4FF006047C3 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		04520B3616F4C4FF006047C3 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		04520B3716F4C4FF006047C3 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
-		04520B3A16F4C4FF006047C3 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController.xib; sourceTree = "<group>"; };
 		04520B4316F4CC55006047C3 /* KGNoise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KGNoise.h; sourceTree = "<group>"; };
 		04520B4416F4CC55006047C3 /* KGNoise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KGNoise.m; sourceTree = "<group>"; };
 		04520B4616F4CC55006047C3 /* KLNoteViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KLNoteViewController.h; sourceTree = "<group>"; };
 		04520B4716F4CC55006047C3 /* KLNoteViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KLNoteViewController.m; sourceTree = "<group>"; };
+		047BECD916F94D96004C9B87 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				047BECDA16F94D96004C9B87 /* QuartzCore.framework in Frameworks */,
 				04520B1F16F4C4FF006047C3 /* UIKit.framework in Frameworks */,
 				04520B2116F4C4FF006047C3 /* Foundation.framework in Frameworks */,
 				04520B2316F4C4FF006047C3 /* CoreGraphics.framework in Frameworks */,
@@ -83,6 +88,7 @@
 		04520B1D16F4C4FF006047C3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				047BECD916F94D96004C9B87 /* QuartzCore.framework */,
 				04520B1E16F4C4FF006047C3 /* UIKit.framework */,
 				04520B2016F4C4FF006047C3 /* Foundation.framework */,
 				04520B2216F4C4FF006047C3 /* CoreGraphics.framework */,
@@ -97,10 +103,10 @@
 				04520B2E16F4C4FF006047C3 /* AppDelegate.m */,
 				04520B3616F4C4FF006047C3 /* ViewController.h */,
 				04520B3716F4C4FF006047C3 /* ViewController.m */,
-				04520B3916F4C4FF006047C3 /* ViewController.xib */,
-				04520B2516F4C4FF006047C3 /* Supporting Files */,
 				04389FF416F584E100531E7A /* LoggerViewController.h */,
 				04389FF516F584E100531E7A /* LoggerViewController.m */,
+				0407C09A16F979EC00365A3A /* LoggerViewController.xib */,
+				04520B2516F4C4FF006047C3 /* Supporting Files */,
 			);
 			path = UIProtoWork;
 			sourceTree = "<group>";
@@ -108,6 +114,7 @@
 		04520B2516F4C4FF006047C3 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				0407C0A316F990FD00365A3A /* center_panel_bg.png */,
 				04520B2616F4C4FF006047C3 /* UIProtoWork-Info.plist */,
 				04520B2716F4C4FF006047C3 /* InfoPlist.strings */,
 				04520B2A16F4C4FF006047C3 /* main.m */,
@@ -201,7 +208,8 @@
 				04520B3116F4C4FF006047C3 /* Default.png in Resources */,
 				04520B3316F4C4FF006047C3 /* Default@2x.png in Resources */,
 				04520B3516F4C4FF006047C3 /* Default-568h@2x.png in Resources */,
-				04520B3B16F4C4FF006047C3 /* ViewController.xib in Resources */,
+				0407C09B16F979EC00365A3A /* LoggerViewController.xib in Resources */,
+				0407C0A416F990FD00365A3A /* center_panel_bg.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -230,14 +238,6 @@
 				04520B2816F4C4FF006047C3 /* en */,
 			);
 			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		04520B3916F4C4FF006047C3 /* ViewController.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				04520B3A16F4C4FF006047C3 /* en */,
-			);
-			name = ViewController.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
