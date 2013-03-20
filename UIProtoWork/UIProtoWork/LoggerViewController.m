@@ -15,8 +15,8 @@
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
  *
- * 3. Any redistribution, use, or modification is done solely for personal
- *    benefit and not for any commercial purpose or for monetary gain
+ * 3. Any redistribution is done solely for personal benefit and not for any
+ *    commercial purpose or for monetary gain
  *
  * 4. No binary form of source code is submitted to App Store℠ of Apple Inc.
  *
@@ -49,6 +49,7 @@
 	self.titleBar = nil;
 	self.searchBar = nil;
 	self.titleLabel = nil;
+	self.toolBar = nil;
 	[super dealloc];
 }
 
@@ -79,6 +80,14 @@
     }
 
 	self.titleLabel.text = @"NSLogger Client (iPhone 5.2)";
+	
+
+    
+	self.toolBar.backgroundColor = [UIColor colorWithRed:0.73 green:0.73 blue:0.73 alpha:1.000];
+    self.toolBar.alternateBackgroundColor = [UIColor colorWithRed:0.94 green:0.94 blue:0.94 alpha:1.000];
+    self.toolBar.noiseBlendMode = kCGBlendModeMultiply;
+    self.toolBar.noiseOpacity = 0.1;
+
 }
 
 - (void)didReceiveMemoryWarning

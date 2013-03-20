@@ -36,8 +36,8 @@ modification, are permitted provided that the following conditions are met:
    this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
-3. Any redistribution, use, or modification is done solely for personal benefit
-   and not for any commercial purpose or for monetary gain.
+3. Any redistribution is done solely for personal benefit and not for any
+   commercial purpose or for monetary gain.
 
 4. No binary form of source code is submitted to App Store℠ of Apple Inc.
 
