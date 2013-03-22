@@ -81,7 +81,8 @@
 
 	self.titleLabel.text = @"NSLogger Client (iPhone 5.2)";
 	
-
+	[self.timeLabel setFont:[UIFont fontWithName:@"Digital-7" size:_timeLabel.font.pointSize]];
+	[self.runCountLabel setFont:[UIFont fontWithName:@"Inconsolata" size:_runCountLabel.font.pointSize]];
     
 	self.toolBar.backgroundColor = [UIColor colorWithRed:0.73 green:0.73 blue:0.73 alpha:1.000];
     self.toolBar.alternateBackgroundColor = [UIColor colorWithRed:0.94 green:0.94 blue:0.94 alpha:1.000];

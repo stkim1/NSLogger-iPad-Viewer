@@ -42,6 +42,8 @@
 #import "KGNoise.h"
 
 @interface LoggerViewController : UIViewController
+@property (nonatomic, assign) IBOutlet UILabel	*timeLabel;
+@property (nonatomic, assign) IBOutlet UILabel	*runCountLabel;
 @property (nonatomic, assign) IBOutlet UILabel	*titleLabel;
 @property (nonatomic, assign) IBOutlet UISearchBar *searchBar;
 @property (nonatomic, strong) IBOutlet KGNoiseLinearGradientView *titleBar;

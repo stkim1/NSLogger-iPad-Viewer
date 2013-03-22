@@ -18,7 +18,7 @@ DETAILED DOCUMENTS, EXAMPLES, AND DEMOS TO BE ADDED SOON(™)
 <img width="480" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ios_13_03_10.png" />
 
 ###UIProtoWork (13/03/20)
-<img width="480" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/sim_13_03_20a.png" />
+<img width="480" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/sim_13_03_22.png" />
 
 
 ##License
@@ -61,8 +61,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <a href="https://github.com/fpillet/NSLogger">NSLogger</a> Copyright (c) 2010-2012, Florent Pillet All rights reserved. 
 <a href="https://github.com/KieranLafferty/KLNoteViewController">KLNoteViewController</a> Copyright (c) 2012 Kieran Lafferty All rights reserved. 
 <a href="https://github.com/kgn/KGNoise">KGNoise</a> Copyright (c) 2012 David Keegan (http://davidkeegan.com) All rights reserved
-<a href="http://www.cocoawithlove.com/">Cocoa With Love</a> Copyright (c) 2007, 2008, 2010 Matt Gallagher. All rights reserved </pre>
-
+<a href="http://www.cocoawithlove.com/">Cocoa With Love</a> Copyright (c) 2007, 2008, 2010 Matt Gallagher. All rights reserved 
+<a href="http://johnaugust.com/2013/introducing-courier-prime">Courier Prime</a> Copyright (c) 2013, Quote-Unquote Apps, with Reserved Font Name Courier Prime.
+Lucida Grande, Lucida Grande Copyright (c) 1997, 2000, Bigelow & Holmes Inc. U.S. Pat. Des. 289,420. All rights reserved.
+<a href="http://www.levien.com/type/myfonts/inconsolata.html">Inconsolata</a> Copyright 2006 Raph Levien. Released under the Apache 2 license.
+<a href="http://www.styleseven.com">Digital-7</a> Copyright (c) 2008, Sizenko Alexander, Style-7 All rights reserved.</pre>
 
 _VER. 0.1.8_<br/>
 _Updated : Mar. 20, 2013_
