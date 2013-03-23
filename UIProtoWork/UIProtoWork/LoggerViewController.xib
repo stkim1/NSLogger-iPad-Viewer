@@ -213,10 +213,10 @@
 					<object class="IBUIImageView" id="733737040">
 						<reference key="NSNextResponder" ref="156268740"/>
 						<int key="NSvFlags">293</int>
-						<string key="NSFrame">{{219, 20}, {330, 51}}</string>
+						<string key="NSFrame">{{264, 20}, {240, 50}}</string>
 						<reference key="NSSuperview" ref="156268740"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView" ref="539072740"/>
+						<reference key="NSNextKeyView" ref="603814818"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<bool key="IBUIUserInteractionEnabled">NO</bool>
 						<string key="targetRuntimeIdentifier">IBIPadFramework</string>
@@ -228,10 +228,10 @@
 					<object class="IBUILabel" id="603814818">
 						<reference key="NSNextResponder" ref="156268740"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{237, 18}, {303, 29}}</string>
+						<string key="NSFrame">{{264, 18}, {240, 29}}</string>
 						<reference key="NSSuperview" ref="156268740"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView" ref="303464916"/>
+						<reference key="NSNextKeyView" ref="539072740"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<object class="NSColor" key="IBUIBackgroundColor" id="836972971">
 							<int key="NSColorSpace">3</int>
@@ -261,10 +261,10 @@
 					<object class="IBUILabel" id="539072740">
 						<reference key="NSNextResponder" ref="156268740"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{219, 47}, {330, 21}}</string>
+						<string key="NSFrame">{{264, 45}, {240, 21}}</string>
 						<reference key="NSSuperview" ref="156268740"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView" ref="603814818"/>
+						<reference key="NSNextKeyView" ref="303464916"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<reference key="IBUIBackgroundColor" ref="836972971"/>
 						<bool key="IBUIOpaque">NO</bool>
@@ -278,12 +278,14 @@
 						<int key="IBUIBaselineAdjustment">1</int>
 						<int key="IBUITextAlignment">1</int>
 						<object class="IBUIFontDescription" key="IBUIFontDescription">
-							<int key="type">1</int>
-							<double key="pointSize">16</double>
+							<string key="name">ArialRoundedMTBold</string>
+							<string key="family">Arial Rounded MT Bold</string>
+							<int key="traits">0</int>
+							<double key="pointSize">12</double>
 						</object>
 						<object class="NSFont" key="IBUIFont">
-							<string key="NSName">Helvetica</string>
-							<double key="NSSize">16</double>
+							<string key="NSName">ArialRoundedMTBold</string>
+							<double key="NSSize">12</double>
 							<int key="NSfFlags">16</int>
 						</object>
 						<bool key="IBUIAdjustsFontSizeToFit">NO</bool>
@@ -577,7 +579,7 @@
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<object class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
 			<string key="NS.key.0">center_panel_bg.png</string>
-			<string key="NS.object.0">{330, 51}</string>
+			<string key="NS.object.0">{240, 50}</string>
 		</object>
 		<string key="IBCocoaTouchPluginVersion">2083</string>
 	</data>

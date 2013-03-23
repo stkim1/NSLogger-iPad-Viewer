@@ -24,6 +24,7 @@
 		04520B4916F4CC55006047C3 /* KLNoteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 04520B4716F4CC55006047C3 /* KLNoteViewController.m */; };
 		047BECDA16F94D96004C9B87 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 047BECD916F94D96004C9B87 /* QuartzCore.framework */; };
 		04AA7C2516FC7610008C34E3 /* NSLoggerResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 04AA7C2416FC7610008C34E3 /* NSLoggerResource.bundle */; };
+		04B3431916FD963C004C370A /* center_panel_bg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 04B3431816FD963C004C370A /* center_panel_bg@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,6 +53,7 @@
 		04520B4716F4CC55006047C3 /* KLNoteViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KLNoteViewController.m; sourceTree = "<group>"; };
 		047BECD916F94D96004C9B87 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		04AA7C2416FC7610008C34E3 /* NSLoggerResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = NSLoggerResource.bundle; path = "../iPad Viewer/NSLoggerResource.bundle"; sourceTree = "<group>"; };
+		04B3431816FD963C004C370A /* center_panel_bg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "center_panel_bg@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -117,6 +119,7 @@
 		04520B2516F4C4FF006047C3 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				04B3431816FD963C004C370A /* center_panel_bg@2x.png */,
 				0407C0A316F990FD00365A3A /* center_panel_bg.png */,
 				04520B2616F4C4FF006047C3 /* UIProtoWork-Info.plist */,
 				04520B2716F4C4FF006047C3 /* InfoPlist.strings */,
@@ -214,6 +217,7 @@
 				0407C09B16F979EC00365A3A /* LoggerViewController.xib in Resources */,
 				0407C0A416F990FD00365A3A /* center_panel_bg.png in Resources */,
 				04AA7C2516FC7610008C34E3 /* NSLoggerResource.bundle in Resources */,
+				04B3431916FD963C004C370A /* center_panel_bg@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
