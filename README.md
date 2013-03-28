@@ -10,8 +10,8 @@ Derived from [Florent Pillet's NSLogger](https://github.com/fpillet/NSLogger), N
 UI WORK-IN-PROGRESS.
 
 ##Documents
-As soon as ver 1.0 comes out, iPad viewer will go to main distribution.<br/>
-All pull request, issue, and question will only be accepted through [the main repo](https://github.com/fpillet/NSLogger).<br/>
+As soon as ver 1.0 comes out, iPad viewer will go to [the main repository](https://github.com/fpillet/NSLogger).<br/>
+All pull request, issue, and question will only be accepted through there.<br/>
 Stay tuned.
 
 ##Screen Shots
