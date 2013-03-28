@@ -7,10 +7,12 @@ Derived from [Florent Pillet's NSLogger](https://github.com/fpillet/NSLogger), N
 
 ##Status
 
-UI work in progress.
+UI WORK-IN-PROGRESS.
 
 ##Documents
-DETAILED DOCUMENTS, EXAMPLES, AND DEMOS TO BE ADDED SOON(™)
+As soon as ver 1.0 comes out, iPad viewer will go to main distribution.<br/>
+All pull request, issue, and question will only be accepted through [the main repo](https://github.com/fpillet/NSLogger).<br/>
+Stay tuned.
 
 ##Screen Shots
 
