@@ -5,6 +5,10 @@ NSLogger viewer app on iPad
 
 Derived from [Florent Pillet's NSLogger](https://github.com/fpillet/NSLogger), NSLogger iPad Viewer lets you collect an application's log to an iPad.
 
+##Requirements
+iOS 5.1 and upward<br/>
+iPad 2 or (iPad mini) <sup>*</sup>iCloud not supported.
+
 ##Status
 
 UI WORK-IN-PROGRESS.
@@ -70,4 +74,4 @@ Lucida Grande, Lucida Grande Copyright (c) 1997, 2000, Bigelow & Holmes Inc. U.S
 <a href="http://www.styleseven.com">Digital-7</a> Copyright (c) 2008, Sizenko Alexander, Style-7 All rights reserved.</pre>
 
 _VER. 0.1.8_<br/>
-_Updated : Mar. 20, 2013_
+_Updated : Mar. 30, 2013_
