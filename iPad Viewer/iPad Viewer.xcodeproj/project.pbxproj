@@ -53,6 +53,7 @@
 		048444BC16D29AA600FBAA6B /* LoggerDataWrite.m in Sources */ = {isa = PBXBuildFile; fileRef = 048444B416D29AA600FBAA6B /* LoggerDataWrite.m */; };
 		048444BD16D29AA600FBAA6B /* LoggerDataEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 048444B616D29AA600FBAA6B /* LoggerDataEntry.m */; };
 		048444BE16D29AA600FBAA6B /* LoggerDataStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 048444B816D29AA600FBAA6B /* LoggerDataStorage.m */; };
+		04A8844C17074A4100A64257 /* ICloudSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A8844B17074A4100A64257 /* ICloudSupport.m */; };
 		04D13F5116B56AF4004FDB3A /* LoggerNativeConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 04D13F4C16B56AF4004FDB3A /* LoggerNativeConnection.m */; };
 		04D13F5216B56AF4004FDB3A /* LoggerNativeMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 04D13F4E16B56AF4004FDB3A /* LoggerNativeMessage.m */; };
 		04D13F5316B56AF4004FDB3A /* LoggerNativeTransport.m in Sources */ = {isa = PBXBuildFile; fileRef = 04D13F5016B56AF4004FDB3A /* LoggerNativeTransport.m */; };
@@ -149,6 +150,8 @@
 		048444B616D29AA600FBAA6B /* LoggerDataEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerDataEntry.m; sourceTree = "<group>"; };
 		048444B716D29AA600FBAA6B /* LoggerDataStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerDataStorage.h; sourceTree = "<group>"; };
 		048444B816D29AA600FBAA6B /* LoggerDataStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerDataStorage.m; sourceTree = "<group>"; };
+		04A8844A17074A4100A64257 /* ICloudSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ICloudSupport.h; sourceTree = "<group>"; };
+		04A8844B17074A4100A64257 /* ICloudSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ICloudSupport.m; sourceTree = "<group>"; };
 		04D13F4B16B56AF4004FDB3A /* LoggerNativeConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerNativeConnection.h; sourceTree = "<group>"; };
 		04D13F4C16B56AF4004FDB3A /* LoggerNativeConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerNativeConnection.m; sourceTree = "<group>"; };
 		04D13F4D16B56AF4004FDB3A /* LoggerNativeMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerNativeMessage.h; sourceTree = "<group>"; };
@@ -351,6 +354,7 @@
 				044FEF8716AC4A810067FA53 /* time_converter.h */,
 				044FEF8816AC4A810067FA53 /* ValueTransformers.h */,
 				044FEF8916AC4A810067FA53 /* ValueTransformers.m */,
+				04A8844917074A4100A64257 /* ICloud */,
 				044FEF7A16AC4A810067FA53 /* CoreData */,
 				044FEF7D16AC4A810067FA53 /* Directory */,
 				044FEF8216AC4A810067FA53 /* Macro */,
@@ -437,6 +441,15 @@
 				048444B416D29AA600FBAA6B /* LoggerDataWrite.m */,
 			);
 			path = DataOperation;
+			sourceTree = "<group>";
+		};
+		04A8844917074A4100A64257 /* ICloud */ = {
+			isa = PBXGroup;
+			children = (
+				04A8844A17074A4100A64257 /* ICloudSupport.h */,
+				04A8844B17074A4100A64257 /* ICloudSupport.m */,
+			);
+			path = ICloud;
 			sourceTree = "<group>";
 		};
 		04D13F4A16B56AF4004FDB3A /* NativeLogFormat */ = {
@@ -558,6 +571,7 @@
 				048444BC16D29AA600FBAA6B /* LoggerDataWrite.m in Sources */,
 				048444BD16D29AA600FBAA6B /* LoggerDataEntry.m in Sources */,
 				048444BE16D29AA600FBAA6B /* LoggerDataStorage.m in Sources */,
+				04A8844C17074A4100A64257 /* ICloudSupport.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -631,7 +645,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "iPad Viewer/iPad Viewer-Prefix.pch";
 				INFOPLIST_FILE = "iPad Viewer/iPad Viewer-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -643,7 +657,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "iPad Viewer/iPad Viewer-Prefix.pch";
 				INFOPLIST_FILE = "iPad Viewer/iPad Viewer-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};

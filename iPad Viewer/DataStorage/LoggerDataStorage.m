@@ -102,6 +102,9 @@ unsigned int _delete_dependency_count(NSArray*, LoggerDataDelete*);
 	// and instruction queue
 	dispatch_queue_t		_highPriorityOperationQueue;
 
+	// according to this count, we will resume or suspend the queue above
+	unsigned int			_high_queue_suspension_count;
+
 	// this queue will concurrently dispatch actual instructions
 	dispatch_queue_t		_operationDispatcherQueue;
 
@@ -148,30 +151,35 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 		// manages instruction dependency, create instruction, take
 		// read/write/delete/purge command from other components
 		_lowPriorityOperationQueue =\
-			dispatch_queue_create("com.colorfulglue.loggerdatastorage.datamanagerqueue"
+			dispatch_queue_create("com.colorfulglue.loggerdatastorage.lowpriorityqueue"
 								  ,DISPATCH_QUEUE_SERIAL);
 		
 		// read/write/delete/purge instruction handling queue
 		_highPriorityOperationQueue = \
-			dispatch_queue_create("com.colorfulglue.loggerdatastorage.operationqueue"
+			dispatch_queue_create("com.colorfulglue.loggerdatastorage.highpriorityqueue"
 								  ,DISPATCH_QUEUE_SERIAL);
-
+		
+		_high_queue_suspension_count = 1;
+		
 		// process instruction
 		_operationDispatcherQueue = \
 			dispatch_queue_create("com.colorfulglue.loggerdatastorage.dispatcherqueue"
 								  ,DISPATCH_QUEUE_CONCURRENT);
-
+		
 		
 		// low priority queue will target high priority
 		dispatch_set_target_queue(_lowPriorityOperationQueue,_highPriorityOperationQueue);
 		
-		
+		// cpu core counts
 		int cpus = [[NSProcessInfo processInfo] processorCount];
 		
 		dispatch_sync(_highPriorityOperationQueue, ^{
+			
+			// grab basePath
 			NSArray *paths = \
 				NSSearchPathForDirectoriesInDomains(NSDocumentDirectory
 													,NSUserDomainMask, YES);
+			
 			NSString *path = \
 				([paths count] > 0) ? [paths objectAtIndex:0] : nil;
 			
@@ -179,17 +187,18 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 				(path) ? [NSString stringWithFormat:@"%@/",path] : nil;
 			
 			_basepath = [targetPath retain];
-
 			
-			_dataEntryCache = 0;
+			
+			// data cache setup
+			_dataEntryCacheSize = 0;
 
 			_dataEntryCache = \
 				[[NSMutableDictionary alloc] initWithCapacity:0];
 			
 			
-			// operation queue setup
+			// operational queue setup
 			_cpuCount = cpus;
-
+			
 			_operationPool =\
 				[[NSMutableArray alloc] initWithCapacity:_cpuCount * 2];
 			
@@ -199,18 +208,22 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 			_writeOperationSlot = \
 				[[NSMutableArray alloc] initWithCapacity:_cpuCount];
 		});
-		
-		
 	}
 	return self;
 }
 
+#ifdef NO_SINGLETONE_DATASTORAGE
 -(void)dealloc
 {
+	
 	// need to dealloc arrays
 	dispatch_sync(_highPriorityOperationQueue, ^{
 		[_dataEntryCache removeAllObjects],[_dataEntryCache release],_dataEntryCache = nil;
 		[_basepath release],_basepath = nil;
+		
+		[_operationPool removeAllObjects];
+		[_operationPool release];
+		_operationPool = nil;
 		
 		[_readOperationSlot removeAllObjects];
 		[_readOperationSlot release];
@@ -220,18 +233,19 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 		[_writeOperationSlot release];
 		_writeOperationSlot = nil;
 	});
-
+	
 	dispatch_release(_lowPriorityOperationQueue),_lowPriorityOperationQueue = NULL;
     dispatch_release(_highPriorityOperationQueue),_highPriorityOperationQueue = NULL;
 	dispatch_release(_operationDispatcherQueue),_operationDispatcherQueue = NULL;
-
+	
 	[super dealloc];
+	
 }
+#endif
 
 //------------------------------------------------------------------------------
 #pragma mark - App life cycle handlers
 //------------------------------------------------------------------------------
-
 // when app did start
 -(void)appStarted
 {
@@ -241,12 +255,21 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 // app resigned from activity (power button, home button clicked)
 -(void)appResignActive
 {
-	
+	if(0 < _high_queue_suspension_count)
+	{
+		dispatch_suspend(_highPriorityOperationQueue);
+		_high_queue_suspension_count--;
+	}
 }
 
 // app becomes active again
 -(void)appBecomeActive
 {
+	if(_high_queue_suspension_count <= 0)
+	{
+		dispatch_resume(_highPriorityOperationQueue);
+		_high_queue_suspension_count++;
+	}
 	
 }
 

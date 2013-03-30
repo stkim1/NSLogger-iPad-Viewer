@@ -41,6 +41,7 @@
 #import "AppDelegate.h"
 #import "LoggerTransportManager.h"
 #import "LoggerMessageViewController.h"
+#import "ICloudSupport.h"
 
 @implementation AppDelegate
 {
@@ -56,6 +57,15 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+	// block whole document directory being backed-up
+	NSArray *paths = \
+	NSSearchPathForDirectoriesInDomains(NSDocumentDirectory
+										,NSUserDomainMask, YES);
+	NSString *docDirectory = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
+	[ICloudSupport disableFilepathFromiCloudSync:docDirectory];
+	
+	[[LoggerDataStorage sharedDataStorage] appStarted];
+	[[LoggerDataManager sharedDataManager] appStarted];
 	[[LoggerTransportManager sharedTransportManager] appStarted];
 	
 	//[(LoggerMessageViewController *)self.window.rootViewController
@@ -75,6 +85,8 @@
 	
 	application.idleTimerDisabled  = NO;
 	[[LoggerTransportManager sharedTransportManager] appResignActive];
+	[[LoggerDataManager sharedDataManager] appResignActive];
+	[[LoggerDataStorage sharedDataStorage] appResignActive];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
@@ -93,6 +105,8 @@
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
 
 	application.idleTimerDisabled  = YES;
+	[[LoggerDataStorage sharedDataStorage] appBecomeActive];
+	[[LoggerDataManager sharedDataManager] appBecomeActive];
 	[[LoggerTransportManager sharedTransportManager] appBecomeActive];
 }
 
@@ -100,6 +114,8 @@
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 	[[LoggerTransportManager sharedTransportManager] appWillTerminate];
+	[[LoggerDataManager sharedDataManager] appWillTerminate];
+	[[LoggerDataStorage sharedDataStorage] appWillTerminate];
 }
 
 @end

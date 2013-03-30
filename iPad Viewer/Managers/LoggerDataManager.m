@@ -185,7 +185,36 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 	return  self;
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - AppDelegateCycleHandle
+//------------------------------------------------------------------------------
+// when app did start
+-(void)appStarted
+{
+	
+}
 
+// app resigned from activity (power button, home button clicked)
+-(void)appResignActive
+{
+	
+}
+
+// app becomes active again
+-(void)appBecomeActive
+{
+	
+}
+
+// app will terminate
+-(void)appWillTerminate
+{
+	
+}
+
+//------------------------------------------------------------------------------
+#pragma mark - property synthesis
+//------------------------------------------------------------------------------
 -(NSManagedObjectModel *)managedObjectModel
 {
 	if(_managedObjectModel == nil)

@@ -39,13 +39,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "LoggerTransport.h"
-#import "LoggerDataStorage.h"
 
-@interface LoggerDataManager : NSObject
-<LoggerTransportDelegate
-,AppDelegateCycleHandle>
-+(LoggerDataManager *)sharedDataManager;
-@property (nonatomic, readonly) NSManagedObjectContext *messageDisplayContext;
-@property (nonatomic, retain) LoggerDataStorage *dataStorage;
+@interface ICloudSupport : NSObject
++ (BOOL)disableFilepathFromiCloudSync:(NSString *)aFilePath;
 @end

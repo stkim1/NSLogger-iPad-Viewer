@@ -38,14 +38,45 @@
  *
  */
 
-#import <Foundation/Foundation.h>
-#import "LoggerTransport.h"
-#import "LoggerDataStorage.h"
+#import "ICloudSupport.h"
+#import <sys/xattr.h>
+#import "NullStringCheck.h"
 
-@interface LoggerDataManager : NSObject
-<LoggerTransportDelegate
-,AppDelegateCycleHandle>
-+(LoggerDataManager *)sharedDataManager;
-@property (nonatomic, readonly) NSManagedObjectContext *messageDisplayContext;
-@property (nonatomic, retain) LoggerDataStorage *dataStorage;
+@implementation ICloudSupport
++ (BOOL)disableFilepathFromiCloudSync:(NSString *)aFilePath
+{
+	assert([NSThread isMainThread]);
+	
+	if(IS_NULL_STRING(aFilePath))
+		return NO;
+	
+	if(![[NSFileManager defaultManager] fileExistsAtPath:aFilePath])
+		return NO;
+
+	NSURL *fileURL =  [NSURL fileURLWithPath:aFilePath];
+
+	// suport from ios 5.1
+	if (&NSURLIsExcludedFromBackupKey)
+	{
+		NSError *error = nil;
+		BOOL result =\
+			[fileURL
+			 setResourceValue:[NSNumber numberWithBool:YES]
+			 forKey:NSURLIsExcludedFromBackupKey
+			 error:&error];
+
+		if (result == NO || error != nil)
+		{
+			MTLogVerify(@"Error excluding '%@' from backup. Error: %@",fileURL, error);
+			return NO;
+		}
+		else
+		{
+			MTLogVerify(@"Excluded '%@' from backup",fileURL);
+			return YES;
+		}
+	}
+
+	return YES;
+}
 @end
