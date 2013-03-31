@@ -16,7 +16,7 @@ UI WORK-IN-PROGRESS.
 
 ##Documents
 As soon as ver 1.0 comes out, iPad viewer will go to [the main repository](https://github.com/fpillet/NSLogger).<br/>
-All pull requests, issues, and questions will only be accepted through there.<br/>
+All pull requests and issues will only be accepted through there.<br/>
 Stay tuned.
 
 ##Meanwhile, if you're interested…
