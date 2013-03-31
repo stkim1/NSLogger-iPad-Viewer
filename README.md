@@ -15,16 +15,16 @@ iPad 2 or iPad mini<br/>
 UI WORK-IN-PROGRESS.
 
 ##Documents
-As soon as ver 1.0 comes out, iPad viewer will go to [the main repository](https://github.com/fpillet/NSLogger).<br/>
+As soon as ver 1.0 comes out, iPad viewer will go to [the main repository](https://github.com/fpillet/NSLogger) with documents.<br/>
 All pull requests and issues will only be accepted through there.<br/>
 Stay tuned.
 
-##Meanwhile, if you're interested…
+###Meanwhile, if you're interested…
 1. [Caught at the scene
 ](http://blog.colorfulglue.com/2012/12/caught-at-the-scene/)
 2. [NSLogger viewer architecture](http://blog.colorfulglue.com/2013/02/nslogger-viewer-architecture/)
 
-##Questions
+###Questions
 Throw 'em at [@stkim1](http://twitter.com/stkim1)
 
 ##Screen Shots
