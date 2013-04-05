@@ -10,6 +10,10 @@
 		040AD42216ACF5F60072DFAD /* LoggerClientInfoCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 040AD41D16ACF5F60072DFAD /* LoggerClientInfoCell.m */; };
 		040AD42316ACF5F60072DFAD /* LoggerMarkerCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 040AD41F16ACF5F60072DFAD /* LoggerMarkerCell.m */; };
 		040AD42416ACF5F60072DFAD /* LoggerMessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 040AD42116ACF5F60072DFAD /* LoggerMessageCell.m */; };
+		042F180B170E7D3A007ECDA4 /* LoggerMessageFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 042F1803170E7D3A007ECDA4 /* LoggerMessageFormatter.m */; };
+		042F180C170E7D3A007ECDA4 /* LoggerClientSize.m in Sources */ = {isa = PBXBuildFile; fileRef = 042F1806170E7D3A007ECDA4 /* LoggerClientSize.m */; };
+		042F180D170E7D3A007ECDA4 /* LoggerMarkerSize.m in Sources */ = {isa = PBXBuildFile; fileRef = 042F1808170E7D3A007ECDA4 /* LoggerMarkerSize.m */; };
+		042F180E170E7D3A007ECDA4 /* LoggerMessageSize.m in Sources */ = {isa = PBXBuildFile; fileRef = 042F180A170E7D3A007ECDA4 /* LoggerMessageSize.m */; };
 		044FEF1C16AC49810067FA53 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 044FEF1B16AC49810067FA53 /* UIKit.framework */; };
 		044FEF1E16AC49810067FA53 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 044FEF1D16AC49810067FA53 /* Foundation.framework */; };
 		044FEF2016AC49810067FA53 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 044FEF1F16AC49810067FA53 /* CoreGraphics.framework */; };
@@ -29,9 +33,6 @@
 		044FEF9E16AC4A810067FA53 /* LoggerDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 044FEF5D16AC4A810067FA53 /* LoggerDataManager.m */; };
 		044FEF9F16AC4A810067FA53 /* LoggerPreferenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 044FEF5F16AC4A810067FA53 /* LoggerPreferenceManager.m */; };
 		044FEFA016AC4A810067FA53 /* LoggerTransportManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 044FEF6116AC4A810067FA53 /* LoggerTransportManager.m */; };
-		044FEFA116AC4A810067FA53 /* LoggerClientHeight.m in Sources */ = {isa = PBXBuildFile; fileRef = 044FEF6516AC4A810067FA53 /* LoggerClientHeight.m */; };
-		044FEFA216AC4A810067FA53 /* LoggerMarkerHeight.m in Sources */ = {isa = PBXBuildFile; fileRef = 044FEF6716AC4A810067FA53 /* LoggerMarkerHeight.m */; };
-		044FEFA316AC4A810067FA53 /* LoggerMessageHeight.m in Sources */ = {isa = PBXBuildFile; fileRef = 044FEF6916AC4A810067FA53 /* LoggerMessageHeight.m */; };
 		044FEFA416AC4A810067FA53 /* LoggerConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 044FEF6B16AC4A810067FA53 /* LoggerConnection.m */; };
 		044FEFA516AC4A810067FA53 /* LoggerIPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 044FEF6D16AC4A810067FA53 /* LoggerIPConnection.m */; };
 		044FEFA616AC4A810067FA53 /* LoggerMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 044FEF6F16AC4A810067FA53 /* LoggerMessage.m */; };
@@ -69,6 +70,14 @@
 		040AD41F16ACF5F60072DFAD /* LoggerMarkerCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerMarkerCell.m; sourceTree = "<group>"; };
 		040AD42016ACF5F60072DFAD /* LoggerMessageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerMessageCell.h; sourceTree = "<group>"; };
 		040AD42116ACF5F60072DFAD /* LoggerMessageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerMessageCell.m; sourceTree = "<group>"; };
+		042F1802170E7D3A007ECDA4 /* LoggerMessageFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerMessageFormatter.h; sourceTree = "<group>"; };
+		042F1803170E7D3A007ECDA4 /* LoggerMessageFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerMessageFormatter.m; sourceTree = "<group>"; };
+		042F1805170E7D3A007ECDA4 /* LoggerClientSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerClientSize.h; sourceTree = "<group>"; };
+		042F1806170E7D3A007ECDA4 /* LoggerClientSize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerClientSize.m; sourceTree = "<group>"; };
+		042F1807170E7D3A007ECDA4 /* LoggerMarkerSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerMarkerSize.h; sourceTree = "<group>"; };
+		042F1808170E7D3A007ECDA4 /* LoggerMarkerSize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerMarkerSize.m; sourceTree = "<group>"; };
+		042F1809170E7D3A007ECDA4 /* LoggerMessageSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerMessageSize.h; sourceTree = "<group>"; };
+		042F180A170E7D3A007ECDA4 /* LoggerMessageSize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerMessageSize.m; sourceTree = "<group>"; };
 		0431653C16C5486300C078D8 /* UIColorRGBA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIColorRGBA.h; sourceTree = "<group>"; };
 		044FEF1716AC49810067FA53 /* iPad Viewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iPad Viewer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		044FEF1B16AC49810067FA53 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -103,12 +112,6 @@
 		044FEF5F16AC4A810067FA53 /* LoggerPreferenceManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerPreferenceManager.m; sourceTree = "<group>"; };
 		044FEF6016AC4A810067FA53 /* LoggerTransportManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerTransportManager.h; sourceTree = "<group>"; };
 		044FEF6116AC4A810067FA53 /* LoggerTransportManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerTransportManager.m; sourceTree = "<group>"; };
-		044FEF6416AC4A810067FA53 /* LoggerClientHeight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerClientHeight.h; sourceTree = "<group>"; };
-		044FEF6516AC4A810067FA53 /* LoggerClientHeight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerClientHeight.m; sourceTree = "<group>"; };
-		044FEF6616AC4A810067FA53 /* LoggerMarkerHeight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerMarkerHeight.h; sourceTree = "<group>"; };
-		044FEF6716AC4A810067FA53 /* LoggerMarkerHeight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerMarkerHeight.m; sourceTree = "<group>"; };
-		044FEF6816AC4A810067FA53 /* LoggerMessageHeight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerMessageHeight.h; sourceTree = "<group>"; };
-		044FEF6916AC4A810067FA53 /* LoggerMessageHeight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerMessageHeight.m; sourceTree = "<group>"; };
 		044FEF6A16AC4A810067FA53 /* LoggerConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerConnection.h; sourceTree = "<group>"; };
 		044FEF6B16AC4A810067FA53 /* LoggerConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerConnection.m; sourceTree = "<group>"; };
 		044FEF6C16AC4A810067FA53 /* LoggerIPConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerIPConnection.h; sourceTree = "<group>"; };
@@ -194,6 +197,28 @@
 				040AD42116ACF5F60072DFAD /* LoggerMessageCell.m */,
 			);
 			path = "Views & Cells";
+			sourceTree = "<group>";
+		};
+		042F1801170E7D3A007ECDA4 /* MessageFormatter */ = {
+			isa = PBXGroup;
+			children = (
+				042F1802170E7D3A007ECDA4 /* LoggerMessageFormatter.h */,
+				042F1803170E7D3A007ECDA4 /* LoggerMessageFormatter.m */,
+			);
+			path = MessageFormatter;
+			sourceTree = "<group>";
+		};
+		042F1804170E7D3A007ECDA4 /* MessageSizeCalculator */ = {
+			isa = PBXGroup;
+			children = (
+				042F1805170E7D3A007ECDA4 /* LoggerClientSize.h */,
+				042F1806170E7D3A007ECDA4 /* LoggerClientSize.m */,
+				042F1807170E7D3A007ECDA4 /* LoggerMarkerSize.h */,
+				042F1808170E7D3A007ECDA4 /* LoggerMarkerSize.m */,
+				042F1809170E7D3A007ECDA4 /* LoggerMessageSize.h */,
+				042F180A170E7D3A007ECDA4 /* LoggerMessageSize.m */,
+			);
+			path = MessageSizeCalculator;
 			sourceTree = "<group>";
 		};
 		0431653B16C5486300C078D8 /* UIColor */ = {
@@ -317,8 +342,9 @@
 		044FEF6216AC4A810067FA53 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				042F1801170E7D3A007ECDA4 /* MessageFormatter */,
+				042F1804170E7D3A007ECDA4 /* MessageSizeCalculator */,
 				04D13F4A16B56AF4004FDB3A /* NativeLogFormat */,
-				044FEF6316AC4A810067FA53 /* Height_Calculator */,
 				044FEF6A16AC4A810067FA53 /* LoggerConnection.h */,
 				044FEF6B16AC4A810067FA53 /* LoggerConnection.m */,
 				044FEF6C16AC4A810067FA53 /* LoggerIPConnection.h */,
@@ -329,19 +355,6 @@
 				044FEF7116AC4A810067FA53 /* LoggerTransport.m */,
 			);
 			path = Model;
-			sourceTree = "<group>";
-		};
-		044FEF6316AC4A810067FA53 /* Height_Calculator */ = {
-			isa = PBXGroup;
-			children = (
-				044FEF6416AC4A810067FA53 /* LoggerClientHeight.h */,
-				044FEF6516AC4A810067FA53 /* LoggerClientHeight.m */,
-				044FEF6616AC4A810067FA53 /* LoggerMarkerHeight.h */,
-				044FEF6716AC4A810067FA53 /* LoggerMarkerHeight.m */,
-				044FEF6816AC4A810067FA53 /* LoggerMessageHeight.h */,
-				044FEF6916AC4A810067FA53 /* LoggerMessageHeight.m */,
-			);
-			path = Height_Calculator;
 			sourceTree = "<group>";
 		};
 		044FEF7916AC4A810067FA53 /* Utilities */ = {
@@ -545,9 +558,6 @@
 				044FEF9E16AC4A810067FA53 /* LoggerDataManager.m in Sources */,
 				044FEF9F16AC4A810067FA53 /* LoggerPreferenceManager.m in Sources */,
 				044FEFA016AC4A810067FA53 /* LoggerTransportManager.m in Sources */,
-				044FEFA116AC4A810067FA53 /* LoggerClientHeight.m in Sources */,
-				044FEFA216AC4A810067FA53 /* LoggerMarkerHeight.m in Sources */,
-				044FEFA316AC4A810067FA53 /* LoggerMessageHeight.m in Sources */,
 				044FEFA416AC4A810067FA53 /* LoggerConnection.m in Sources */,
 				044FEFA516AC4A810067FA53 /* LoggerIPConnection.m in Sources */,
 				044FEFA616AC4A810067FA53 /* LoggerMessage.m in Sources */,
@@ -572,6 +582,10 @@
 				048444BD16D29AA600FBAA6B /* LoggerDataEntry.m in Sources */,
 				048444BE16D29AA600FBAA6B /* LoggerDataStorage.m in Sources */,
 				04A8844C17074A4100A64257 /* ICloudSupport.m in Sources */,
+				042F180B170E7D3A007ECDA4 /* LoggerMessageFormatter.m in Sources */,
+				042F180C170E7D3A007ECDA4 /* LoggerClientSize.m in Sources */,
+				042F180D170E7D3A007ECDA4 /* LoggerMarkerSize.m in Sources */,
+				042F180E170E7D3A007ECDA4 /* LoggerMessageSize.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

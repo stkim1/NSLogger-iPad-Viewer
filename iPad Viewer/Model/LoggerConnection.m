@@ -212,14 +212,14 @@ char sConnectionAssociatedObjectKey = 1;
 		
 		for(LoggerMessage *m in msgs)
 		{
+			
+#if 0
 			[m textRepresentation];
 			[m image];
 			[m portraitHeight];
-
-			// for now, landscape display is not supported
-#ifdef SUPPORT_LADNSACPE_DISPLAY
 			[m landscapeHeight];
 #endif
+			[m formatMessage];
 		}
 
 		if(LoggerCheckDelegate(delegate

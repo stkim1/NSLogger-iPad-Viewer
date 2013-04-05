@@ -45,6 +45,18 @@
 #import "LoggerConnection.h"
 #import "NullStringCheck.h"
 
+/*
+#import "LoggerMessageHeight.h"
+#import "LoggerClientHeight.h"
+#import "LoggerMarkerHeight.h"
+*/
+
+#import "LoggerMessageFormatter.h"
+
+#import "LoggerMessageSize.h"
+#import "LoggerClientSize.h"
+#import "LoggerMarkerSize.h"
+
 @implementation LoggerMessage
 @synthesize tag, message, threadID;
 @synthesize type, contentsType, level, timestamp;
@@ -52,17 +64,23 @@
 @synthesize image, imageSize;
 @synthesize sequence;
 @synthesize filename, functionName, lineNumber;
+@synthesize textRepresentation = _textRepresentation;
+@synthesize truncated = _truncated;
 @dynamic messageText;
 @dynamic messageType;
-@synthesize textRepresentation = _textRepresentation;
-@synthesize portraitHeight = _portraitHeight;
-@synthesize landscapeHeight = _landscapeHeight;
+
+@dynamic portraitHeight;
+@dynamic landscapeHeight;
+
+@dynamic portaightMessageSize;
+@dynamic landscapeMessageSize;
 
 - (id) init
 {
-	if ((self = [super init]) != nil)
+	self = [super init];
+	if (self != nil)
 	{
-		_portraitHeight = _landscapeHeight = 0;
+		_portaightMessageSize = _landscapeMessageSize = CGSizeZero;
 	}
 	return self;
 }
@@ -96,6 +114,7 @@
 	return imageSize;
 }
 
+#if 0
 - (NSString *)textRepresentation
 {
 	if(!IS_NULL_STRING(_textRepresentation))
@@ -207,10 +226,30 @@
 	_textRepresentation = s;
 	return _textRepresentation;
 }
+#endif
+
+
+
+#pragma mark - 
+- (void)formatMessage
+{
+	NSString *formattedMessage =
+		[LoggerMessageFormatter
+		 formatAndTruncateDisplayMessage:self
+		 truncated:&_truncated];
+
+	self.textRepresentation = formattedMessage;
+
+	UIImage *formattedImage __attribute__((unused)) = [self image];
+	
+	CGSize size __attribute__((unused)) = [self portaightMessageSize];
+	size = [self landscapeMessageSize];
+}
+
+
 
 // -----------------------------------------------------------------------------
 #pragma mark -
-#pragma mark Special methods for use by predicates
 // -----------------------------------------------------------------------------
 - (NSString *)messageText
 {
@@ -228,84 +267,114 @@
 	return @"img";
 }
 
+-(CGSize)portaightMessageSize
+{
+	if(CGSizeEqualToSize(_portaightMessageSize, CGSizeZero))
+	{
+		CGSize size;
+		CGFloat maxWidth = \
+			MSG_CELL_PORTRAIT_WIDTH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + 8);
+		CGFloat maxHeight = \
+			(MSG_CELL_PORTRAIT_MAX_HEIGHT - 4);
+		
+		switch (self.type)
+		{
+			case LOGMSG_TYPE_LOG:
+			case LOGMSG_TYPE_BLOCKSTART:
+			case LOGMSG_TYPE_BLOCKEND:{
+				size = [LoggerMessageSize
+						sizeForMessage:self
+						truncated:_truncated
+						maxWidth:maxWidth
+						maxHeight:maxHeight];
+				break;
+			}
+			case LOGMSG_TYPE_CLIENTINFO:
+			case LOGMSG_TYPE_DISCONNECT:{
+				size = [LoggerClientSize
+						sizeForMessage:self
+						truncated:_truncated
+						maxWidth:maxWidth
+						maxHeight:maxHeight];
+				break;
+			}
+			case LOGMSG_TYPE_MARK:{
+				size = [LoggerMarkerSize
+						sizeForMessage:self
+						truncated:_truncated
+						maxWidth:maxWidth
+						maxHeight:maxHeight];
+				break;
+			}
+		}
+
+		_portaightMessageSize = size;
+	}
+	
+	return _portaightMessageSize;
+}
+
+-(CGSize)landscapeMessageSize
+{
+	if(CGSizeEqualToSize(_landscapeMessageSize, CGSizeZero))
+	{
+		CGSize size;
+		CGFloat maxWidth = \
+			MSG_CELL_LANDSCAPE_WDITH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + 8);
+		CGFloat maxHeight = \
+			(MSG_CELL_LANDSCALE_MAX_HEIGHT - 4);
+
+		switch (self.type)
+		{
+			case LOGMSG_TYPE_LOG:
+			case LOGMSG_TYPE_BLOCKSTART:
+			case LOGMSG_TYPE_BLOCKEND:{
+				size = [LoggerMessageSize
+						sizeForMessage:self
+						truncated:_truncated
+						maxWidth:maxWidth
+						maxHeight:maxHeight];
+				break;
+			}
+			case LOGMSG_TYPE_CLIENTINFO:
+			case LOGMSG_TYPE_DISCONNECT:{
+				size = [LoggerClientSize
+						sizeForMessage:self
+						truncated:_truncated
+						maxWidth:maxWidth
+						maxHeight:maxHeight];
+				break;
+			}
+			case LOGMSG_TYPE_MARK:{
+				size = [LoggerMarkerSize
+						sizeForMessage:self
+						truncated:_truncated
+						maxWidth:maxWidth
+						maxHeight:maxHeight];
+				break;
+			}
+		}
+
+		_landscapeMessageSize = size;
+	}
+
+	return _landscapeMessageSize;
+}
+
+
+
+
 //------------------------------------------------------------------------------
 #pragma mark - Message Height
 //------------------------------------------------------------------------------
 -(CGFloat)portraitHeight
 {
-	if(_portraitHeight == 0)
-	{
-		CGFloat height = 0;
-		
-		switch (self.type)
-		{
-			case LOGMSG_TYPE_LOG:
-			case LOGMSG_TYPE_BLOCKSTART:
-			case LOGMSG_TYPE_BLOCKEND:
-				height = [LoggerMessageHeight
-						  heightForMessage:self
-						  onWidth:MSG_CELL_PORTRAIT_WIDTH
-						  withMaxHeight:MSG_CELL_PORTRAIT_MAX_HEIGHT];
-				break;
-			case LOGMSG_TYPE_CLIENTINFO:
-			case LOGMSG_TYPE_DISCONNECT:
-				height = [LoggerClientHeight
-						  heightForMessage:self
-						  onWidth:MSG_CELL_PORTRAIT_WIDTH
-						  withMaxHeight:MSG_CELL_PORTRAIT_MAX_HEIGHT];
-				break;
-			case LOGMSG_TYPE_MARK:
-				height = [LoggerMarkerHeight
-						  heightForMessage:self
-						  onWidth:MSG_CELL_PORTRAIT_WIDTH
-						  withMaxHeight:MSG_CELL_PORTRAIT_MAX_HEIGHT];
-				break;
-		}
-		_portraitHeight = height;
-	}
-
-	if(contentsType == kMessageImage)
-	{
-		MTLogVerify(@"------ cell height %f-----",_portraitHeight);
-	}
-
-	return _portraitHeight;
+	return _portaightMessageSize.height;
 }
-
 
 -(CGFloat)landscapeHeight
 {
-#ifdef SUPPORT_LADNSACPE_DISPLAY
-	if(_landscapeHeight == 0)
-	{
-		CGFloat height = 0;
-		
-		switch (self.type)
-		{
-			case LOGMSG_TYPE_LOG:
-			case LOGMSG_TYPE_BLOCKSTART:
-			case LOGMSG_TYPE_BLOCKEND:
-				height = [LoggerMessageHeight
-						  heightForMessage:self
-						  onWidth:MSG_CELL_LANDSCAPE_WDITH];
-				break;
-			case LOGMSG_TYPE_CLIENTINFO:
-			case LOGMSG_TYPE_DISCONNECT:
-				height = [LoggerClientHeight
-						  heightForMessage:self
-						  onWidth:MSG_CELL_LANDSCAPE_WDITH];
-				break;
-			case LOGMSG_TYPE_MARK:
-				height = [LoggerMarkerHeight
-						  heightForMessage:self
-						  onWidth:MSG_CELL_LANDSCAPE_WDITH];
-				break;
-		}
-		_landscapeHeight = height;
-	}
-#endif
-
-	return _landscapeHeight;
+	return _landscapeMessageSize.height;
 }
 
 // -----------------------------------------------------------------------------

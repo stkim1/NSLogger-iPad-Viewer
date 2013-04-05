@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model name="" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="2057" systemVersion="12C60" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+<model name="" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="2061" systemVersion="12D78" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="LoggerClientData" representedClassName="LoggerClientData" syncable="YES">
         <attribute name="clientDevice" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="clientHash" attributeType="Integer 32" defaultValueString="0" indexed="YES" syncable="YES"/>
@@ -27,22 +27,25 @@
         <attribute name="functionName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="imageSize" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="landscapeHeight" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="landscapeMessageSize" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="level" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="lineNumber" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <attribute name="messageText" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="messageType" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="portraitHeight" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="portraitMessageSize" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="runCount" attributeType="Integer 32" defaultValueString="0" indexed="YES" syncable="YES"/>
         <attribute name="sequence" attributeType="Integer 32" defaultValueString="0" indexed="YES" syncable="YES"/>
         <attribute name="tag" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="textRepresentation" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="threadID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="timestamp" attributeType="Integer 64" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <attribute name="truncated" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="type" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
     </entity>
     <elements>
         <element name="LoggerClientData" positionX="477" positionY="189" width="128" height="165"/>
         <element name="LoggerConnectionStatusData" positionX="270" positionY="306" width="128" height="150"/>
-        <element name="LoggerMessageData" positionX="268" positionY="-69" width="128" height="330"/>
+        <element name="LoggerMessageData" positionX="268" positionY="-69" width="128" height="375"/>
     </elements>
 </model>

@@ -44,12 +44,6 @@
 #import <UIKit/UIKit.h>
 #import "LoggerConstModel.h"
 
-#import "LoggerMessageHeight.h"
-#import "LoggerClientHeight.h"
-#import "LoggerMarkerHeight.h"
-
-//#define SUPPORT_LADNSACPE_DISPLAY
-
 @class LoggerConnection;
 
 @interface LoggerMessage : NSObject
@@ -77,11 +71,13 @@
 	CGSize						imageSize;
 
 	NSString					*_textRepresentation; // text representation of this message
-	// stkim1_jan.18,2013
+
+	// stkim1 Apr.04,2013
 	// width of cells in iOS version is fixed so we can pre-calculate and cache
 	// heights for two orientations at messageProcessingQueue of LoggerConnection
-	CGFloat						_portraitHeight;
-	CGFloat						_landscapeHeight;
+	BOOL						_truncated;
+	CGSize						_portaightMessageSize;
+	CGSize						_landscapeMessageSize;
 }
 @property (nonatomic, assign) struct timeval		timestamp;
 @property (nonatomic, retain) NSString				*tag;
@@ -97,12 +93,17 @@
 @property (nonatomic, assign) short					type;
 @property (nonatomic, assign) short					contentsType;
 @property (nonatomic, readonly) CGSize				imageSize;
-@property (nonatomic, readonly) NSString			*textRepresentation;
+@property (nonatomic, retain) NSString				*textRepresentation;
 @property (nonatomic, readonly) NSString			*messageText;
 @property (nonatomic, readonly) NSString			*messageType;
+
 @property (nonatomic, readonly) CGFloat				portraitHeight;
 @property (nonatomic, readonly) CGFloat				landscapeHeight;
 
-- (void)computeTimeDelta:(struct timeval *)td since:(LoggerMessage *)previousMessage;
+@property (nonatomic, readonly, getter = isTruncated) BOOL truncated;
+@property (nonatomic, readonly) CGSize				portaightMessageSize;
+@property (nonatomic, readonly) CGSize				landscapeMessageSize;
 
+- (void)computeTimeDelta:(struct timeval *)td since:(LoggerMessage *)previousMessage;
+- (void)formatMessage;
 @end

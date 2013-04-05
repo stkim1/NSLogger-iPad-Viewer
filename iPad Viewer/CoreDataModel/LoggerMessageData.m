@@ -59,11 +59,13 @@
 @dynamic filename;
 @dynamic functionName;
 @dynamic imageSize;
+@dynamic landscapeMessageSize;
 @dynamic landscapeHeight;
 @dynamic level;
 @dynamic lineNumber;
 @dynamic messageText;
 @dynamic messageType;
+@dynamic portraitMessageSize;
 @dynamic portraitHeight;
 @dynamic runCount;
 @dynamic sequence;
@@ -71,6 +73,7 @@
 @dynamic textRepresentation;
 @dynamic threadID;
 @dynamic timestamp;
+@dynamic truncated;
 @dynamic type;
 
 -(unsigned long)rawDataSize

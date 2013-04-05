@@ -2,7 +2,10 @@
  *
  * Modified BSD license.
  *
- * Based on source code copyright (c) 2010-2012 Florent Pillet,
+ * Based on
+ * Copyright (c) 2010-2011 Florent Pillet <fpillet@gmail.com>
+ * Copyright (c) 2008 Loren Brichter,
+ *
  * Copyright (c) 2012-2013 Sung-Taek, Kim <stkim1@colorfulglue.com> All Rights
  * Reserved.
  *
@@ -45,15 +48,13 @@
 
 @class LoggerMessage;
 
-@interface LoggerMessageHeight : NSObject
-+ (CGFloat)minimumHeightForCellOnWidth:(CGFloat)aWidth;
+@interface LoggerMessageFormatter : NSObject
++(NSString *)formatTimestamp:(struct timeval *)aTimestamp;
 
-+ (CGFloat)heightForFileLineFunctionOnWidth:(CGFloat)aWidth;
-
-+ (CGFloat)heightForMessage:(LoggerMessage *)aMessage
-					onWidth:(CGFloat)aWidth
-			  withMaxHeight:(CGFloat)aMaxHeight;
-
-+ (CGFloat)heightForFileLineFunctionOfMessage:(LoggerMessage *)aMessage
-									  onWidth:(CGFloat)aWidth;
+/*
+ * hate to make a method that does two, but in order to cut mem usage,
+ * I need this to do two at the same time.
+ */
++(NSString *)formatAndTruncateDisplayMessage:(LoggerMessage *)aMessage
+								   truncated:(BOOL *)isTruncated;
 @end

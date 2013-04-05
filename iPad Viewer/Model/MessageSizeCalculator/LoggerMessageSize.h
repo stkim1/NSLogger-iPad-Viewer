@@ -39,11 +39,23 @@
  *
  */
 
+#import <Foundation/Foundation.h>
+#import "LoggerConstModel.h"
 #import "LoggerConstView.h"
-NSString * const kBottomHintText = @"Double-click to see all text...";
-NSString * const kBottomHintData = @"Double-click to see all data...";
-NSString * const kDefaultFontName = @"Lucida Grande";
-NSString * const kTagAndLevelFontName = @"LucidaGrande-Bold";
-NSString * const kMonospacedFontName = @"Inconsolata";
 
-NSString * const kMessageAttributesChangedNotification = @"MessageAttributesChangedNotification";
+@class LoggerMessage;
+
+@interface LoggerMessageSize : NSObject
++ (CGFloat)minimumHeightForCellOnWidth:(CGFloat)aWidth;
+
++ (CGFloat)sizeForFileLineFunctionOnWidth:(CGFloat)aWidth;
+
++ (CGSize)sizeForMessage:(LoggerMessage *)aMessage
+			   truncated:(BOOL)truncated
+				maxWidth:(CGFloat)aMaxWidth
+			   maxHeight:(CGFloat)aMaxHeight;
+
++ (CGSize)sizeForFileLineFunctionOfMessage:(LoggerMessage *)aMessage
+								   onWidth:(CGFloat)aWidth;
+
+@end

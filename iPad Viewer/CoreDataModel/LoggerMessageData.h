@@ -52,11 +52,13 @@
 @property (nonatomic, retain) NSString * filename;
 @property (nonatomic, retain) NSString * functionName;
 @property (nonatomic, retain) NSString * imageSize;
+@property (nonatomic, retain) NSString * landscapeMessageSize;
 @property (nonatomic, retain) NSNumber * landscapeHeight;
 @property (nonatomic, retain) NSNumber * level;
 @property (nonatomic, retain) NSNumber * lineNumber;
 @property (nonatomic, retain) NSString * messageText;
 @property (nonatomic, retain) NSString * messageType;
+@property (nonatomic, retain) NSString * portraitMessageSize;
 @property (nonatomic, retain) NSNumber * portraitHeight;
 @property (nonatomic, retain) NSNumber * runCount;
 @property (nonatomic, retain) NSNumber * sequence;
@@ -64,6 +66,7 @@
 @property (nonatomic, retain) NSString * textRepresentation;
 @property (nonatomic, retain) NSString * threadID;
 @property (nonatomic, retain) NSNumber * timestamp;
+@property (nonatomic, retain) NSNumber * truncated;
 @property (nonatomic, retain) NSNumber * type;
 
 -(LoggerMessageType)dataType;

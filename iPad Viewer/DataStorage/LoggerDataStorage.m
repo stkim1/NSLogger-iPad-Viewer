@@ -191,7 +191,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 			
 			// data cache setup
 			_dataEntryCacheSize = 0;
-
+			
 			_dataEntryCache = \
 				[[NSMutableDictionary alloc] initWithCapacity:0];
 			

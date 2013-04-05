@@ -67,7 +67,7 @@
     [super viewDidLoad];
 	[self setDataManager:[LoggerDataManager sharedDataManager]];
 
-#if 0
+#if 1
 	assert([self.dataManager messageDisplayContext] != nil);
 	
 	NSFetchRequest *request =\

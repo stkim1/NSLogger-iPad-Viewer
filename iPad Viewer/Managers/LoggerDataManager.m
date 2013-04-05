@@ -615,12 +615,16 @@ didReceiveMessages:(NSArray *)theMessages
 					[messageData setMessageType:	[aMessage messageType]];
 					[messageData setTextRepresentation:[aMessage textRepresentation]];
 
+					
+					
+					[messageData setPortraitMessageSize:NSStringFromCGSize([aMessage portaightMessageSize])];
+					[messageData setLandscapeMessageSize:NSStringFromCGSize([aMessage landscapeMessageSize])];
+					
 					[messageData setPortraitHeight: [NSNumber numberWithFloat:[aMessage portraitHeight]]];
-#ifdef SUPPORT_LADNSACPE_DISPLAY
 					[messageData setLandscapeHeight:[NSNumber numberWithFloat:[aMessage landscapeHeight]]];
-#else
-					[messageData setLandscapeHeight:[NSNumber numberWithFloat:0.f]];
-#endif
+
+					[messageData setTruncated:[NSNumber numberWithBool:[aMessage isTruncated]]];
+					
 					//now store datas
 					switch ([aMessage contentsType])
 					{

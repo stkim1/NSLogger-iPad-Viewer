@@ -469,18 +469,32 @@ UIColor *defaultTagAndLevelColor = nil;
 			// it slows down the UI to no avail. Just cut the string to a reasonable size, and take
 			// the calculations from here.
 			BOOL truncated = NO;
-			if ([s length] > 2048)
+			if ([s length] > MSG_TRUNCATE_THREADHOLD_LENGTH)
 			{
 				truncated = YES;
-				s = [s substringToIndex:2048];
+				s = [s substringToIndex:MSG_TRUNCATE_THREADHOLD_LENGTH];
 			}
+
 			
-			// compute display string size, limit to cell height
+			
+			
+			
+			
+			
+// compute display string size, limit to cell height
+#if 0
 			CGSize lr = [s
 						 sizeWithFont:monospacedFont
 						 forWidth:MSG_CELL_PORTRAIT_WIDTH
 						 lineBreakMode:NSLineBreakByWordWrapping];
-			
+#else
+			CGSize lr = [s
+						 sizeWithFont:monospacedFont
+						 constrainedToSize:CGSizeMake(aDrawRect.size.width, MSG_CELL_HEIGHT_CONSTRAINT)
+						 lineBreakMode:NSLineBreakByWordWrapping];
+#endif
+
+			//if this is happening, there's something seriously wrong
 			if (lr.height > aDrawRect.size.height)
 				truncated = YES;
 			else
@@ -488,15 +502,15 @@ UIColor *defaultTagAndLevelColor = nil;
 				aDrawRect.origin.y += floorf((aDrawRect.size.height - lr.height) / 2.0f);
 				aDrawRect.size.height = lr.height;
 			}
-			
+
 			CGFloat hintHeight = 0;
 			NSString *hint = nil;
 			if (truncated)
 			{
 				// display a hint instructing user to double-click message in order
 				// to see all contents
-				
-				hint = NSLocalizedString(@"Double-click to see all text...", @"");
+
+				hint = NSLocalizedString(kBottomHintText, @"");
 				hintHeight =
 					[hint
 					 sizeWithFont:monospacedFont
@@ -505,12 +519,23 @@ UIColor *defaultTagAndLevelColor = nil;
 			}
 			
 			aDrawRect.size.height -= hintHeight;
+			
+			
+
+			
+			
+			
+			
+			
+			
+			
+			
+// draw text
 			[s
 			 drawInRect:aDrawRect
 			 withFont:monospacedFont
 			 lineBreakMode:NSLineBreakByWordWrapping
 			 alignment:NSTextAlignmentLeft];
-			
 			
 			// Draw hint "Double click to see all text..." if needed
 			if (hint != nil)
@@ -622,7 +647,7 @@ UIColor *defaultTagAndLevelColor = nil;
 				   CGRectGetWidth(cellFrame) - (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH) - 6,
 				   CGRectGetHeight(cellFrame));
 	CGFloat fileLineFunctionHeight = 0;
-	
+		
 	[self drawMessageInRect:drawRect highlightedTextColor:nil];
 	
 	

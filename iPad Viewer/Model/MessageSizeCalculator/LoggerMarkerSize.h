@@ -39,8 +39,8 @@
  *
  */
 
-#import "LoggerMessageHeight.h"
+#import <Foundation/Foundation.h>
+#import "LoggerMessageSize.h"
 
-@interface LoggerMarkerHeight : LoggerMessageHeight
-
+@interface LoggerMarkerSize : LoggerMessageSize
 @end

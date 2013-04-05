@@ -39,7 +39,34 @@
  *
  */
 
-#import "LoggerMessageHeight.h"
+#import "LoggerClientSize.h"
+#import "LoggerMessage.h"
 
-@interface LoggerClientHeight : LoggerMessageHeight
+extern UIFont	*measureDefaultFont;
+extern UIFont	*measureTagAndLevelFont;
+extern UIFont	*measureMonospacedFont;
+
+@implementation LoggerClientSize
+
++ (CGSize)sizeForMessage:(LoggerMessage *)aMessage
+			   truncated:(BOOL)truncated
+				maxWidth:(CGFloat)aMaxWidth
+			   maxHeight:(CGFloat)aMaxHeight
+{
+	UIFont *monospacedFont   = measureMonospacedFont;
+	
+	CGSize sz = CGSizeMake(aMaxWidth, aMaxHeight);
+	CGSize const maxConstraint = CGSizeMake(aMaxWidth,aMaxHeight);
+
+	NSString *s = aMessage.textRepresentation;
+
+	CGSize lr = [s
+				 sizeWithFont:monospacedFont
+				 constrainedToSize:maxConstraint
+				 lineBreakMode:NSLineBreakByWordWrapping];
+	
+	sz.height = fminf(lr.height, sz.height);
+
+	return sz;
+}
 @end

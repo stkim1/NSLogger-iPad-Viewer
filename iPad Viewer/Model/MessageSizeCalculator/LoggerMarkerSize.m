@@ -39,37 +39,33 @@
  *
  */
 
-#import "LoggerMarkerHeight.h"
+#import "LoggerMarkerSize.h"
 #import "LoggerMessage.h"
 
 extern UIFont	*measureDefaultFont;
 extern UIFont	*measureTagAndLevelFont;
 extern UIFont	*measureMonospacedFont;
 
-@implementation LoggerMarkerHeight
-+ (CGFloat)heightForMessage:(LoggerMessage *)aMessage
-					onWidth:(CGFloat)aWidth
-			  withMaxHeight:(CGFloat)aMaxHeight
+@implementation LoggerMarkerSize
++ (CGSize)sizeForMessage:(LoggerMessage *)aMessage
+			   truncated:(BOOL)truncated
+				maxWidth:(CGFloat)aMaxWidth
+			   maxHeight:(CGFloat)aMaxHeight
 {
-/*
-	CGFloat minimumHeight = \
-		[LoggerMessageHeight
-		 minimumHeightForCellOnWidth:aWidth];
-*/
-
+	
 	UIFont *monospacedFont   = measureMonospacedFont;
 	
-	CGSize sz = CGSizeMake(aWidth, aMaxHeight);
+	CGSize sz = CGSizeMake(aMaxWidth, aMaxHeight);
+	CGSize const maxConstraint = CGSizeMake(aMaxWidth,aMaxHeight);
 	
-	sz.width -= 8;
-	sz.height -= 4;
-
-	CGSize lr = [aMessage.message
+	NSString *s = aMessage.textRepresentation;
+	CGSize lr = [s
 				 sizeWithFont:monospacedFont
-				 forWidth:aWidth
+				 constrainedToSize:maxConstraint
 				 lineBreakMode:NSLineBreakByWordWrapping];
-	
-	return fminf(lr.height, sz.height);
+
+	sz.height = fminf(lr.height, sz.height);
+	return sz;
 }
 
 @end

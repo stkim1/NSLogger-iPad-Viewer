@@ -51,11 +51,25 @@
 #define TIMESTAMP_COLUMN_WIDTH			85.0f
 #define	DEFAULT_THREAD_COLUMN_WIDTH		85.f
 
+//sizeWithFont:forWidth:lineBreakMode: does not work in the way you'd expect
+//setup a height constraint and use sizeWithFont:constrainedToSize:lineBreakMode:
+// instead
+#define MSG_CELL_HEIGHT_CONSTRAINT		20000.f
+
 #define MSG_CELL_PORTRAIT_WIDTH			768.f
 #define MSG_CELL_PORTRAIT_MAX_HEIGHT	1004.f
 
 #define MSG_CELL_LANDSCAPE_WDITH		1024.f
 #define MSG_CELL_LANDSCALE_MAX_HEIGHT	748.f
+
+#define MSG_CELL_TOP_MARGIN				3.f
+#define MSG_CELL_BOTTOM_MARGIN			3.f
+#define MSG_CELL_TOP_BOTTOM_MARGIN		6.f
+
+#define MSG_TRUNCATE_THREADHOLD_LENGTH	2048
+
+extern NSString * const kBottomHintText;
+extern NSString * const kBottomHintData;
 
 extern NSString * const kDefaultFontName;
 #define DEFAULT_FONT_SIZE				11.f
