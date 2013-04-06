@@ -30,7 +30,7 @@ Throw 'em at [@stkim1](http://twitter.com/stkim1)
 ##Screen Shots
 
 ###iPad Viwer (13/04/06)
-<img width="480" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ios_13_04_06.png" />
+<img width="480" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/sim_13_04_06.png" />
 
 ###UIProtoWork (13/03/24)
 <img width="480" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/sim_13_03_24.png" />
