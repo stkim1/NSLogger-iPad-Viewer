@@ -48,14 +48,17 @@
 @interface LoggerMessageSize : NSObject
 + (CGFloat)minimumHeightForCellOnWidth:(CGFloat)aWidth;
 
-+ (CGFloat)sizeForFileLineFunctionOnWidth:(CGFloat)aWidth;
++ (CGFloat)sizeOfFileLineFunctionOnWidth:(CGFloat)aWidth;
 
-+ (CGSize)sizeForMessage:(LoggerMessage *)aMessage
-			   truncated:(BOOL)truncated
++ (CGSize)sizeOfMessage:(LoggerMessage * const)aMessage
 				maxWidth:(CGFloat)aMaxWidth
 			   maxHeight:(CGFloat)aMaxHeight;
 
-+ (CGSize)sizeForFileLineFunctionOfMessage:(LoggerMessage *)aMessage
++ (CGSize)sizeOfHint:(LoggerMessage * const)aMessage
+			maxWidth:(CGFloat)aMaxWidth
+		   maxHeight:(CGFloat)aMaxHeight;
+
++ (CGSize)sizeOfFileLineFunctionOfMessage:(LoggerMessage * const)aMessage
 								   onWidth:(CGFloat)aWidth;
 
 @end

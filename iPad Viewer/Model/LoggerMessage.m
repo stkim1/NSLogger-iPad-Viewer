@@ -63,24 +63,31 @@
 @synthesize parts;
 @synthesize image, imageSize;
 @synthesize sequence;
+@synthesize timestampString = _timestampString;
 @synthesize filename, functionName, lineNumber;
 @synthesize textRepresentation = _textRepresentation;
 @synthesize truncated = _truncated;
+
+
 @dynamic messageText;
 @dynamic messageType;
 
 @dynamic portraitHeight;
-@dynamic landscapeHeight;
+@dynamic portraitMessageSize;
+@dynamic portraitHintSize;
 
-@dynamic portaightMessageSize;
+@dynamic landscapeHeight;
 @dynamic landscapeMessageSize;
+@dynamic landscapeHintSize;
 
 - (id) init
 {
 	self = [super init];
 	if (self != nil)
 	{
-		_portaightMessageSize = _landscapeMessageSize = CGSizeZero;
+		_portraitMessageSize = _landscapeMessageSize = CGSizeZero;
+		_portraitHintSize = _landscapeHintSize = CGSizeZero;
+		_truncated = NO;
 	}
 	return self;
 }
@@ -94,6 +101,7 @@
 	[message release];
 	[image release];
 	[threadID release];
+	[_timestampString release];
 	[_textRepresentation release];
 	[super dealloc];
 }
@@ -233,19 +241,36 @@
 #pragma mark - 
 - (void)formatMessage
 {
+	// timestamp
+	NSString *ts =
+		[LoggerMessageFormatter
+		 formatTimestamp:&timestamp];
+	
+	[ts retain];
+	[_timestampString release],_timestampString = nil;
+	_timestampString = ts;
+	
+	// message format
 	NSString *formattedMessage =
 		[LoggerMessageFormatter
 		 formatAndTruncateDisplayMessage:self
 		 truncated:&_truncated];
-
-	self.textRepresentation = formattedMessage;
+	
+	[formattedMessage retain];
+	[_textRepresentation release],_textRepresentation = nil;
+	_textRepresentation = formattedMessage;
 
 	UIImage *formattedImage __attribute__((unused)) = [self image];
-	
-	CGSize size __attribute__((unused)) = [self portaightMessageSize];
-	size = [self landscapeMessageSize];
-}
 
+	CGSize size __attribute__((unused)) = [self portraitMessageSize];
+	size = [self landscapeMessageSize];
+	
+	if(_truncated)
+	{
+		size = [self portraitHintSize];
+		size = [self landscapeHintSize];
+	}
+}
 
 
 // -----------------------------------------------------------------------------
@@ -267,15 +292,41 @@
 	return @"img";
 }
 
--(CGSize)portaightMessageSize
+
+
+//------------------------------------------------------------------------------
+#pragma mark - Message size
+//------------------------------------------------------------------------------
+-(CGFloat)portraitHeight
 {
-	if(CGSizeEqualToSize(_portaightMessageSize, CGSizeZero))
+	CGFloat height = _portraitMessageSize.height;
+	
+	if(_truncated)
+	{
+		height += _portraitHintSize.height;
+	}
+	
+	height += MSG_CELL_TOP_BOTTOM_PADDING;
+	return height;
+}
+
+-(CGSize)portraitMessageSize
+{
+	if(CGSizeEqualToSize(_portraitMessageSize, CGSizeZero))
 	{
 		CGSize size;
 		CGFloat maxWidth = \
-			MSG_CELL_PORTRAIT_WIDTH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + 8);
-		CGFloat maxHeight = \
-			(MSG_CELL_PORTRAIT_MAX_HEIGHT - 4);
+			MSG_CELL_PORTRAIT_WIDTH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING);
+		
+		CGFloat maxHeight = MSG_CELL_PORTRAIT_MAX_HEIGHT;
+		if(_truncated)
+		{
+			maxHeight -= MSG_CELL_TOP_PADDING;
+		}
+		else
+		{
+			maxHeight -= MSG_CELL_TOP_BOTTOM_PADDING;
+		}
 		
 		switch (self.type)
 		{
@@ -283,8 +334,7 @@
 			case LOGMSG_TYPE_BLOCKSTART:
 			case LOGMSG_TYPE_BLOCKEND:{
 				size = [LoggerMessageSize
-						sizeForMessage:self
-						truncated:_truncated
+						sizeOfMessage:self
 						maxWidth:maxWidth
 						maxHeight:maxHeight];
 				break;
@@ -292,26 +342,68 @@
 			case LOGMSG_TYPE_CLIENTINFO:
 			case LOGMSG_TYPE_DISCONNECT:{
 				size = [LoggerClientSize
-						sizeForMessage:self
-						truncated:_truncated
+						sizeOfMessage:self
 						maxWidth:maxWidth
 						maxHeight:maxHeight];
 				break;
 			}
 			case LOGMSG_TYPE_MARK:{
 				size = [LoggerMarkerSize
-						sizeForMessage:self
-						truncated:_truncated
+						sizeOfMessage:self
 						maxWidth:maxWidth
 						maxHeight:maxHeight];
 				break;
 			}
 		}
 
-		_portaightMessageSize = size;
+		_portraitMessageSize = size;
 	}
 	
-	return _portaightMessageSize;
+	return _portraitMessageSize;
+}
+
+-(CGSize)portraitHintSize
+{
+	if(CGSizeEqualToSize(_portraitHintSize, CGSizeZero))
+	{
+		
+		CGSize size;
+		CGFloat maxWidth = \
+			MSG_CELL_PORTRAIT_WIDTH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING);
+		CGFloat maxHeight = MSG_CELL_PORTRAIT_MAX_HEIGHT - MSG_CELL_TOP_PADDING;
+		
+		switch (self.type)
+		{
+			case LOGMSG_TYPE_LOG:
+			case LOGMSG_TYPE_BLOCKSTART:
+			case LOGMSG_TYPE_BLOCKEND:{
+				size = [LoggerMessageSize
+						sizeOfHint:self
+						maxWidth:maxWidth
+						maxHeight:maxHeight];
+				break;
+			}
+			default:
+				break;
+		}
+		
+		_portraitHintSize = size;
+	}
+	
+	return _portraitHintSize;
+}
+
+-(CGFloat)landscapeHeight
+{
+	CGFloat height = _landscapeMessageSize.height;
+	
+	if(_truncated)
+	{
+		height += _landscapeHintSize.height;
+	}
+	
+	height += MSG_CELL_TOP_BOTTOM_PADDING;
+	return height;
 }
 
 -(CGSize)landscapeMessageSize
@@ -320,9 +412,19 @@
 	{
 		CGSize size;
 		CGFloat maxWidth = \
-			MSG_CELL_LANDSCAPE_WDITH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + 8);
-		CGFloat maxHeight = \
-			(MSG_CELL_LANDSCALE_MAX_HEIGHT - 4);
+			MSG_CELL_LANDSCAPE_WDITH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING);
+		
+		CGFloat maxHeight = MSG_CELL_LANDSCALE_MAX_HEIGHT;
+
+		if(_truncated)
+		{
+			maxHeight -= MSG_CELL_TOP_PADDING;
+		}
+		else
+		{
+			maxHeight -= MSG_CELL_TOP_BOTTOM_PADDING;
+		}
+			
 
 		switch (self.type)
 		{
@@ -330,8 +432,7 @@
 			case LOGMSG_TYPE_BLOCKSTART:
 			case LOGMSG_TYPE_BLOCKEND:{
 				size = [LoggerMessageSize
-						sizeForMessage:self
-						truncated:_truncated
+						sizeOfMessage:self
 						maxWidth:maxWidth
 						maxHeight:maxHeight];
 				break;
@@ -339,16 +440,14 @@
 			case LOGMSG_TYPE_CLIENTINFO:
 			case LOGMSG_TYPE_DISCONNECT:{
 				size = [LoggerClientSize
-						sizeForMessage:self
-						truncated:_truncated
+						sizeOfMessage:self
 						maxWidth:maxWidth
 						maxHeight:maxHeight];
 				break;
 			}
 			case LOGMSG_TYPE_MARK:{
 				size = [LoggerMarkerSize
-						sizeForMessage:self
-						truncated:_truncated
+						sizeOfMessage:self
 						maxWidth:maxWidth
 						maxHeight:maxHeight];
 				break;
@@ -361,21 +460,37 @@
 	return _landscapeMessageSize;
 }
 
-
-
-
-//------------------------------------------------------------------------------
-#pragma mark - Message Height
-//------------------------------------------------------------------------------
--(CGFloat)portraitHeight
+-(CGSize)landscapeHintSize
 {
-	return _portaightMessageSize.height;
+	if (CGSizeEqualToSize(_landscapeHintSize, CGSizeZero))
+	{
+		CGSize size;
+		CGFloat maxWidth = \
+			MSG_CELL_LANDSCAPE_WDITH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING);
+		CGFloat maxHeight = MSG_CELL_LANDSCALE_MAX_HEIGHT - MSG_CELL_TOP_PADDING;
+		
+		switch (self.type)
+		{
+			case LOGMSG_TYPE_LOG:
+			case LOGMSG_TYPE_BLOCKSTART:
+			case LOGMSG_TYPE_BLOCKEND:{
+				size = [LoggerMessageSize
+						sizeOfHint:self
+						maxWidth:maxWidth
+						maxHeight:maxHeight];
+				break;
+			}
+			default:
+				break;
+		}
+
+		_landscapeHintSize = size;
+
+	}
+	
+	return _landscapeHintSize;
 }
 
--(CGFloat)landscapeHeight
-{
-	return _landscapeMessageSize.height;
-}
 
 // -----------------------------------------------------------------------------
 #pragma mark - Other

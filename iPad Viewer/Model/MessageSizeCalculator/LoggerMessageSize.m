@@ -115,7 +115,7 @@ NSString		*hintForLargeData = nil;
 	return fmaxf((r1.height + r2.height), (r3.height + r4.height)) + 4;
 }
 
-+ (CGFloat)sizeForFileLineFunctionOnWidth:(CGFloat)aWidth
++ (CGFloat)sizeOfFileLineFunctionOnWidth:(CGFloat)aWidth
 {
 	UIFont *tagAndLevelFont  = measureTagAndLevelFont;
 	
@@ -124,11 +124,10 @@ NSString		*hintForLargeData = nil;
 				forWidth:aWidth
 				lineBreakMode:NSLineBreakByWordWrapping];
 	
-	return r.height + MSG_CELL_TOP_BOTTOM_MARGIN;
+	return r.height + MSG_CELL_TOP_BOTTOM_PADDING;
 }
 
-+ (CGSize)sizeForMessage:(LoggerMessage *)aMessage
-			   truncated:(BOOL)truncated
++ (CGSize)sizeOfMessage:(LoggerMessage * const)aMessage
 				maxWidth:(CGFloat)aMaxWidth
 			   maxHeight:(CGFloat)aMaxHeight
 {
@@ -151,20 +150,8 @@ NSString		*hintForLargeData = nil;
 						 constrainedToSize:maxConstraint
 						 lineBreakMode:NSLineBreakByWordWrapping];
 
-			if(truncated)
-			{
-				CGSize hr =\
-					[hintForLongText
-					 sizeWithFont:monospacedFont
-					 constrainedToSize:maxConstraint
-					 lineBreakMode:NSLineBreakByWordWrapping];
 
-				sz.height = fminf(lr.height + hr.height, sz.height);
-			}
-			else
-			{
-				sz.height = fminf(lr.height, sz.height);
-			}
+			sz.height = fminf(lr.height, sz.height);
 			break;
 		}
 
@@ -179,17 +166,6 @@ NSString		*hintForLargeData = nil;
 						 lineBreakMode:NSLineBreakByWordWrapping];
 
 			sz.height = lr.height * nLines;
-			
-			if(truncated)
-			{
-				CGSize hr =\
-					[hintForLargeData
-					 sizeWithFont:monospacedFont
-					 constrainedToSize:maxConstraint
-					 lineBreakMode:NSLineBreakByWordWrapping];
-
-				sz.height += hr.height;
-			}
 			break;
 		}
 
@@ -205,15 +181,59 @@ NSString		*hintForLargeData = nil;
 		default:
 			break;
 	}
-	
-	CGFloat displayHeight = sz.height + MSG_CELL_TOP_BOTTOM_MARGIN;
-	sz.height = fmaxf(displayHeight, minimumHeight);
+
+	//CGFloat displayHeight = sz.height + MSG_CELL_TOP_BOTTOM_PADDING;
+	sz.height = fmaxf(sz.height, minimumHeight);
 
 	// return calculated drawing size
 	return sz;
 }
 
-+ (CGSize)sizeForFileLineFunctionOfMessage:(LoggerMessage *)aMessage
++ (CGSize)sizeOfHint:(LoggerMessage * const)aMessage
+			maxWidth:(CGFloat)aMaxWidth
+		   maxHeight:(CGFloat)aMaxHeight
+{
+	UIFont *monospacedFont   = measureMonospacedFont;
+	CGSize sz = CGSizeMake(aMaxWidth,aMaxHeight);
+	CGSize const maxConstraint = CGSizeMake(aMaxWidth,aMaxHeight);
+	
+	switch (aMessage.contentsType)
+	{
+		case kMessageString: {
+			
+			CGSize hr =\
+				[hintForLongText
+				 sizeWithFont:monospacedFont
+				 constrainedToSize:maxConstraint
+				 lineBreakMode:NSLineBreakByWordWrapping];
+
+			sz.height = fminf(hr.height, sz.height);
+			break;
+		}
+			
+		case kMessageData: {
+			
+			CGSize hr =\
+				[hintForLargeData
+				 sizeWithFont:monospacedFont
+				 constrainedToSize:maxConstraint
+				 lineBreakMode:NSLineBreakByWordWrapping];
+
+			sz.height = fminf(hr.height, sz.height);
+			break;
+		}
+
+		case kMessageImage:
+		default:
+			break;
+	}
+
+	// return calculated drawing size
+	return sz;
+}
+
+
++ (CGSize)sizeOfFileLineFunctionOfMessage:(LoggerMessage * const)aMessage
 								   onWidth:(CGFloat)aWidth
 {
 	return CGSizeZero;

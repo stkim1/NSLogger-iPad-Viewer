@@ -29,8 +29,8 @@ Throw 'em at [@stkim1](http://twitter.com/stkim1)
 
 ##Screen Shots
 
-###iPad Viwer (13/03/10)
-<img width="480" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ios_13_03_10.png" />
+###iPad Viwer (13/04/06)
+<img width="480" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ios_13_04_06.png" />
 
 ###UIProtoWork (13/03/24)
 <img width="480" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/sim_13_03_24.png" />
@@ -83,4 +83,4 @@ Lucida Grande, Lucida Grande Copyright (c) 1997, 2000, Bigelow & Holmes Inc. U.S
 <a href="http://www.styleseven.com">Digital-7</a> Copyright (c) 2008, Sizenko Alexander, Style-7 All rights reserved.</pre>
 
 _VER. 0.1.8_<br/>
-_Updated : Apr. 4, 2013_
+_Updated : Apr. 6, 2013_

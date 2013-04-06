@@ -49,12 +49,12 @@
 @class LoggerMessage;
 
 @interface LoggerMessageFormatter : NSObject
-+(NSString *)formatTimestamp:(struct timeval *)aTimestamp;
++(NSString *)formatTimestamp:(struct timeval * const)aTimestamp;
 
 /*
  * hate to make a method that does two, but in order to cut mem usage,
  * I need this to do two at the same time.
  */
-+(NSString *)formatAndTruncateDisplayMessage:(LoggerMessage *)aMessage
++(NSString *)formatAndTruncateDisplayMessage:(LoggerMessage * const)aMessage
 								   truncated:(BOOL *)isTruncated;
 @end

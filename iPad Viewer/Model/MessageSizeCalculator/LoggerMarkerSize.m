@@ -47,8 +47,7 @@ extern UIFont	*measureTagAndLevelFont;
 extern UIFont	*measureMonospacedFont;
 
 @implementation LoggerMarkerSize
-+ (CGSize)sizeForMessage:(LoggerMessage *)aMessage
-			   truncated:(BOOL)truncated
++ (CGSize)sizeOfMessage:(LoggerMessage *)aMessage
 				maxWidth:(CGFloat)aMaxWidth
 			   maxHeight:(CGFloat)aMaxHeight
 {

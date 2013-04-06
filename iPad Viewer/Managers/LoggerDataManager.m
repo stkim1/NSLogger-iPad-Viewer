@@ -597,6 +597,8 @@ didReceiveMessages:(NSArray *)theMessages
 					[messageData setRunCount:		[NSNumber numberWithInt:[theConnection reconnectionCount]]];
 
 					[messageData setTimestamp:		[NSNumber numberWithUnsignedLongLong:tm64]];
+					[messageData setTimestampString:[aMessage timestampString]];
+
 					[messageData setTag:			[aMessage tag]];
 					[messageData setFilename:		[aMessage filename]];
 					[messageData setFunctionName:	[aMessage functionName]];
@@ -608,27 +610,49 @@ didReceiveMessages:(NSArray *)theMessages
 					[messageData setLevel:			[NSNumber numberWithShort:[aMessage level]]];
 					[messageData setType:			[NSNumber numberWithShort:[aMessage type]]];
 					[messageData setContentsType:	[NSNumber numberWithShort:[aMessage contentsType]]];
-					
-					[messageData setImageSize:		NSStringFromCGSize([aMessage imageSize])];
-					
-					[messageData setMessageText:	[aMessage messageText]];
 					[messageData setMessageType:	[aMessage messageType]];
-					[messageData setTextRepresentation:[aMessage textRepresentation]];
 
-					
-					
-					[messageData setPortraitMessageSize:NSStringFromCGSize([aMessage portaightMessageSize])];
-					[messageData setLandscapeMessageSize:NSStringFromCGSize([aMessage landscapeMessageSize])];
-					
 					[messageData setPortraitHeight: [NSNumber numberWithFloat:[aMessage portraitHeight]]];
+					[messageData setPortraitMessageSize:NSStringFromCGSize([aMessage portraitMessageSize])];
 					[messageData setLandscapeHeight:[NSNumber numberWithFloat:[aMessage landscapeHeight]]];
+					[messageData setLandscapeMessageSize:NSStringFromCGSize([aMessage landscapeMessageSize])];
 
-					[messageData setTruncated:[NSNumber numberWithBool:[aMessage isTruncated]]];
-					
 					//now store datas
 					switch ([aMessage contentsType])
 					{
+						case kMessageString:{
+							
+							// formatted text for string message
+							[messageData setTextRepresentation:[aMessage textRepresentation]];
+
+							// save full text
+							[messageData setMessageText:[aMessage messageText]];
+
+							[messageData setTruncated:[NSNumber numberWithBool:[aMessage isTruncated]]];
+							
+							// set hint size
+							if([aMessage isTruncated])
+							{
+								[messageData setPortraitHintSize:NSStringFromCGSize([aMessage portraitHintSize])];
+								[messageData setLandscapeHintSize:NSStringFromCGSize([aMessage landscapeHintSize])];
+							}
+							break;
+						}
+							
 						case kMessageData:{
+
+							// formatted text for binary message
+							[messageData setTextRepresentation:[aMessage textRepresentation]];
+							
+							[messageData setTruncated:[NSNumber numberWithBool:[aMessage isTruncated]]];
+							
+							// set hint size
+							if([aMessage isTruncated])
+							{
+								[messageData setPortraitHintSize:NSStringFromCGSize([aMessage portraitHintSize])];
+								[messageData setLandscapeHintSize:NSStringFromCGSize([aMessage landscapeHintSize])];
+							}
+
 							
 							// filepath is made of 'client hash'/'run count'/'timestamp.data'
 							NSString *filepath = \
@@ -645,18 +669,24 @@ didReceiveMessages:(NSArray *)theMessages
 							 toPath:filepath
 							 forType:kMessageData];
 
+
 							break;
 						}
 							
 						case kMessageImage:{
+
+							// set image size
+							[messageData setImageSize:NSStringFromCGSize([aMessage imageSize])];
 							
+							
+							// filepath is made of 'client hash'/'run count'/'timestamp.data'
 							NSString *filepath = \
 								[NSString stringWithFormat:@"%lx/%d/%llx.image"
 								 ,[theConnection clientHash]
 								 ,[theConnection reconnectionCount]
 								 ,tm64];
 
-							// data filepath
+							// image filepath
 							[messageData setDataFilepath:filepath];
 
 							[[self dataStorage]
@@ -672,7 +702,6 @@ didReceiveMessages:(NSArray *)theMessages
 					
 					
 					dataSaveSize += [messageData rawDataSize];
-
 				}
 				
 			}

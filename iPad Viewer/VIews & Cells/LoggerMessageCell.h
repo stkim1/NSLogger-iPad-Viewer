@@ -56,7 +56,7 @@ extern NSString * const kMessageCellReuseID;
 {
 	UIView					*_messageView;		// a view which draws content of message
 	UITableView				*_hostTableView;	// a tableview hosting this cell
-	LoggerMessageData		*_messageData;		// *NOT RETAINED* : this comes from CoreData
+	LoggerMessageData		*_messageData;
 	UIImage					*_imageData;
 }
 @property (nonatomic, assign) UITableView				*hostTableView;

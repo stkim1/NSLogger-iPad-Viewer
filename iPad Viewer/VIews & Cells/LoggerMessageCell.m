@@ -451,113 +451,70 @@ UIColor *defaultTagAndLevelColor = nil;
 {
 	CGContextRef context = UIGraphicsGetCurrentContext();
 	CGContextSaveGState(context);
-
+	
 	[[UIColor blackColor] set];
-
+	
 	UIFont *monospacedFont = displayMonospacedFont;
+	CGSize textDrawSize = CGSizeFromString([self.messageData portraitMessageSize]);
+	BOOL isTruncated = [self.messageData.truncated boolValue];
+	NSString *s = [self.messageData textRepresentation];
 
 	switch([_messageData dataType])
 	{
 		case kMessageString:{
-			// in case the message text is empty, use the function name as message text
-			// this is typically used to record a waypoint in the code flow
-			NSString *s = _messageData.messageText;
-			if (![s length] && _messageData.functionName)
-				s = _messageData.functionName;
-			
-			// very long messages can't be displayed entirely. No need to compute their full size,
-			// it slows down the UI to no avail. Just cut the string to a reasonable size, and take
-			// the calculations from here.
-			BOOL truncated = NO;
-			if ([s length] > MSG_TRUNCATE_THREADHOLD_LENGTH)
-			{
-				truncated = YES;
-				s = [s substringToIndex:MSG_TRUNCATE_THREADHOLD_LENGTH];
-			}
 
+			// Draw hint "Double click to see all text..." if needed
 			
-			
-			
-			
-			
-			
-// compute display string size, limit to cell height
-#if 0
-			CGSize lr = [s
-						 sizeWithFont:monospacedFont
-						 forWidth:MSG_CELL_PORTRAIT_WIDTH
-						 lineBreakMode:NSLineBreakByWordWrapping];
-#else
-			CGSize lr = [s
-						 sizeWithFont:monospacedFont
-						 constrainedToSize:CGSizeMake(aDrawRect.size.width, MSG_CELL_HEIGHT_CONSTRAINT)
-						 lineBreakMode:NSLineBreakByWordWrapping];
-#endif
-
-			//if this is happening, there's something seriously wrong
-			if (lr.height > aDrawRect.size.height)
-				truncated = YES;
-			else
-			{
-				aDrawRect.origin.y += floorf((aDrawRect.size.height - lr.height) / 2.0f);
-				aDrawRect.size.height = lr.height;
-			}
-
-			CGFloat hintHeight = 0;
-			NSString *hint = nil;
-			if (truncated)
-			{
-				// display a hint instructing user to double-click message in order
-				// to see all contents
-
-				hint = NSLocalizedString(kBottomHintText, @"");
-				hintHeight =
-					[hint
-					 sizeWithFont:monospacedFont
-					 constrainedToSize:aDrawRect.size
-					 lineBreakMode:NSLineBreakByWordWrapping].height;
-			}
-			
-			aDrawRect.size.height -= hintHeight;
-			
-			
-
-			
-			
-			
-			
-			
-			
-			
-			
-// draw text
+			CGRect textDrawRect = (CGRect){aDrawRect.origin,textDrawSize};
+			// draw text
 			[s
-			 drawInRect:aDrawRect
+			 drawInRect:textDrawRect
 			 withFont:monospacedFont
 			 lineBreakMode:NSLineBreakByWordWrapping
 			 alignment:NSTextAlignmentLeft];
 			
-			// Draw hint "Double click to see all text..." if needed
-			if (hint != nil)
+			if (isTruncated)
 			{
-				aDrawRect.origin.y += aDrawRect.size.height;
-				aDrawRect.size.height = hintHeight;
+				// draw text frame
+				textDrawRect = (CGRect){aDrawRect.origin,textDrawSize};
+				
+				NSString *hint = NSLocalizedString(kBottomHintText, nil);
+				CGSize hintDrawSize = CGSizeFromString([self.messageData portraitHintSize]);
+				CGRect hintDrawRect = \
+					(CGRect){{CGRectGetMinX(aDrawRect),CGRectGetMinY(aDrawRect) + textDrawSize.height},hintDrawSize};
+
+				// draw hint first
 				[hint
-				 drawInRect:aDrawRect
+				 drawInRect:hintDrawRect
 				 withFont:monospacedFont
 				 lineBreakMode:NSLineBreakByWordWrapping
 				 alignment:NSTextAlignmentLeft];
 			}
-
+			
 			break;
 		}
 		case kMessageData: {
-			NSString *s = [_messageData textRepresentation];
 			[s
 			 drawInRect:aDrawRect
 			 withFont:monospacedFont
 			 lineBreakMode:NSLineBreakByWordWrapping
 			 alignment:NSTextAlignmentLeft];
+
+			// Draw hint "Double click to see all text..." if needed
+			if (isTruncated)
+			{
+				NSString *hint = NSLocalizedString(kBottomHintData, nil);
+				CGSize hintDrawSize = CGSizeFromString([self.messageData portraitHintSize]);
+
+				CGRect hintDrawRect = \
+					(CGRect){{CGRectGetMinX(aDrawRect),CGRectGetMinY(aDrawRect) + textDrawSize.height},hintDrawSize};
+
+				[hint
+				 drawInRect:hintDrawRect
+				 withFont:monospacedFont
+				 lineBreakMode:NSLineBreakByWordWrapping
+				 alignment:NSTextAlignmentLeft];
+			}
 
 			break;
 		}
@@ -574,11 +531,14 @@ UIColor *defaultTagAndLevelColor = nil;
 				[self.imageData drawInRect:imageRect];
 				self.imageData = nil;
 			}
+			break;
 		}
+		default:
+			break;
 	}
 	
 	CGContextRestoreGState(context);
-
+	
 }
 
 - (void)drawMessageView:(CGRect)cellFrame
@@ -640,12 +600,13 @@ UIColor *defaultTagAndLevelColor = nil;
 
 	[self drawThreadIDAndTagInRect:drawRect highlightedTextColor:nil];
 	
-	
+
 	// Draw message
-	drawRect = CGRectMake(CGRectGetMinX(cellFrame) + TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + 3,
-				   CGRectGetMinY(cellFrame),
-				   CGRectGetWidth(cellFrame) - (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH) - 6,
-				   CGRectGetHeight(cellFrame));
+	drawRect =
+		CGRectMake(CGRectGetMinX(cellFrame) + (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_LEFT_PADDING),
+				   CGRectGetMinY(cellFrame) + MSG_CELL_TOP_PADDING,
+				   CGRectGetWidth(cellFrame) - (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING),
+				   CGRectGetHeight(cellFrame) - MSG_CELL_TOP_BOTTOM_PADDING);
 	CGFloat fileLineFunctionHeight = 0;
 		
 	[self drawMessageInRect:drawRect highlightedTextColor:nil];

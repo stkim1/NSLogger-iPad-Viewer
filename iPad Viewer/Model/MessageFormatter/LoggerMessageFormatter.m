@@ -48,7 +48,7 @@
 #include <sys/time.h>
 
 @implementation LoggerMessageFormatter
-+(NSString *)formatTimestamp:(struct timeval *)aTimestamp
++(NSString *)formatTimestamp:(struct timeval * const)aTimestamp
 {
 	if(aTimestamp == NULL)
 		return nil;
@@ -65,7 +65,7 @@
 	return timestampStr;
 }
 
-+(NSString *)formatAndTruncateDisplayMessage:(LoggerMessage *)aMessage truncated:(BOOL *)isTruncated
++(NSString *)formatAndTruncateDisplayMessage:(LoggerMessage * const)aMessage truncated:(BOOL *)isTruncated
 {
 	NSString *displayMessage = nil;
 
@@ -73,6 +73,8 @@
 	{
 		case kMessageString:{
 			
+			// in case the message text is empty, use the function name as message text
+			// this is typically used to record a waypoint in the code flow
 			NSString *message = nil;
 			if (![aMessage.message length] && [aMessage.functionName length])
 			{
@@ -83,13 +85,19 @@
 				message = aMessage.message;
 			}
 			
-			// restrict message length for very long contents
+			// very long messages can't be displayed entirely. No need to compute their full size,
+			// it slows down the UI to no avail. Just cut the string to a reasonable size, and take
+			// the calculations from here.
 			if ([message length] > MSG_TRUNCATE_THREADHOLD_LENGTH)
 			{
 				displayMessage = [message substringToIndex:MSG_TRUNCATE_THREADHOLD_LENGTH];
 				*isTruncated = TRUE;
 			}
-			
+			else
+			{
+				displayMessage = message;
+			}
+
 			break;
 		}
 		case kMessageData:{

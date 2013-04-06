@@ -48,8 +48,7 @@ extern UIFont	*measureMonospacedFont;
 
 @implementation LoggerClientSize
 
-+ (CGSize)sizeForMessage:(LoggerMessage *)aMessage
-			   truncated:(BOOL)truncated
++ (CGSize)sizeOfMessage:(LoggerMessage *)aMessage
 				maxWidth:(CGFloat)aMaxWidth
 			   maxHeight:(CGFloat)aMaxHeight
 {

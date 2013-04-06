@@ -209,18 +209,8 @@ char sConnectionAssociatedObjectKey = 1;
 		 I find this is a perfect spot to pre-calculate data to cache
 		 such as cell height, image size, text representation
 		 */
-		
-		for(LoggerMessage *m in msgs)
-		{
-			
-#if 0
-			[m textRepresentation];
-			[m image];
-			[m portraitHeight];
-			[m landscapeHeight];
-#endif
-			[m formatMessage];
-		}
+
+		[msgs makeObjectsPerformSelector:@selector(formatMessage)];
 
 		if(LoggerCheckDelegate(delegate
 							   ,@protocol(LoggerConnectionDelegate)

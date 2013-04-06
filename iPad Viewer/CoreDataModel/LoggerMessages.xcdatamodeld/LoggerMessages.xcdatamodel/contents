@@ -27,12 +27,14 @@
         <attribute name="functionName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="imageSize" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="landscapeHeight" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="landscapeHintSize" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="landscapeMessageSize" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="level" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="lineNumber" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <attribute name="messageText" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="messageType" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="portraitHeight" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="portraitHintSize" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="portraitMessageSize" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="runCount" attributeType="Integer 32" defaultValueString="0" indexed="YES" syncable="YES"/>
         <attribute name="sequence" attributeType="Integer 32" defaultValueString="0" indexed="YES" syncable="YES"/>
@@ -40,12 +42,13 @@
         <attribute name="textRepresentation" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="threadID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="timestamp" attributeType="Integer 64" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <attribute name="timestampString" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="truncated" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="type" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
     </entity>
     <elements>
-        <element name="LoggerClientData" positionX="477" positionY="189" width="128" height="165"/>
-        <element name="LoggerConnectionStatusData" positionX="270" positionY="306" width="128" height="150"/>
-        <element name="LoggerMessageData" positionX="268" positionY="-69" width="128" height="375"/>
+        <element name="LoggerClientData" positionX="0" positionY="0" width="128" height="165"/>
+        <element name="LoggerConnectionStatusData" positionX="0" positionY="0" width="128" height="150"/>
+        <element name="LoggerMessageData" positionX="0" positionY="0" width="128" height="420"/>
     </elements>
 </model>
