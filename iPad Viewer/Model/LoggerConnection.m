@@ -232,62 +232,75 @@ char sConnectionAssociatedObjectKey = 1;
 
 - (void)clientInfoReceived:(LoggerMessage *)message
 {
-	/*
-	 * Adler32 hash : http://en.wikipedia.org/wiki/Adler-32
-	 * Source Code : https://github.com/madler/zlib/blob/master/adler32.c#L65
-	 */
-	uLong hash = adler32(0L, Z_NULL, 0);
 	
-	NSDictionary *parts = message.parts;
-	NSString *value = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_CLIENT_NAME]];
-	
-	if (!IS_NULL_STRING(value))
-	{
-		self.clientName = value;
-		hash = adler32(hash, (Bytef *)[self.clientName UTF8String], (uInt)[self.clientName length]);
-	}
-	
-	value = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_CLIENT_VERSION]];
-	if (!IS_NULL_STRING(value))
-	{
-		self.clientVersion = value;
-		hash = adler32(hash, (Bytef *)[self.clientVersion UTF8String], (uInt)[self.clientVersion length]);
-	}
-	
-	value = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_OS_NAME]];
-	if (!IS_NULL_STRING(value))
-	{
-		self.clientOSName = value;
-		hash = adler32(hash, (Bytef *)[self.clientOSName UTF8String], (uInt)[self.clientOSName length]);
-	}
-	
-	value = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_OS_VERSION]];
-	if (!IS_NULL_STRING(value))
-	{
-		self.clientOSVersion = value;
-		hash = adler32(hash, (Bytef *)[self.clientOSVersion UTF8String], (uInt)[self.clientOSVersion length]);
-	}
-	
-	value = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_CLIENT_MODEL]];
-	if (!IS_NULL_STRING(value))
-	{
-		self.clientDevice = value;
-		hash = adler32(hash, (Bytef *)[self.clientDevice UTF8String], (uInt)[self.clientDevice length]);
-	}
-	
-	value = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_UNIQUEID]];
-	if (!IS_NULL_STRING(value))
-	{
-		self.clientUDID = value;
-		hash = adler32(hash, (Bytef *)[self.clientUDID UTF8String], (uInt)[self.clientUDID length]);
-	}
+	dispatch_async(messageProcessingQueue, ^{
+		/*
+		 * Adler32 hash : http://en.wikipedia.org/wiki/Adler-32
+		 * Source Code : https://github.com/madler/zlib/blob/master/adler32.c#L65
+		 */
+		uLong hash = adler32(0L, Z_NULL, 0);
+		
+		NSDictionary *parts = message.parts;
+		NSString *value = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_CLIENT_NAME]];
+		
+		if (!IS_NULL_STRING(value))
+		{
+			self.clientName = value;
+			hash = adler32(hash, (Bytef *)[self.clientName UTF8String], (uInt)[self.clientName length]);
+		}
+		
+		value = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_CLIENT_VERSION]];
+		if (!IS_NULL_STRING(value))
+		{
+			self.clientVersion = value;
+			hash = adler32(hash, (Bytef *)[self.clientVersion UTF8String], (uInt)[self.clientVersion length]);
+		}
+		
+		value = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_OS_NAME]];
+		if (!IS_NULL_STRING(value))
+		{
+			self.clientOSName = value;
+			hash = adler32(hash, (Bytef *)[self.clientOSName UTF8String], (uInt)[self.clientOSName length]);
+		}
+		
+		value = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_OS_VERSION]];
+		if (!IS_NULL_STRING(value))
+		{
+			self.clientOSVersion = value;
+			hash = adler32(hash, (Bytef *)[self.clientOSVersion UTF8String], (uInt)[self.clientOSVersion length]);
+		}
+		
+		value = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_CLIENT_MODEL]];
+		if (!IS_NULL_STRING(value))
+		{
+			self.clientDevice = value;
+			hash = adler32(hash, (Bytef *)[self.clientDevice UTF8String], (uInt)[self.clientDevice length]);
+		}
+		
+		value = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_UNIQUEID]];
+		if (!IS_NULL_STRING(value))
+		{
+			self.clientUDID = value;
+			hash = adler32(hash, (Bytef *)[self.clientUDID UTF8String], (uInt)[self.clientUDID length]);
+		}
 
-	_clientHash = hash;
-	
-	// make sure _client hash is non-nil hash
-	assert(adler32(0L, Z_NULL, 0) != _clientHash);
+		_clientHash = hash;
+		
+		// make sure _client hash is non-nil hash
+		assert(adler32(0L, Z_NULL, 0) != _clientHash);
 
-	MTLog(@"client hash %lx",hash);
+		MTLog(@"client hash %lx\n message%@",hash,message.message);
+		
+		// format message string for client info
+		[message formatMessage];
+		
+		if(LoggerCheckDelegate(delegate
+							   ,@protocol(LoggerConnectionDelegate)
+							   ,@selector(connection:didEstablishWithMessage:)))
+		{
+			[self.delegate connection:self didEstablishWithMessage:message];
+		}
+	});
 }
 
 - (NSString *)clientAppDescription

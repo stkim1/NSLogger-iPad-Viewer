@@ -234,15 +234,15 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 // transport report new connection to manager
 - (void)transport:(LoggerTransport *)theTransport
 didEstablishConnection:(LoggerConnection *)theConnection
+clientInfo:(LoggerMessage *)theInfoMessage
 {
-	MTLog(@"setup new connection [%@]",theConnection);
-
 	// report transport status first
 	[self presentTransportStatus:[theTransport status]];
 
 	[_dataManager
 	 transport:theTransport
-	 didEstablishConnection:theConnection];
+	 didEstablishConnection:theConnection
+	 clientInfo:theInfoMessage];
 }
 
 // method that may not be called on main thread

@@ -52,6 +52,9 @@
 // -----------------------------------------------------------------------------
 @protocol LoggerConnectionDelegate <NSObject>
 
+- (void)connection:(LoggerConnection *)theConnection
+didEstablishWithMessage:(LoggerMessage *)theMessage;
+
 // method that may not be called on main thread
 - (void)connection:(LoggerConnection *)theConnection didReceiveMessages:(NSArray *)theMessages range:(NSRange)rangeInMessagesList;
 

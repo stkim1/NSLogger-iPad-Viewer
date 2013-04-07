@@ -40,6 +40,7 @@
  */
 
 #import "LoggerClientInfoCell.h"
+#import "LoggerCommon.h"
 
 NSString * const kClientInfoCellReuseID = @"clientInfoCell";
 extern UIFont *displayDefaultFont;
@@ -56,14 +57,85 @@ extern UIFont *displayMonospacedFont;
 		 reuseIdentifier:kClientInfoCellReuseID];
 }
 
-- (void)drawMessageView:(CGRect)aRect
+- (void)drawMessageView:(CGRect)cellFrame
 {
 	CGContextRef context = UIGraphicsGetCurrentContext();
-	UIColor *backgroundColor = [UIColor redColor];
+	CGContextSaveGState(context);
 
-	//UIColor *textColor = [UIColor blackColor];
-	[backgroundColor set];
-	CGContextFillRect(context, aRect);
+	BOOL disconnected = ([self.messageData.type shortValue] == LOGMSG_TYPE_DISCONNECT);
+	BOOL highlighted = [self isHighlighted];
+	
+	// background and separators colors (thank you, Xcode build window)
+	UIColor *separatorColor, *backgroundColor;
+	if (disconnected)
+	{
+		separatorColor =
+			[UIColor
+			 colorWithRed:(202.0f / 255.0f)
+			 green:(31.0f / 255.0f)
+			 blue:(27.0f / 255.0f)
+			 alpha:1.f];
+		
+		backgroundColor =
+			[UIColor
+			 colorWithRed:(252.0f / 255.0f)
+			 green:(224.0f / 255.0f)
+			 blue:(224.0f / 255.0f)
+			 alpha:1.f];
+	}
+	else
+	{
+		separatorColor =
+			[UIColor
+			 colorWithRed:(28.0f / 255.0f)
+			 green:(227.0f / 255.0f)
+			 blue:0.f
+			 alpha:1.f];
+		
+		backgroundColor =
+			[UIColor
+			 colorWithRed:(224.0f / 255.0f)
+			 green:1.f
+			 blue:(224.0f / 255.0f)
+			 alpha:1.f];
+	}
+	
+	// Draw cell background and separators
+	if (!highlighted)
+	{
+		CGContextSetFillColorWithColor(context, backgroundColor.CGColor);
+		CGContextFillRect(context, cellFrame);
+	}
+	
+	CGContextSetShouldAntialias(context, false);
+	CGContextSetLineWidth(context, 1.0f);
+	CGContextSetLineCap(context, kCGLineCapSquare);
+	CGContextSetStrokeColorWithColor(context, separatorColor.CGColor);
+	CGContextBeginPath(context);
+	
+	// horizontal bottom separator
+	CGContextMoveToPoint(context, CGRectGetMinX(cellFrame), floorf(CGRectGetMinY(cellFrame)));
+	CGContextAddLineToPoint(context, floorf(CGRectGetMaxX(cellFrame)), floorf(CGRectGetMinY(cellFrame)));
+	CGContextMoveToPoint(context, CGRectGetMinX(cellFrame), floorf(CGRectGetMaxY(cellFrame)));
+	CGContextAddLineToPoint(context, CGRectGetMaxX(cellFrame), floorf(CGRectGetMaxY(cellFrame)));
+	CGContextStrokePath(context);
+	CGContextSetShouldAntialias(context, true);
+	
+	// Draw client info
+	CGRect r = CGRectMake(CGRectGetMinX(cellFrame) + MSG_CELL_LEFT_PADDING,
+						  CGRectGetMinY(cellFrame) + MSG_CELL_TOP_PADDING,
+						  CGRectGetWidth(cellFrame) - MSG_CELL_SIDE_PADDING,
+						  CGRectGetHeight(cellFrame) - MSG_CELL_TOP_BOTTOM_PADDING);
+	
+	[[UIColor blackColor] set];
+
+	[[self.messageData textRepresentation]
+	 drawInRect:r
+	 withFont:displayMonospacedFont
+	 lineBreakMode:NSLineBreakByWordWrapping
+	 alignment:NSTextAlignmentCenter];
+
+	CGContextRestoreGState(context);
 }
 
 @end

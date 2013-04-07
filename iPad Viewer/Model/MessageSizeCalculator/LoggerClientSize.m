@@ -52,6 +52,9 @@ extern UIFont	*measureMonospacedFont;
 				maxWidth:(CGFloat)aMaxWidth
 			   maxHeight:(CGFloat)aMaxHeight
 {
+	CGFloat minimumHeight = \
+		[LoggerMessageSize minimumHeightForCellOnWidth:aMaxWidth];
+
 	UIFont *monospacedFont   = measureMonospacedFont;
 	
 	CGSize sz = CGSizeMake(aMaxWidth, aMaxHeight);
@@ -64,8 +67,7 @@ extern UIFont	*measureMonospacedFont;
 				 constrainedToSize:maxConstraint
 				 lineBreakMode:NSLineBreakByWordWrapping];
 	
-	sz.height = fminf(lr.height, sz.height);
-
+	sz.height = fmaxf(fminf(lr.height, sz.height),minimumHeight);
 	return sz;
 }
 @end

@@ -67,7 +67,7 @@
     [super viewDidLoad];
 	[self setDataManager:[LoggerDataManager sharedDataManager]];
 
-#if 1
+#if 0
 	assert([self.dataManager messageDisplayContext] != nil);
 	
 	NSFetchRequest *request =\
@@ -135,113 +135,6 @@
 #endif
 }
 
--(void)insertTableViewSection
-{
-	NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:0];
-	
-	[self.tableView
-	 insertSections:indexSet
-	 withRowAnimation:UITableViewRowAnimationAutomatic];
-}
-
-
--(void)deleteTableViewSection
-{
-	NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:0];
-
-	[self.tableView
-	 deleteSections:indexSet
-	 withRowAnimation:UITableViewRowAnimationAutomatic];
-}
-
-
--(void)readMessages:(NSNotification *)aNotification
-{
-	NSDictionary *userInfo = [aNotification userInfo];
-	
-	MTLog(@"userInfo %@",userInfo);
-	
-	uLong clientHash = [[userInfo objectForKey:kClientHash] integerValue];
-	int32_t runCount = [[userInfo objectForKey:kClientRunCount] integerValue];
-
-	self.clientInfo = nil;
-	self.clientInfo = userInfo;
-	
-	assert([self.dataManager messageDisplayContext] != nil);
-		
-	if(_messageFetchResultController != nil)
-	{
-		self.messageFetchResultController.delegate = nil;
-		self.messageFetchResultController = nil;
-		[self deleteTableViewSection];
-	}
-	
-	NSFetchRequest *request = [[NSFetchRequest alloc] init];
-
-	NSEntityDescription *entity =\
-		[NSEntityDescription
-		 entityForName:@"LoggerMessageData"
-		 inManagedObjectContext:[[self dataManager] messageDisplayContext]];
-#warning possible bug introduction. watchout
-	[request setShouldRefreshRefetchedObjects:NO];
-	[request setEntity:entity];
-	[request setFetchBatchSize:20];
-	//[request setFetchLimit:40];
-	//[request setFetchOffset:0];
-
-	[request setPredicate:
-		[NSPredicate
-		 predicateWithFormat:
-		 @"clientHash == %d AND runCount == %d"
-		 ,clientHash
-		 ,runCount]];
-	
-	NSSortDescriptor *sortByTimestamp = \
-		[[NSSortDescriptor alloc]
-		 initWithKey:@"timestamp"
-		 ascending:NO];
-	
-	NSSortDescriptor *sortBySequence = \
-		[[NSSortDescriptor alloc]
-		 initWithKey:@"sequence"
-		 ascending:NO];
-	
-	[request setSortDescriptors:@[sortBySequence,sortByTimestamp]];
-	
-	NSString *cacheName = [NSString stringWithFormat:@"Cache-%lx",clientHash];
-	
-	[NSFetchedResultsController deleteCacheWithName:cacheName];
-	//[NSFetchedResultsController deleteCacheWithName:nil];
-	
-	NSFetchedResultsController *frc = \
-		[[NSFetchedResultsController alloc]
-		 initWithFetchRequest:request
-		 managedObjectContext:[[self dataManager] messageDisplayContext]
-		 sectionNameKeyPath:nil//@"uniqueID"
-		 cacheName:cacheName];
-	
-
-	[frc setDelegate:self];
-	[self setMessageFetchResultController:frc];
-	
-	// alert tableview to prepare for incoming data
-	// before fetching started, make sure every setup is completed
-	[self insertTableViewSection];
-	
-	NSError *error = nil;
-	[frc performFetch:&error];
-	
-	[frc release],frc = nil;
-	[sortBySequence release],sortBySequence = nil;
-	[sortByTimestamp release],sortByTimestamp = nil;
-	[request release],request = nil;
-}
-
--(void)deleteMessages:(NSNotification *)aNotification
-{
-}
-
-
 -(void)viewDidAppear:(BOOL)animated
 {
 	[super viewDidAppear:animated];
@@ -261,14 +154,17 @@
 }
 
 
+//------------------------------------------------------------------------------
+#pragma mark - TableView + NSFetchedResultController Control
+//------------------------------------------------------------------------------
 -(IBAction)deletePath:(id)sender
 {
 	if(_clientInfo == nil)
 		return;
-
+	
 	uLong clientHash = [[self.clientInfo objectForKey:kClientHash] integerValue];
 	int32_t runCount = [[self.clientInfo objectForKey:kClientRunCount] integerValue];
-
+	
 	NSString *targetDir = [[NSString alloc] initWithFormat:@"%lx/%d/",clientHash,runCount];
 	[[LoggerDataStorage sharedDataStorage]
 	 deleteWholePath:targetDir];
@@ -276,53 +172,143 @@
 }
 
 
+-(void)readMessages:(NSNotification *)aNotification
+{
+	NSDictionary *userInfo = [aNotification userInfo];
+	
+	MTLog(@"userInfo %@",userInfo);
+	
+	uLong clientHash = [[userInfo objectForKey:kClientHash] integerValue];
+	int32_t runCount = [[userInfo objectForKey:kClientRunCount] integerValue];
+	
+	self.clientInfo = nil;
+	self.clientInfo = userInfo;
+	
+	assert([self.dataManager messageDisplayContext] != nil);
+	
+	if(_messageFetchResultController != nil)
+	{
+		self.messageFetchResultController.delegate = nil;
+		self.messageFetchResultController = nil;
+		[self deleteTableViewSection];
+	}
+	
+	NSFetchRequest *request = [[NSFetchRequest alloc] init];
+	
+	NSEntityDescription *entity =\
+		[NSEntityDescription
+		 entityForName:@"LoggerMessageData"
+		 inManagedObjectContext:[[self dataManager] messageDisplayContext]];
+#warning possible bug introduction. watchout
+	[request setShouldRefreshRefetchedObjects:NO];
+	[request setEntity:entity];
+	[request setFetchBatchSize:20];
+	//[request setFetchLimit:40];
+	//[request setFetchOffset:0];
+	
+	[request setPredicate:
+	 [NSPredicate
+	  predicateWithFormat:
+	  @"clientHash == %d AND runCount == %d"
+	  ,clientHash
+	  ,runCount]];
+	
+	NSSortDescriptor *sortByTimestamp = \
+		[[NSSortDescriptor alloc]
+		 initWithKey:@"timestamp"
+		 ascending:YES];
+	
+	NSSortDescriptor *sortBySequence = \
+		[[NSSortDescriptor alloc]
+		 initWithKey:@"sequence"
+		 ascending:YES];
+	
+	[request setSortDescriptors:@[sortBySequence,sortByTimestamp]];
+	
+	NSString *cacheName = [NSString stringWithFormat:@"Cache-%lx",clientHash];
+	
+	[NSFetchedResultsController deleteCacheWithName:cacheName];
+	//[NSFetchedResultsController deleteCacheWithName:nil];
+	
+	NSFetchedResultsController *frc = \
+		[[NSFetchedResultsController alloc]
+		 initWithFetchRequest:request
+		 managedObjectContext:[[self dataManager] messageDisplayContext]
+		 sectionNameKeyPath:nil//@"uniqueID"
+		 cacheName:cacheName];
+	
+	NSLog(@"performFetch");
+	NSError *error = nil;
+	[frc performFetch:&error];
+	
+	// alert tableview to prepare for incoming data
+	// before fetching started, make sure every setup is completed
+	[self setMessageFetchResultController:frc];
+	[frc setDelegate:self];
+	
+
+	[self insertTableViewSection];
+	[self.tableView
+	 reloadSections:[NSIndexSet indexSetWithIndex:0]
+	 withRowAnimation:UITableViewRowAnimationNone];
+	
+	[frc release],frc = nil;
+	[sortBySequence release],sortBySequence = nil;
+	[sortByTimestamp release],sortByTimestamp = nil;
+	[request release],request = nil;
+}
+
+-(void)deleteMessages:(NSNotification *)aNotification
+{
+}
+
+
+-(void)insertTableViewSection
+{
+	NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:0];
+	
+	[self.tableView
+	 insertSections:indexSet
+	 withRowAnimation:UITableViewRowAnimationAutomatic];
+}
+
+
+-(void)deleteTableViewSection
+{
+	NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:0];
+	
+	[self.tableView
+	 deleteSections:indexSet
+	 withRowAnimation:UITableViewRowAnimationAutomatic];
+}
+
 
 //------------------------------------------------------------------------------
 #pragma mark - UITableViewDataSource Delegate Methods
 //------------------------------------------------------------------------------
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-	NSInteger numberOfSections = 0;
-
 	if(_messageFetchResultController == nil)
 	{
-		return numberOfSections;
+		return 0;
 	}
 	
-	//numberOfSections = [[self.messageFetchResultController sections] count];
-	numberOfSections = 1;
-
-	return numberOfSections;
+	return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)aTableView
  numberOfRowsInSection:(NSInteger)aSection
 {
-    NSInteger numberOfRows = 0;
-
-	if(_messageFetchResultController == nil)
-	{
-		return numberOfRows;
-	}
-	
-	
-    if ([[self.messageFetchResultController sections] count] > 0)
-	{
-        id <NSFetchedResultsSectionInfo> sectionInfo = \
-			[[self.messageFetchResultController sections] objectAtIndex:0];
-        numberOfRows = [sectionInfo numberOfObjects];
-    }
-	
-    return numberOfRows;
+	return [[self.messageFetchResultController fetchedObjects] count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)aTableView
 		 cellForRowAtIndexPath:(NSIndexPath *)anIndexPath
 {
-	
+
 	if(_messageFetchResultController == nil)
 	{
-		return 0;
+		return nil;
 	}
 	
 	LoggerMessageData *msg = \
@@ -334,8 +320,7 @@
 	{
 		case LOGMSG_TYPE_LOG:
 		case LOGMSG_TYPE_BLOCKSTART:
-		case LOGMSG_TYPE_BLOCKEND:
-		{
+		case LOGMSG_TYPE_BLOCKEND:{
 			cell =
 				[self.tableView
 				 dequeueReusableCellWithIdentifier:kMessageCellReuseID];
@@ -354,8 +339,7 @@
 		}
 			
 		case LOGMSG_TYPE_CLIENTINFO:
-		case LOGMSG_TYPE_DISCONNECT:
-		{
+		case LOGMSG_TYPE_DISCONNECT:{
 			cell =
 				[self.tableView
 				 dequeueReusableCellWithIdentifier:kClientInfoCellReuseID];
@@ -373,8 +357,7 @@
 			break;
 		}
 
-		case LOGMSG_TYPE_MARK:
-		{
+		case LOGMSG_TYPE_MARK:{
 			cell =
 				[self.tableView
 				 dequeueReusableCellWithIdentifier:kMarkerCellReuseID];
@@ -424,49 +407,37 @@ heightForRowAtIndexPath:(NSIndexPath *)anIndexPath
 	  newIndexPath:(NSIndexPath *)aNewIndexPath
 {
 	UITableView *tableView = self.tableView;
-	
-	switch(aType) {
-		case NSFetchedResultsChangeInsert:
-			[tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:aNewIndexPath] withRowAnimation:UITableViewRowAnimationFade];
-			break;
-			
-		case NSFetchedResultsChangeDelete:
-			[tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:anIndexPath] withRowAnimation:UITableViewRowAnimationFade];
-			break;
 
-		case NSFetchedResultsChangeUpdate:
-		{
-			LoggerMessageCell *cell =
-				(LoggerMessageCell *)[self.tableView cellForRowAtIndexPath:anIndexPath];
-			[cell setupForIndexpath:anIndexPath messageData:(LoggerMessageData *)anObject];
+	switch(aType)
+	{
+		case NSFetchedResultsChangeInsert:{
+			[tableView
+			 insertRowsAtIndexPaths:@[aNewIndexPath]
+			 withRowAnimation:UITableViewRowAnimationFade];
 			break;
 		}
+
+		case NSFetchedResultsChangeDelete:
+		case NSFetchedResultsChangeUpdate:
 		case NSFetchedResultsChangeMove:
-			[tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:anIndexPath] withRowAnimation:UITableViewRowAnimationFade];
-            [tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:aNewIndexPath] withRowAnimation:UITableViewRowAnimationFade];
+		default:
             break;
 	}
 
 }
 
-- (void)controller:(NSFetchedResultsController *)controller
-  didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo
-		   atIndex:(NSUInteger)sectionIndex
-	 forChangeType:(NSFetchedResultsChangeType)type
-{
-}
-
-#if 0
-- (NSString *)controller:(NSFetchedResultsController *)controller
-sectionIndexTitleForSectionName:(NSString *)sectionName
-{
-
-}
-#endif
-
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
 {
 	[self.tableView endUpdates];
+
+	NSInteger rowTotal = [self.tableView numberOfRowsInSection:0] - 1;
+	[[NSOperationQueue mainQueue]
+	addOperationWithBlock:^{
+		[self.tableView
+		 scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:rowTotal inSection:0]
+		 atScrollPosition:UITableViewScrollPositionBottom
+		 animated:NO];
+	}];
 }
 
 @end

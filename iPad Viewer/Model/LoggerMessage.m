@@ -241,35 +241,62 @@
 #pragma mark - 
 - (void)formatMessage
 {
-	// timestamp
-	NSString *ts =
-		[LoggerMessageFormatter
-		 formatTimestamp:&timestamp];
+	NSString *formattedMessage = nil;
 	
+	switch (type) {
+		case LOGMSG_TYPE_CLIENTINFO:{
+			
+			formattedMessage = \
+				[LoggerMessageFormatter formatClientInfoMessage:self];
+			[formattedMessage retain];
+			// set message body
+			[_textRepresentation release],_textRepresentation = nil;
+			_textRepresentation = formattedMessage;
+
+			threadID = nil;
+			_truncated = NO;
+
+			CGSize size __attribute__((unused)) = [self portraitMessageSize];
+			size = [self landscapeMessageSize];
+
+
+			break;
+		}
+		default:{
+			// message format
+			NSString *formattedMessage =
+				[LoggerMessageFormatter
+				 formatAndTruncateDisplayMessage:self
+				 truncated:&_truncated];
+			[formattedMessage retain];
+
+			// set message body
+			[_textRepresentation release],_textRepresentation = nil;
+			_textRepresentation = formattedMessage;
+			
+			// in case image message, preload image
+			if(contentsType == kMessageImage){
+				UIImage *formattedImage __attribute__((unused)) = [self image];
+			}
+
+			CGSize size __attribute__((unused)) = [self portraitMessageSize];
+			size = [self landscapeMessageSize];
+
+			if(_truncated)
+			{
+				size = [self portraitHintSize];
+				size = [self landscapeHintSize];
+			}
+			
+			break;
+		}
+	}
+	
+	// set timestamp string
+	NSString *ts = [LoggerMessageFormatter formatTimestamp:&timestamp];
 	[ts retain];
 	[_timestampString release],_timestampString = nil;
 	_timestampString = ts;
-	
-	// message format
-	NSString *formattedMessage =
-		[LoggerMessageFormatter
-		 formatAndTruncateDisplayMessage:self
-		 truncated:&_truncated];
-	
-	[formattedMessage retain];
-	[_textRepresentation release],_textRepresentation = nil;
-	_textRepresentation = formattedMessage;
-
-	UIImage *formattedImage __attribute__((unused)) = [self image];
-
-	CGSize size __attribute__((unused)) = [self portraitMessageSize];
-	size = [self landscapeMessageSize];
-	
-	if(_truncated)
-	{
-		size = [self portraitHintSize];
-		size = [self landscapeHintSize];
-	}
 }
 
 

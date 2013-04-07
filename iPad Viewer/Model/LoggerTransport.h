@@ -60,7 +60,8 @@
 // once we have received the ClientInfo message) or reuse an existing document
 // if this is a reconnection
 - (void)transport:(LoggerTransport *)theTransport
-didEstablishConnection:(LoggerConnection *)theConnection;
+didEstablishConnection:(LoggerConnection *)theConnection
+	   clientInfo:(LoggerMessage *)theInfoMessage;
 
 // method reporting messages to transport maanger
 - (void)transport:(LoggerTransport *)theTransport
@@ -110,7 +111,6 @@ didDisconnectRemote:(LoggerConnection *)theConnection;
 - (void)addConnection:(LoggerConnection *)aConnection;
 - (void)removeConnection:(LoggerConnection *)aConnection;
 
-- (void)attachConnectionToManager:(LoggerConnection *)aConnection;
 - (void)reportStatusToManager:(NSDictionary *)aStatusDict;
 - (void)reportErrorToManager:(NSDictionary *)anErrorDict;
 

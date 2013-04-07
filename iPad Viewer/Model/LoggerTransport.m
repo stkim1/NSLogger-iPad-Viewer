@@ -92,18 +92,6 @@
 	}
 }
 
-- (void)attachConnectionToManager:(LoggerConnection *)aConnection
-{
-	if(LoggerCheckDelegate(transManager
-						   ,@protocol(LoggerTransportDelegate)
-						   ,@selector(transport:didEstablishConnection:)))
-	{
-		[transManager
-		 transport:self
-		 didEstablishConnection:aConnection];
-	}
-}
-
 - (void)reportStatusToManager:(NSDictionary *)aStatusDict
 {
 	[self.transManager presentTransportStatus:aStatusDict];
@@ -152,12 +140,27 @@
 		kTransportStatusString:[self transportStatusString]};
 }
 
-
 //------------------------------------------------------------------------------
 #pragma mark - logger connection delegate
 //------------------------------------------------------------------------------
+- (void)connection:(LoggerConnection *)theConnection
+didEstablishWithMessage:(LoggerMessage *)theMessage
+{
+	if(LoggerCheckDelegate(transManager
+						   ,@protocol(LoggerTransportDelegate)
+						   ,@selector(transport:didEstablishConnection:clientInfo:)))
+	{
+		[transManager
+		 transport:self
+		 didEstablishConnection:theConnection
+		 clientInfo:theMessage];
+	}
+}
+
 // method that may not be called on main thread
-- (void)connection:(LoggerConnection *)theConnection didReceiveMessages:(NSArray *)theMessages range:(NSRange)rangeInMessagesList
+- (void)connection:(LoggerConnection *)theConnection
+didReceiveMessages:(NSArray *)theMessages
+			 range:(NSRange)rangeInMessagesList
 {
 	if(LoggerCheckDelegate(transManager
 						   ,@protocol(LoggerTransportDelegate)

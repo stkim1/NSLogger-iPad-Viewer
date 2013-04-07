@@ -484,11 +484,11 @@ didReceiveMessages:(NSArray *)theMessages
 //------------------------------------------------------------------------------
 - (void)transport:(LoggerTransport *)theTransport
 didEstablishConnection:(LoggerConnection *)theConnection
+	   clientInfo:(LoggerMessage *)theInfoMessage
 {
 	dispatch_async(_messageProcessQueue, ^{
 		@autoreleasepool
 		{
-
 			// run count is 0 based. when there is client info exist,
 			// you can increase runcount by client's runcount
 			int32_t lastRunCount = 0;
@@ -539,6 +539,45 @@ MTLog(@"transport:didEstablishConnection: (%lx)[%d]",theConnection.clientHash, t
 				[status setStartTime:		[NSNumber numberWithLongLong:mach_absolute_time()]];
 				//[status setClientInfo:		client];
 				[client addConnectionStatusObject:status];
+				
+			
+				LoggerMessageData *messageData =\
+					[NSEntityDescription
+					 insertNewObjectForEntityForName:@"LoggerMessageData"
+					 inManagedObjectContext:[self messageProcessContext]];
+
+				struct timeval tm = [theInfoMessage timestamp];
+				uint64_t tm64 = timetoint64(&tm);
+				
+				//run count of the connection
+				[messageData setClientHash:		[NSNumber numberWithUnsignedLong:clientHash]];
+				[messageData setRunCount:		[NSNumber numberWithInt:lastRunCount]];
+				
+				[messageData setTimestamp:		[NSNumber numberWithUnsignedLongLong:tm64]];
+				[messageData setTimestampString:[theInfoMessage timestampString]];
+				
+				[messageData setTag:			nil];
+				[messageData setFilename:		nil];
+				[messageData setFunctionName:	nil];
+
+				[messageData setSequence:		[NSNumber numberWithUnsignedInteger:0]];
+				[messageData setThreadID:		nil];
+				[messageData setLineNumber:		[NSNumber numberWithInt:0]];
+				
+				[messageData setLevel:			[NSNumber numberWithShort:0]];
+				[messageData setType:			[NSNumber numberWithShort:[theInfoMessage type]]];
+				[messageData setContentsType:	[NSNumber numberWithShort:[theInfoMessage contentsType]]];
+				[messageData setMessageType:	[theInfoMessage messageType]];
+				
+				[messageData setPortraitHeight: [NSNumber numberWithFloat:[theInfoMessage portraitHeight]]];
+				[messageData setPortraitMessageSize:NSStringFromCGSize([theInfoMessage portraitMessageSize])];
+				[messageData setLandscapeHeight:[NSNumber numberWithFloat:[theInfoMessage landscapeHeight]]];
+				[messageData setLandscapeMessageSize:NSStringFromCGSize([theInfoMessage landscapeMessageSize])];
+				
+				
+				// formatted text for string message
+				[messageData setTextRepresentation:[theInfoMessage textRepresentation]];
+
 			}
 			@catch (NSException *exception)
 			{

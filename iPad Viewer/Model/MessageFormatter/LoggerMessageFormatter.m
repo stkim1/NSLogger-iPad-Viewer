@@ -65,6 +65,42 @@
 	return timestampStr;
 }
 
++ (NSString *)formatClientInfoMessage:(LoggerMessage *)message
+{
+	NSDictionary *parts = message.parts;
+	NSString *clientName = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_CLIENT_NAME]];
+	NSString *clientVersion = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_CLIENT_VERSION]];
+	NSString *clientAppInfo = @"";
+	if ([clientName length])
+		clientAppInfo = [NSString stringWithFormat:NSLocalizedString(@"Client connected: %@ %@", @""),
+						 clientName,
+						 clientVersion ? clientVersion : @""];
+	
+	NSString *osName = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_OS_NAME]];
+	NSString *osVersion = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_OS_VERSION]];
+	NSString *osInfo = @"";
+	if ([osName length])
+		osInfo = [NSString stringWithFormat:NSLocalizedString(@"%@ (%@ %@)", @""),
+				  [clientAppInfo length] ? @"" : NSLocalizedString(@"Client connected", @""),
+				  osName,
+				  osVersion ? osVersion : @""];
+	
+	NSString *hardware = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_CLIENT_MODEL]];
+	NSString *hardwareInfo = @"";
+	if ([hardware length])
+		hardwareInfo = [NSString stringWithFormat:NSLocalizedString(@"\nHardware: %@", @""), hardware];
+	
+	NSString *uniqueID = [parts objectForKey:[NSNumber numberWithInteger:PART_KEY_UNIQUEID]];
+	NSString *uniqueIDString = @"";
+	if ([uniqueID length])
+		uniqueIDString = [NSString stringWithFormat:NSLocalizedString(@"\nUDID: %@", @""), uniqueID];
+	NSString *header = @"";
+	if (clientAppInfo == nil)
+		header = NSLocalizedString(@"Client connected\n", @"");
+
+	return [NSString stringWithFormat:@"%@%@%@%@%@", header, clientAppInfo, osInfo, hardwareInfo, uniqueIDString];
+}
+
 +(NSString *)formatAndTruncateDisplayMessage:(LoggerMessage * const)aMessage truncated:(BOOL *)isTruncated
 {
 	NSString *displayMessage = nil;
@@ -102,8 +138,6 @@
 		}
 		case kMessageData:{
 			NSData *message = aMessage.message;
-			
-			MTLog(@"contentsType %d",aMessage.contentsType);
 			assert([message isKindOfClass:[NSData class]]);
 			
 			// convert NSData block to hex-ascii strings

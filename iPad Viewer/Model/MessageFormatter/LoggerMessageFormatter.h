@@ -51,9 +51,12 @@
 @interface LoggerMessageFormatter : NSObject
 +(NSString *)formatTimestamp:(struct timeval * const)aTimestamp;
 
+// client message should formatted here.
++ (NSString *)formatClientInfoMessage:(LoggerMessage *)message;
+
 /*
- * hate to make a method that does two, but in order to cut mem usage,
- * I need this to do two at the same time.
+ * hate to make a method that does two things at once, but in order to cut cpu
+ * usage, I need to check if message is truncated while message gets cut.
  */
 +(NSString *)formatAndTruncateDisplayMessage:(LoggerMessage * const)aMessage
 								   truncated:(BOOL *)isTruncated;
