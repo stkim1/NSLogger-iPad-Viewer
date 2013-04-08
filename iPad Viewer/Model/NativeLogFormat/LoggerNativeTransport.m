@@ -608,7 +608,7 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 
 		switch(streamEvent)
 		{
-			case NSStreamEventHasBytesAvailable:
+			case NSStreamEventHasBytesAvailable:{
 				while ([cnx.readStream hasBytesAvailable])
 				{
 					// read bytes
@@ -665,6 +665,7 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 					[msgs release];
 				}
 				break;
+			}
 
 			case NSStreamEventErrorOccurred: {
 				MTLog(@"Stream error occurred: stream=%@ self=%@ error=%@", theStream, self, [theStream streamError]);
@@ -707,19 +708,15 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 				// fall through
 			case NSStreamEventEndEncountered: {
 				// Append a disconnect message for only one of the two streams
-				struct timeval t;
-				gettimeofday(&t, NULL);
 				LoggerMessage *msg = [[LoggerMessage alloc] init];
-				msg.timestamp = t;
-				msg.type = LOGMSG_TYPE_DISCONNECT;
-				msg.message = NSLocalizedString(@"Client disconnected", @"");
-				[cnx messagesReceived:[NSArray arrayWithObject:msg]];
-				[msg release];
+				[msg makeTerminalMessage];
+				[cnx clientDisconnectWithMessage:msg];
 				cnx.connected = NO;
+				[msg release];
 				[cnx.buffer setLength:0];
 				break;
 			}
-				
+
 			case NSStreamEventOpenCompleted:
 				cnx.connected = YES;
 				break;

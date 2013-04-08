@@ -40,6 +40,7 @@
  */
 
 #import <objc/runtime.h>
+#include <sys/time.h>
 #import "LoggerMessage.h"
 #import "LoggerCommon.h"
 #import "LoggerConnection.h"
@@ -238,17 +239,18 @@
 
 
 
-#pragma mark - 
+// -----------------------------------------------------------------------------
+#pragma mark - Message Format
+// -----------------------------------------------------------------------------
 - (void)formatMessage
 {
-	NSString *formattedMessage = nil;
-	
 	switch (type) {
 		case LOGMSG_TYPE_CLIENTINFO:{
-			
-			formattedMessage = \
-				[LoggerMessageFormatter formatClientInfoMessage:self];
+			NSString *formattedMessage = \
+				[LoggerMessageFormatter
+				 formatClientInfoMessage:self];
 			[formattedMessage retain];
+
 			// set message body
 			[_textRepresentation release],_textRepresentation = nil;
 			_textRepresentation = formattedMessage;
@@ -258,10 +260,28 @@
 
 			CGSize size __attribute__((unused)) = [self portraitMessageSize];
 			size = [self landscapeMessageSize];
-
-
 			break;
 		}
+
+		case LOGMSG_TYPE_DISCONNECT:{
+			NSString *formattedMessage =
+				[LoggerMessageFormatter
+				 formatAndTruncateDisplayMessage:self
+				 truncated:&_truncated];
+			[formattedMessage retain];
+
+			// set message body
+			[_textRepresentation release],_textRepresentation = nil;
+			_textRepresentation = formattedMessage;
+			
+			threadID = nil;
+			_truncated = NO;
+			
+			CGSize size __attribute__((unused)) = [self portraitMessageSize];
+			size = [self landscapeMessageSize];
+			break;
+		}
+			
 		default:{
 			// message format
 			NSString *formattedMessage =
@@ -299,10 +319,6 @@
 	_timestampString = ts;
 }
 
-
-// -----------------------------------------------------------------------------
-#pragma mark -
-// -----------------------------------------------------------------------------
 - (NSString *)messageText
 {
 	if (contentsType == kMessageString)
@@ -517,6 +533,20 @@
 	
 	return _landscapeHintSize;
 }
+
+- (void)makeTerminalMessage
+{
+	// Append a disconnect message for only one of the two streams
+
+	gettimeofday(&timestamp, NULL);
+	type = LOGMSG_TYPE_DISCONNECT;
+
+#warning this is a dirty hack not to circulating around coredata save chain
+	sequence = INT_MAX-2;
+	message = NSLocalizedString(@"Client disconnected", @"");
+	contentsType = kMessageString;
+}
+
 
 
 // -----------------------------------------------------------------------------

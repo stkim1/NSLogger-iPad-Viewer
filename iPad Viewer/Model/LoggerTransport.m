@@ -174,17 +174,17 @@ didReceiveMessages:(NSArray *)theMessages
 	}
 }
 
-// method report to the according transport
-- (void)remoteDisconnected:(LoggerConnection *)theConnection
+-(void)connection:(LoggerConnection *)theConnection
+didDisconnectWithMessage:(LoggerMessage *)theMessage
 {
 	if(LoggerCheckDelegate(transManager
 						   ,@protocol(LoggerTransportDelegate)
-						   ,@selector(transport:didDisconnectRemote:)))
+						   ,@selector(transport:didDisconnectRemote:lastMessage:)))
 	{
 		[transManager
 		 transport:self
-		 didDisconnectRemote:theConnection];
+		 didDisconnectRemote:theConnection
+		 lastMessage:theMessage];
 	}
 }
-
 @end

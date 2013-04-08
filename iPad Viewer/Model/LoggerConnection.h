@@ -56,10 +56,13 @@
 didEstablishWithMessage:(LoggerMessage *)theMessage;
 
 // method that may not be called on main thread
-- (void)connection:(LoggerConnection *)theConnection didReceiveMessages:(NSArray *)theMessages range:(NSRange)rangeInMessagesList;
+- (void)connection:(LoggerConnection *)theConnection
+didReceiveMessages:(NSArray *)theMessages
+			 range:(NSRange)rangeInMessagesList;
 
-// method report to the according transport
-- (void)remoteDisconnected:(LoggerConnection *)theConnection;
+-(void)connection:(LoggerConnection *)theConnection
+didDisconnectWithMessage:(LoggerMessage *)theMessage;
+
 @end
 
 // -----------------------------------------------------------------------------
@@ -118,14 +121,17 @@ didEstablishWithMessage:(LoggerMessage *)theMessage;
 - (id)initWithAddress:(NSData *)anAddress;
 - (void)shutdown;
 
-- (void)messagesReceived:(NSArray *)msgs;
 - (void)clientInfoReceived:(LoggerMessage *)message;
+- (void)messagesReceived:(NSArray *)msgs;
+- (void)clientDisconnectWithMessage:(LoggerMessage *)message;
 
 - (NSString *)clientAppDescription;
 - (NSString *)clientAddressDescription;
 - (NSString *)clientDescription;
 
+#ifdef CHECK_DUPLICATED_CONNECTION
 - (BOOL)isNewRunOfClient:(LoggerConnection *)aConnection;
+#endif
 
 @end
 

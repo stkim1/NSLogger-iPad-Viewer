@@ -71,10 +71,12 @@ didReceiveMessages:(NSArray *)theMessages
 
 // method reporting to transport manager
 - (void)transport:(LoggerTransport *)theTransport
-didDisconnectRemote:(LoggerConnection *)theConnection;
+didDisconnectRemote:(LoggerConnection *)theConnection
+	  lastMessage:(LoggerMessage *)theLastMessage;
 
 - (void)transport:(LoggerTransport *)theTransport
  removeConnection:(LoggerConnection *)theConnection;
+
 @end
 
 @interface LoggerTransport : NSObject <LoggerConnectionDelegate>

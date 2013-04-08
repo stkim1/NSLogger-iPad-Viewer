@@ -463,22 +463,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 	}
 }
 
-
-//------------------------------------------------------------------------------
-#pragma mark - save message chain
-//------------------------------------------------------------------------------
-- (void)connection:(LoggerConnection *)theConnection
-didReceiveMessages:(NSArray *)theMessages
-			 range:(NSRange)rangeInMessagesList
-{
-
-}
-
-// handle disconnection
-- (void)remoteDisconnected:(LoggerConnection *)theConnection
-{
-}
-
 //------------------------------------------------------------------------------
 #pragma mark - logger transport delegate
 //------------------------------------------------------------------------------
@@ -761,15 +745,8 @@ didReceiveMessages:(NSArray *)theMessages
 // method reporting to transport manager
 - (void)transport:(LoggerTransport *)theTransport
 didDisconnectRemote:(LoggerConnection *)theConnection
+	  lastMessage:(LoggerMessage *)theLastMessage
 {
-	
-	if(theConnection == nil)
-	{
-		MTLogDebug(@"%s theConnection is nil",__PRETTY_FUNCTION__);
-		return;
-	}
-		
-
 	// handle disconnection specific logic
 	dispatch_async(_messageProcessQueue, ^{
 		@autoreleasepool {
@@ -793,7 +770,45 @@ didDisconnectRemote:(LoggerConnection *)theConnection
 				
 				// connection status info cannot be nil. if it is, we are in trouble
 				assert(status != nil);
-				[status setEndTime:[NSNumber numberWithLongLong:mach_absolute_time()]];
+				
+				struct timeval tm = [theLastMessage timestamp];
+				uint64_t tm64 = timetoint64(&tm);
+				
+				[status setEndTime:[NSNumber numberWithUnsignedLongLong:tm64]];
+				
+				LoggerMessageData *messageData =\
+					[NSEntityDescription
+					 insertNewObjectForEntityForName:@"LoggerMessageData"
+					 inManagedObjectContext:[self messageProcessContext]];
+				
+				//run count of the connection
+				[messageData setClientHash:		[NSNumber numberWithUnsignedLong:[theConnection clientHash]]];
+				[messageData setRunCount:		[NSNumber numberWithInt:[theConnection reconnectionCount]]];
+				
+				[messageData setTimestamp:		[NSNumber numberWithUnsignedLongLong:tm64]];
+				[messageData setTimestampString:[theLastMessage timestampString]];
+				
+				[messageData setTag:			nil];
+				[messageData setFilename:		nil];
+				[messageData setFunctionName:	nil];
+				
+				[messageData setSequence:		[NSNumber numberWithUnsignedInteger:[theLastMessage sequence]]];
+				[messageData setThreadID:		nil];
+				[messageData setLineNumber:		[NSNumber numberWithInt:0]];
+				
+				[messageData setLevel:			[NSNumber numberWithShort:0]];
+				[messageData setType:			[NSNumber numberWithShort:[theLastMessage type]]];
+				[messageData setContentsType:	[NSNumber numberWithShort:[theLastMessage contentsType]]];
+				[messageData setMessageType:	[theLastMessage messageType]];
+				
+				[messageData setPortraitHeight: [NSNumber numberWithFloat:[theLastMessage portraitHeight]]];
+				[messageData setPortraitMessageSize:NSStringFromCGSize([theLastMessage portraitMessageSize])];
+				[messageData setLandscapeHeight:[NSNumber numberWithFloat:[theLastMessage landscapeHeight]]];
+				[messageData setLandscapeMessageSize:NSStringFromCGSize([theLastMessage landscapeMessageSize])];
+				
+				// formatted text for string message
+				[messageData setTextRepresentation:[theLastMessage textRepresentation]];
+
 			}
 			@catch (NSException *exception)
 			{
@@ -821,6 +836,4 @@ didDisconnectRemote:(LoggerConnection *)theConnection
 {
 	
 }
-
-
 @end

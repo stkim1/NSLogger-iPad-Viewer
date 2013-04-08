@@ -260,11 +260,15 @@ didReceiveMessages:(NSArray *)theMessages
 
 - (void)transport:(LoggerTransport *)theTransport
 didDisconnectRemote:(LoggerConnection *)theConnection
+	  lastMessage:(LoggerMessage *)theLastMessage
 {
 	// report transport status first
 	[self presentTransportStatus:[theTransport status]];
-	
-	[_dataManager transport:theTransport didDisconnectRemote:theConnection];
+
+	[_dataManager
+	 transport:theTransport
+	 didDisconnectRemote:theConnection
+	 lastMessage:theLastMessage];
 }
 
 - (void)transport:(LoggerTransport *)theTransport
@@ -272,6 +276,5 @@ didDisconnectRemote:(LoggerConnection *)theConnection
 {
 	[_dataManager transport:theTransport removeConnection:theConnection];
 }
-
 
 @end

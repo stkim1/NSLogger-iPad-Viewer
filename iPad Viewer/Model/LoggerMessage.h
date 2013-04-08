@@ -114,4 +114,7 @@
 
 - (void)computeTimeDelta:(struct timeval *)td since:(LoggerMessage *)previousMessage;
 - (void)formatMessage;
+
+- (void)makeTerminalMessage;
+
 @end

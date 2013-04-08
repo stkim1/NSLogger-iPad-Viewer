@@ -127,11 +127,13 @@
 	 name:kShowClientConnectedNotification
 	 object:nil];
 	
+/*
 	[[NSNotificationCenter defaultCenter]
 	 addObserver:self
-	 selector:@selector(deleteMessages:)
+	 selector:nil//@selector(deleteMessages:)
 	 name:kShowClientDisconnectedNotification
 	 object:nil];
+*/
 #endif
 }
 
