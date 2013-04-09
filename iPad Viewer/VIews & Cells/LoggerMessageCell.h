@@ -70,6 +70,7 @@ extern NSString * const kMessageCellReuseID;
 
 // this method actually draws message content. subclasses should draw their own
 -(void)drawMessageView:(CGRect)cellFrame;
+
 -(void)setupForIndexpath:(NSIndexPath *)anIndexPath
 			 messageData:(LoggerMessageData *)aMessageData;
 

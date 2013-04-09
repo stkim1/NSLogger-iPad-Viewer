@@ -190,8 +190,7 @@ UIColor *defaultTagAndLevelColor = nil;
 	
 	if([self.messageData dataType] == kMessageImage)
 	{
-		MTLogInfo(@"prepareForReuse");
-		[_messageData cancelImageForCell:self];
+		[self.messageData cancelImageForCell:self];
 	}
 
 	self.imageData = nil;
@@ -253,7 +252,7 @@ UIColor *defaultTagAndLevelColor = nil;
 	
 	// Prepare time delta between this message and the previous displayed (filtered) message
 
-	struct timeval tv = int64totime([_messageData.timestamp unsignedLongLongValue]);
+	struct timeval tv = int64totime([self.messageData.timestamp unsignedLongLongValue]);
 
 	//struct timeval td;
 
@@ -334,7 +333,7 @@ UIColor *defaultTagAndLevelColor = nil;
 	CGContextClipToRect(context, r);
 	
 	CGSize threadBounds =
-		[_messageData.threadID
+		[self.messageData.threadID
 		 sizeWithFont:displayDefaultFont
 		 forWidth:r.size.width
 		 lineBreakMode:NSLineBreakByWordWrapping];
@@ -343,15 +342,15 @@ UIColor *defaultTagAndLevelColor = nil;
 	
 	[[UIColor grayColor] set];
 
-	[_messageData.threadID
+	[self.messageData.threadID
 	 drawInRect:CGRectInset(r, 3, 0)
 	 withFont:displayDefaultFont
 	 lineBreakMode:NSLineBreakByWordWrapping
 	 alignment:NSTextAlignmentLeft];
 
 	// Draw tag and level, if provided
-	NSString *tag = _messageData.tag;
-	int level = [_messageData.level intValue];
+	NSString *tag = self.messageData.tag;
+	int level = [self.messageData.level intValue];
 	if ([tag length] || level)
 	{
 		CGFloat threadColumnWidth = DEFAULT_THREAD_COLUMN_WIDTH;
@@ -459,7 +458,7 @@ UIColor *defaultTagAndLevelColor = nil;
 	BOOL isTruncated = [self.messageData.truncated boolValue];
 	NSString *s = [self.messageData textRepresentation];
 
-	switch([_messageData dataType])
+	switch([self.messageData dataType])
 	{
 		case kMessageString:{
 

@@ -51,7 +51,6 @@ extern UIFont	*measureMonospacedFont;
 				maxWidth:(CGFloat)aMaxWidth
 			   maxHeight:(CGFloat)aMaxHeight
 {
-	
 	UIFont *monospacedFont   = measureMonospacedFont;
 	
 	CGSize sz = CGSizeMake(aMaxWidth, aMaxHeight);

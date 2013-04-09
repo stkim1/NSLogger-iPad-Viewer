@@ -90,12 +90,12 @@
 	NSSortDescriptor *sortByTimestamp = \
 		[[NSSortDescriptor alloc]
 		 initWithKey:@"timestamp"
-		 ascending:NO];
+		 ascending:YES];
 
 	NSSortDescriptor *sortBySequence = \
 		[[NSSortDescriptor alloc]
 		 initWithKey:@"sequence"
-		 ascending:NO];
+		 ascending:YES];
 	
 	[request setSortDescriptors:@[sortBySequence,sortByTimestamp]];
 	

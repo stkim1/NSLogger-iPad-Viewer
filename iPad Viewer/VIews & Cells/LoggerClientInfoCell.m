@@ -64,13 +64,7 @@ extern UIFont *displayMonospacedFont;
 
 	BOOL disconnected = ([self.messageData.type shortValue] == LOGMSG_TYPE_DISCONNECT);
 	BOOL highlighted = [self isHighlighted];
-	
-	
-	
-	MTLog(@"timestamp %@ + sequence %d",[self.messageData timestampString],[[self.messageData sequence] unsignedIntegerValue]);
-	
-	
-	
+
 	// background and separators colors (thank you, Xcode build window)
 	UIColor *separatorColor, *backgroundColor;
 	if (disconnected)
@@ -133,6 +127,7 @@ extern UIFont *displayMonospacedFont;
 						  CGRectGetWidth(cellFrame) - MSG_CELL_SIDE_PADDING,
 						  CGRectGetHeight(cellFrame) - MSG_CELL_TOP_BOTTOM_PADDING);
 	
+	// set black color for text
 	[[UIColor blackColor] set];
 
 	[[self.messageData textRepresentation]

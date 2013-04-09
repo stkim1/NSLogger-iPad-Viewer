@@ -48,7 +48,6 @@
 #import "SynthesizeSingleton.h"
 
 #define CHECK_OPERATION_DEPENDENCY
-
 #define DATA_CACHE_PURGE_THRESHOLD	128000
 
 @interface LoggerDataStorage()
@@ -68,6 +67,7 @@
 
 -(void)_purgeDataEntryCache;
 -(void)_cacheDataEntry:(LoggerDataEntry *)aDataEntry forKey:(NSString *)aKey;
+-(void)_checkAccessedDataForPurging:(NSData *)anAccessdData;
 -(void)_uncacheDataEntryForKey:(NSString *)aKey;
 
 static inline
@@ -388,6 +388,16 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 	}
 }
 
+-(void)_checkAccessedDataForPurging:(NSData *)anAccessdData
+{
+	_dataEntryCacheSize += [anAccessdData length];
+	if(DATA_CACHE_PURGE_THRESHOLD <= _dataEntryCacheSize )
+	{
+		// start purging cache
+		[self _purgeDataEntryCache];
+	}
+}
+
 -(void)_uncacheDataEntryForKey:(NSString *)aKey
 {
 	LoggerDataEntry *entry = [[self dataEntryCache] objectForKey:aKey];
@@ -473,6 +483,7 @@ unsigned int _write_dependency_count(NSArray *pool, LoggerDataWrite *operation)
 		 callback:^(LoggerDataOperation *dataOperation, int error, NSData *data) {
 			 MTLogInfo(@"%@ success %@ error %d",[dataEntry filepath],(!error?@"YES":@"NO"),error);
 
+#ifdef HANDLE_WRITING_FAILURE
 			 // handle success
 			 if(error == 0)
 			 {
@@ -481,7 +492,7 @@ unsigned int _write_dependency_count(NSArray *pool, LoggerDataWrite *operation)
 			 else
 			 {
 			 }
-
+#endif
 			 [[dataEntry dataOperations] removeObject:dataOperation];
 
 			 // remove data type data entry from cache immediately after saved
@@ -582,21 +593,15 @@ unsigned int _read_dependency_count(NSArray *pool, LoggerDataRead *operation)
 			MTLogInfo(@"[READ] File read %@ success %@ error %d",aFilepath,(!error?@"YES":@"NO"),error);
 			if(error == 0)
 			{
-				if([dataEntry dataType] == kMessageImage)
-				{
-					[dataEntry setData:data];
-					// handle success
-					aResultHandler(data);
-					[[dataEntry dataOperations] removeObject:dataOperation];
-				}
-				else
-				{
-					// handle success
-					aResultHandler(data);
-					// if data is not image, remove from cache as soon as possible
-					[self _uncacheDataEntryForKey:aFilepath];
-				}
+				// retain accesed data
+				[dataEntry setData:data];
 
+				// handle success
+				aResultHandler(data);
+				[[dataEntry dataOperations] removeObject:dataOperation];
+
+				// check if it's neccessary to purge data cache
+				[self _checkAccessedDataForPurging:data];
 			}
 			else
 			{

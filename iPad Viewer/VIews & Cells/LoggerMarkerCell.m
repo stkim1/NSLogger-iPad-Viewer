@@ -56,13 +56,62 @@ extern UIFont *displayMonospacedFont;
 		 reuseIdentifier:kMarkerCellReuseID];
 }
 
-- (void)drawMessageView:(CGRect)aRect
+- (void)drawMessageView:(CGRect)cellFrame
 {
 	CGContextRef context = UIGraphicsGetCurrentContext();
-	UIColor *backgroundColor = [UIColor yellowColor];
+
+	BOOL highlighted = NO;
 	
-	[backgroundColor set];
-	CGContextFillRect(context, aRect);
+	UIColor *separatorColor =
+		[UIColor
+		 colorWithRed:(162.0f / 255.0f)
+		 green:(174.0f / 255.0f)
+		 blue:(10.0f / 255.0f)
+		 alpha:1.f];
+	
+	if (!highlighted)
+	{
+		UIColor *backgroundColor =
+			[UIColor
+			 colorWithRed:1.f
+			 green:1.f
+			 blue:(197.0f / 255.0f)
+			 alpha:1.f];
+		
+		[backgroundColor set];
+		CGContextFillRect(context, cellFrame);
+	}
+	
+	CGContextSetShouldAntialias(context, false);
+	CGContextSetLineWidth(context, 1.0f);
+	CGContextSetLineCap(context, kCGLineCapSquare);
+	CGContextSetStrokeColorWithColor(context, separatorColor.CGColor);
+
+	CGContextBeginPath(context);
+	CGContextMoveToPoint(context, CGRectGetMinX(cellFrame), floorf(CGRectGetMinY(cellFrame)));
+	CGContextAddLineToPoint(context, floorf(CGRectGetMaxX(cellFrame)), floorf(CGRectGetMinY(cellFrame)));
+	CGContextMoveToPoint(context, CGRectGetMinX(cellFrame), floorf(CGRectGetMaxY(cellFrame)));
+	CGContextAddLineToPoint(context, CGRectGetMaxX(cellFrame), floorf(CGRectGetMaxY(cellFrame)));
+	CGContextStrokePath(context);
+	CGContextSetShouldAntialias(context, true);
+	
+	// Draw client info
+	CGRect r = CGRectMake(CGRectGetMinX(cellFrame) + MSG_CELL_LEFT_PADDING,
+						  CGRectGetMinY(cellFrame) + MSG_CELL_TOP_PADDING,
+						  CGRectGetWidth(cellFrame) - MSG_CELL_SIDE_PADDING,
+						  CGRectGetHeight(cellFrame) - MSG_CELL_TOP_BOTTOM_PADDING);
+	
+	
+	// set black color for text
+	[[UIColor blackColor] set];
+	
+	[[self.messageData textRepresentation]
+	 drawInRect:r
+	 withFont:displayMonospacedFont
+	 lineBreakMode:NSLineBreakByWordWrapping
+	 alignment:NSTextAlignmentCenter];
+	
+	CGContextRestoreGState(context);
 }
 
 @end

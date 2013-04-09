@@ -75,17 +75,24 @@
 							 ,SIZE_MAX
 							 ,[self queue_io_handler]
 							 ,^(bool done, dispatch_data_t data, int error) {
-								 if(lead == NULL)
+
+								 size_t data_size = dispatch_data_get_size(data);
+								 if(data_size != 0)
 								 {
-									 lead = data;
+									 if(lead == NULL)
+									 {
+										 lead = data;
 #warning fix retain error
-									 dispatch_retain(lead);
-								 }
-								 else
-								 {
-									 dispatch_data_t concat = dispatch_data_create_concat(lead,data);
-									 dispatch_release(lead);
-									 lead = concat;
+										 dispatch_retain(lead);
+									 }
+									 else
+									 {
+										 //https://developer.apple.com/library/mac/#documentation/Performance/Reference/GCD_libdispatch_Ref/Reference/reference.html#//apple_ref/doc/uid/TP40008079-CH2-SW81
+										 MTLog(@"------DataRead Op : Lead is NOT NULL. concat data----------");
+										 dispatch_data_t concat = dispatch_data_create_concat(lead,data);
+										 dispatch_release(lead);
+										 lead = concat;
+									 }
 								 }
 								 
 								 if(!done) return;
