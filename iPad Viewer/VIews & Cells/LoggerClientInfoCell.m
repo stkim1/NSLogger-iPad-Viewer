@@ -118,6 +118,7 @@ extern UIFont *displayMonospacedFont;
 	CGContextAddLineToPoint(context, floorf(CGRectGetMaxX(cellFrame)), floorf(CGRectGetMinY(cellFrame)));
 	CGContextMoveToPoint(context, CGRectGetMinX(cellFrame), floorf(CGRectGetMaxY(cellFrame)));
 	CGContextAddLineToPoint(context, CGRectGetMaxX(cellFrame), floorf(CGRectGetMaxY(cellFrame)));
+	
 	CGContextStrokePath(context);
 	CGContextSetShouldAntialias(context, true);
 	

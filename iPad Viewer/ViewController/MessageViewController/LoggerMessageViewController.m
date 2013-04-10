@@ -393,6 +393,20 @@ heightForRowAtIndexPath:(NSIndexPath *)anIndexPath
 	return [[data portraitHeight] floatValue];
 }
 
+- (CGFloat)tableView:(UITableView *)tableView
+heightForHeaderInSection:(NSInteger)section
+{
+	return 0.f;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView
+heightForFooterInSection:(NSInteger)section
+{
+	// This will create a "invisible" footer
+	return 0.f;
+}
+
+
 //------------------------------------------------------------------------------
 #pragma mark - NSFetchedResultController Delegate
 //------------------------------------------------------------------------------

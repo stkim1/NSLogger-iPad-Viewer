@@ -50,7 +50,7 @@
 #import "LoggerUtils.h"
 
 extern NSString * const kMessageCellReuseID;
-#define DEAFULT_BACKGROUND_GRAY_VALUE	0.97f
+#define DEAFULT_BACKGROUND_GRAY_VALUE	0.98f
 
 @interface LoggerMessageCell : UITableViewCell
 {

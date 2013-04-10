@@ -157,9 +157,9 @@ UIColor *defaultTagAndLevelColor = nil;
 	CGRect bound = [self bounds];
 
 	// leave room for the seperator line
-	CGRect messageFrame = CGRectInset(bound, 0, 1);
+	//CGRect messageFrame = CGRectInset(bound, 0, 1);
 
-	[_messageView setFrame:messageFrame];
+	[_messageView setFrame:bound];
 }
 
 - (void)setNeedsDisplay
@@ -567,6 +567,15 @@ UIColor *defaultTagAndLevelColor = nil;
 
 	CGContextSetStrokeColorWithColor(context, [cellSeparatorColor CGColor]);
 	CGContextBeginPath(context);
+
+	// top ceiling line
+	CGContextMoveToPoint(context, CGRectGetMinX(cellFrame), floorf(CGRectGetMinY(cellFrame)));
+	CGContextAddLineToPoint(context, CGRectGetMaxX(cellFrame), floorf(CGRectGetMinY(cellFrame)));
+	
+	// bottom floor line
+	CGContextMoveToPoint(context, CGRectGetMinX(cellFrame), floorf(CGRectGetMaxY(cellFrame)));
+	CGContextAddLineToPoint(context, CGRectGetMaxX(cellFrame), floorf(CGRectGetMaxY(cellFrame)));
+
 	
 	// timestamp/thread separator
 	CGContextMoveToPoint(context, floorf(CGRectGetMinX(cellFrame) + TIMESTAMP_COLUMN_WIDTH), CGRectGetMinY(cellFrame));

@@ -29,8 +29,8 @@ Throw 'em at [@stkim1](http://twitter.com/stkim1)
 
 ##Screen Shots
 
-###iPad Viwer (13/04/08)
-<img width="480" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/sim_13_04_08.png" />
+###iPad Viwer (13/04/10)
+<img width="480" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ios_13_04_10.png" />
 
 ###UIProtoWork (13/03/24)
 <img width="480" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/sim_13_03_24.png" />
@@ -82,5 +82,5 @@ Lucida Grande, Lucida Grande Copyright (c) 1997, 2000, Bigelow & Holmes Inc. U.S
 <a href="http://www.levien.com/type/myfonts/inconsolata.html">Inconsolata</a> Copyright 2006 Raph Levien. Released under the Apache 2 license.
 <a href="http://www.styleseven.com">Digital-7</a> Copyright (c) 2008, Sizenko Alexander, Style-7 All rights reserved.</pre>
 
-_VER. 0.1.8_<br/>
-_Updated : Apr. 8, 2013_
+_VER. 0.1.9_<br/>
+_Updated : Apr. 10, 2013_
