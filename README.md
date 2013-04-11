@@ -32,10 +32,6 @@ Throw 'em at [@stkim1](http://twitter.com/stkim1)
 ###iPad Viwer (13/04/11)
 <img width="480" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/sim_13_04_11.png" />
 
-###UIProtoWork (13/03/24)
-<img width="480" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/sim_13_03_24.png" />
-
-
 ##License
 <pre>Modified BSD license.
 
