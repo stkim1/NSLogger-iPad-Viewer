@@ -38,65 +38,9 @@
  *
  */
 
-#import "LoggerViewController.h"
-#import <QuartzCore/QuartzCore.h>
+#import "BaseViewController.h"
 
-#define VIEWCONTROLLER_TITLE_HEIGHT		79.f
-
-@implementation LoggerViewController
--(void)dealloc
-{
-	self.titleBar = nil;
-	self.searchBar = nil;
-	self.titleLabel = nil;
-	self.toolBar = nil;
-	[super dealloc];
-}
-
--(void)loadView
-{
-	[super loadView];
-	[self.navigationController.navigationBar setFrame:(CGRect){CGPointZero,{self.view.frame.size.width,VIEWCONTROLLER_TITLE_HEIGHT}}];
-	[self.navigationController.navigationBar addSubview:self.titleBar];
-}
-
-
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-	
-	//[self.navigationController setNavigationBarHidden:YES];
-	
-    self.titleBar.backgroundColor = [UIColor colorWithRed:0.73 green:0.73 blue:0.73 alpha:1.000];
-    self.titleBar.alternateBackgroundColor = [UIColor colorWithRed:0.94 green:0.94 blue:0.94 alpha:1.000];
-    self.titleBar.noiseBlendMode = kCGBlendModeMultiply;
-    self.titleBar.noiseOpacity = 0.1;
-
-	for (id img in self.searchBar.subviews)
-	{
-        if ([img isKindOfClass:NSClassFromString(@"UISearchBarBackground")]) {
-			[img removeFromSuperview];
-        }
-    }
-
-	self.titleLabel.text = @"NSLogger Client (iPhone 5.2)";
-	
-	[self.timeLabel setFont:[UIFont fontWithName:@"Digital-7" size:_timeLabel.font.pointSize]];
-	//[self.runCountLabel setFont:[UIFont fontWithName:@"ArialRoundedMTBold" size:_runCountLabel.font.pointSize]];
-    
-	self.toolBar.backgroundColor = [UIColor colorWithRed:0.73 green:0.73 blue:0.73 alpha:1.000];
-    self.toolBar.alternateBackgroundColor = [UIColor colorWithRed:0.94 green:0.94 blue:0.94 alpha:1.000];
-    self.toolBar.noiseBlendMode = kCGBlendModeMultiply;
-    self.toolBar.noiseOpacity = 0.1;
-
-}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-
-
+@interface BaseViewController(KeyboardHandle)
+- (void)dismissKeyboard;
+- (void)addKeyboardDismissGesture;
 @end

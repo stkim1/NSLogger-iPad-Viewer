@@ -38,9 +38,111 @@
  *
  */
 
-#import <UIKit/UIKit.h>
-#import "KLNoteViewController.h"
+#import "BaseViewController.h"
 
-@interface ViewController : KLNoteViewController
-@property (nonatomic, strong) NSMutableArray* viewControllerData;
+@implementation BaseViewController{
+	BOOL		_isOSGreaterThan6;
+}
+@synthesize isOSGreaterThan6 = _isOSGreaterThan6;
+
+-(id)init
+{
+	self = [super init];
+	
+	if(self)
+	{
+		[self completeInstanceCreation];
+	}
+	
+	return self;
+}
+
+-(id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+	self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+	if(self)
+	{
+		[self completeInstanceCreation];
+	}
+
+	return self;
+}
+
+
+#pragma mark view lifecycle method
+-(void)loadView
+{
+	[super loadView];
+	[self finishViewConstruction];
+}
+
+-(void)viewDidUnload
+{
+	[self startViewDestruction];
+	[super viewDidUnload];
+}
+
+-(void)didReceiveMemoryWarning
+{
+	[super didReceiveMemoryWarning];
+    BOOL shouldDislodge = !(self.isViewLoaded && self.view.window);
+    if(self.isOSGreaterThan6 && shouldDislodge)
+    {
+        [self dislodgeViewForMemWarning];
+    }
+}
+
+-(void)dealloc
+{
+	[self startViewDestruction];
+	[self beginInstanceDestruction];
+	[super dealloc];
+}
+
+
+#pragma mark - Instance constructon done
+-(void)completeInstanceCreation
+{
+	_isOSGreaterThan6 =\
+		([[[UIDevice currentDevice]
+		   systemVersion]
+		  compare:@"6.0"
+		  options:NSNumericSearch]
+		 != NSOrderedAscending);
+
+}
+
+- (void)beginInstanceDestruction
+{
+}
+
+#pragma mark - child class view contruction
+-(void)finishViewConstruction
+{
+}
+
+#pragma mark child class view destruction
+- (void)startViewDestruction
+{
+}
+
+// special view distructor for iOS 6
+- (void)dislodgeViewForMemWarning
+{
+
+    [self startViewDestruction];
+    self.view = nil;
+}
+
+
+#pragma mark child class navigation popper
+-(IBAction)popFromParentViewController
+{
+	BOOL shouldAnimate = (self.isViewLoaded && self.view.window);
+	
+	if(self.navigationController != nil)
+		[self.navigationController popViewControllerAnimated:shouldAnimate];
+}
+
+
 @end

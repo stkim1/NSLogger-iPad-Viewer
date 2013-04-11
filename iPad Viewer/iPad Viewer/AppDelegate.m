@@ -40,7 +40,7 @@
 
 #import "AppDelegate.h"
 #import "LoggerTransportManager.h"
-#import "LoggerMessageViewController.h"
+#import "LoggerRootViewController.h"
 #import "ICloudSupport.h"
 
 @implementation AppDelegate
@@ -74,6 +74,14 @@
 	// prevent screen to go sleep. Fine control over this property will be added later
 	application.idleTimerDisabled  = YES;
 	
+	LoggerRootViewController *root = \
+		[[LoggerRootViewController alloc]
+		 initWithNibName:@"LoggerRootViewController"
+		 bundle:nil];
+	
+	self.window.rootViewController = root;
+	[root release];
+
 	[self.window makeKeyAndVisible];
     return YES;
 }

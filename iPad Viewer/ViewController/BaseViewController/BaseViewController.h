@@ -39,12 +39,14 @@
  */
 
 #import <UIKit/UIKit.h>
+#import "NullStringCheck.h"
 
-#import "AppDelegate.h"
-
-int main(int argc, char *argv[])
-{
-	@autoreleasepool {
-	    return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
-	}
-}
+@interface BaseViewController : UIViewController
+@property (nonatomic, readonly ) BOOL isOSGreaterThan6;
+- (void)completeInstanceCreation;
+- (void)beginInstanceDestruction;
+- (void)finishViewConstruction;
+- (void)startViewDestruction;
+- (void)dislodgeViewForMemWarning;
+- (IBAction)popFromParentViewController;
+@end

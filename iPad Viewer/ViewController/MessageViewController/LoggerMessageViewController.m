@@ -39,19 +39,21 @@
  */
 
 #import <CoreData/CoreData.h>
+#import <QuartzCore/QuartzCore.h>
 #import "LoggerMessageViewController.h"
-
 #import "LoggerCommon.h"
 #import "LoggerMessageData.h"
 #import "LoggerMessageCell.h"
 #import "LoggerMarkerCell.h"
 #import "LoggerClientInfoCell.h"
-
 #import "LoggerConstModel.h"
+
+
+#define VIEWCONTROLLER_TITLE_HEIGHT		79.f
 
 @interface LoggerMessageViewController ()
 @property (nonatomic, retain) NSFetchedResultsController	*messageFetchResultController;
-@property (nonatomic, retain) NSDictionary *clientInfo;
+@property (nonatomic, retain) NSDictionary					*clientInfo;
 @end
 
 @implementation LoggerMessageViewController
@@ -62,12 +64,74 @@
 @synthesize messageFetchResultController = _messageFetchResultController;
 @synthesize tableView = _tableView;
 
+//------------------------------------------------------------------------------
+#pragma mark - Inherited Methods
+//------------------------------------------------------------------------------
+-(void)completeInstanceCreation
+{
+	
+	MTLog(@"%s",__PRETTY_FUNCTION__);
+	
+	[super completeInstanceCreation];
+	[self setDataManager:[LoggerDataManager sharedDataManager]];
+	
+	[[NSNotificationCenter defaultCenter]
+	 addObserver:self
+	 selector:@selector(readMessages:)
+	 name:kShowClientConnectedNotification
+	 object:nil];
+	
+	/*
+	 [[NSNotificationCenter defaultCenter]
+	 addObserver:self
+	 selector:nil//@selector(deleteMessages:)
+	 name:kShowClientDisconnectedNotification
+	 object:nil];
+	 */
+}
+
+-(void)finishViewConstruction
+{
+	[super finishViewConstruction];
+	
+	[self.navigationController.navigationBar setFrame:(CGRect){CGPointZero,{self.view.frame.size.width,VIEWCONTROLLER_TITLE_HEIGHT}}];
+	[self.navigationController.navigationBar addSubview:self.titleBar];
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	[self setDataManager:[LoggerDataManager sharedDataManager]];
+
+	self.titleBar.backgroundColor = [UIColor colorWithRed:0.73 green:0.73 blue:0.73 alpha:1.000];
+    self.titleBar.alternateBackgroundColor = [UIColor colorWithRed:0.94 green:0.94 blue:0.94 alpha:1.000];
+    self.titleBar.noiseBlendMode = kCGBlendModeMultiply;
+    self.titleBar.noiseOpacity = 0.1;
+	
+	for (id img in self.searchBar.subviews)
+	{
+        if ([img isKindOfClass:NSClassFromString(@"UISearchBarBackground")]) {
+			[img removeFromSuperview];
+        }
+    }
+	
+	self.titleLabel.text = @"NSLogger Client (iPhone 5.2)";
+	
+	[self.timeLabel setFont:[UIFont fontWithName:@"Digital-7" size:_timeLabel.font.pointSize]];
+	//[self.runCountLabel setFont:[UIFont fontWithName:@"ArialRoundedMTBold" size:_runCountLabel.font.pointSize]];
+    
+	self.toolBar.backgroundColor = [UIColor colorWithRed:0.73 green:0.73 blue:0.73 alpha:1.000];
+    self.toolBar.alternateBackgroundColor = [UIColor colorWithRed:0.94 green:0.94 blue:0.94 alpha:1.000];
+    self.toolBar.noiseBlendMode = kCGBlendModeMultiply;
+    self.toolBar.noiseOpacity = 0.1;
+}
+
 
 #if 0
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+
+
 	assert([self.dataManager messageDisplayContext] != nil);
 	
 	NSFetchRequest *request =\
@@ -119,42 +183,36 @@
 	[sortByTimestamp release],sortByTimestamp = nil;
 	[entity release],entity = nil;
 	[request release],request = nil;
-#else
-	
-	[[NSNotificationCenter defaultCenter]
-	 addObserver:self
-	 selector:@selector(readMessages:)
-	 name:kShowClientConnectedNotification
-	 object:nil];
-	
-/*
-	[[NSNotificationCenter defaultCenter]
-	 addObserver:self
-	 selector:nil//@selector(deleteMessages:)
-	 name:kShowClientDisconnectedNotification
-	 object:nil];
-*/
+
+}
 #endif
-}
 
--(void)viewDidAppear:(BOOL)animated
+-(void)startViewDestruction
 {
-	[super viewDidAppear:animated];
-	id <NSFetchedResultsSectionInfo> sectionInfo = [[_messageFetchResultController sections] objectAtIndex:0];
-	NSArray *fetched = [_messageFetchResultController fetchedObjects];
-	
-	NSLog(@"total sections %d obj count %d fetched object %d"
-		  ,[[_messageFetchResultController sections] count]
-		  ,[sectionInfo numberOfObjects]
-		  ,[fetched count]);
+	[super startViewDestruction];
+
+	if(_messageFetchResultController != nil)
+	{
+		self.messageFetchResultController.delegate = nil;
+		self.messageFetchResultController = nil;
+		[self deleteTableViewSection];
+	}
+
+	self.tableView.delegate = nil;
+	self.tableView = nil;
+	self.titleBar = nil;
+	self.searchBar = nil;
+	self.titleLabel = nil;
+	self.toolBar = nil;
 }
 
-- (void)didReceiveMemoryWarning
+-(void)beginInstanceDestruction
 {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
+	[super beginInstanceDestruction];
+	self.dataManager = nil;
 
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+}
 
 //------------------------------------------------------------------------------
 #pragma mark - TableView + NSFetchedResultController Control
@@ -413,6 +471,8 @@ heightForFooterInSection:(NSInteger)section
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller;
 {
+	MTLog(@"%s",__PRETTY_FUNCTION__);
+	
 	[self.tableView beginUpdates];
 }
 

@@ -1,7 +1,8 @@
 /*
  *
  * Modified BSD license.
- *
+ * 
+ * Based on source code Copyright (c) 2012 Kieran Lafferty
  * Copyright (c) 2012-2013 Sung-Taek, Kim <stkim1@colorfulglue.com> All Rights
  * Reserved.
  *
@@ -38,16 +39,66 @@
  *
  */
 
-#import <UIKit/UIKit.h>
+#import "LoggerRootViewController.h"
 #import "KGNoise.h"
+#import "LoggerMessageViewController.h"
 
-@interface LoggerViewController : UIViewController
-@property (nonatomic, assign) IBOutlet UILabel	*timeLabel;
-@property (nonatomic, assign) IBOutlet UILabel	*runCountLabel;
-@property (nonatomic, assign) IBOutlet UILabel	*titleLabel;
-@property (nonatomic, assign) IBOutlet UISearchBar *searchBar;
-@property (nonatomic, strong) IBOutlet KGNoiseLinearGradientView *titleBar;
+@implementation LoggerRootViewController
+-(void)dealloc
+{
+	self.viewControllerData = nil;
+	[super dealloc];
+}
 
+-(void)loadView
+{
+	CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
+	CGRect viewFrame = (CGRect){CGPointZero,appFrame.size};
+	
+	KGNoiseRadialGradientView *noiseView = \
+		[[KGNoiseRadialGradientView alloc]
+		 initWithFrame:viewFrame];
+    noiseView.backgroundColor = [UIColor colorWithRed:0.814 green:0.798 blue:0.747 alpha:1.000];
+    noiseView.alternateBackgroundColor = [UIColor colorWithRed:1.000 green:0.986 blue:0.945 alpha:1.000];
+    noiseView.noiseOpacity = 0.3;	
+    [self setView:noiseView];
+	[noiseView release],noiseView = nil;
+}
 
-@property (nonatomic, assign) IBOutlet KGNoiseLinearGradientView *toolBar;
+- (void)viewDidLoad
+{
+	self.viewControllerData = [NSMutableArray arrayWithCapacity:1];
+	
+	for(int i = 0; i < 1;i++)
+	{
+		LoggerMessageViewController *vc = \
+			[[LoggerMessageViewController alloc]
+			 initWithNibName:@"LoggerMessageViewController"
+			 bundle:[NSBundle mainBundle]];
+		[self.viewControllerData addObject:vc];
+		[vc release],vc = nil;
+	}
+
+	[super viewDidLoad];
+}
+
+- (NSInteger)numberOfControllerCardsInNoteView:(KLNoteViewController*) noteView
+{
+    return  [self.viewControllerData count];
+}
+
+- (UIViewController *)noteView:(KLNoteViewController*)noteView
+viewControllerForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return [self.viewControllerData objectAtIndex:indexPath.row];
+}
+
+-(void) noteViewController:(KLNoteViewController*) noteViewController
+   didUpdateControllerCard:(KLControllerCard*)controllerCard
+			toDisplayState:(KLControllerCardState) toState
+		  fromDisplayState:(KLControllerCardState) fromState
+{
+	
+}
+
 @end

@@ -38,13 +38,23 @@
  *
  */
 
-#import <Availability.h>
+#import "BaseViewKeyboardAddition.h"
 
-#ifndef __IPHONE_4_0
-#warning "This project uses features only available in iOS SDK 4.0 and later."
-#endif
+@implementation BaseViewController(KeyboardHandle)
+- (void)dismissKeyboard
+{
+	[self.view endEditing:YES];	
+}
 
-#ifdef __OBJC__
-	#import <UIKit/UIKit.h>
-	#import <Foundation/Foundation.h>
-#endif
+-(void)addKeyboardDismissGesture
+{	
+	UITapGestureRecognizer *tabGesture = \
+		[[UITapGestureRecognizer alloc]
+		 initWithTarget:self
+		 action:@selector(dismissKeyboard)];
+	[tabGesture setCancelsTouchesInView:NO];
+	[self.view addGestureRecognizer:tabGesture];
+	[tabGesture release];
+}
+
+@end

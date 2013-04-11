@@ -40,14 +40,22 @@
 
 #import <UIKit/UIKit.h>
 #import "LoggerDataManager.h"
+#import "KGNoise.h"
 #import <CoreData/NSFetchedResultsController.h>
+#import "BaseViewController.h"
 
-
-@interface LoggerMessageViewController : UIViewController
+@interface LoggerMessageViewController : BaseViewController
 <UITableViewDataSource
 ,UITableViewDelegate
 ,NSFetchedResultsControllerDelegate>
 @property (nonatomic, assign) LoggerDataManager			*dataManager;
 @property (nonatomic, assign) IBOutlet UITableView		*tableView;
+@property (nonatomic, assign) IBOutlet UILabel			*timeLabel;
+@property (nonatomic, assign) IBOutlet UILabel			*runCountLabel;
+@property (nonatomic, assign) IBOutlet UILabel			*titleLabel;
+@property (nonatomic, assign) IBOutlet UISearchBar		*searchBar;
+@property (nonatomic, strong) IBOutlet KGNoiseLinearGradientView *titleBar;
+@property (nonatomic, assign) IBOutlet KGNoiseLinearGradientView *toolBar;
+
 -(IBAction)deletePath:(id)sender;
 @end

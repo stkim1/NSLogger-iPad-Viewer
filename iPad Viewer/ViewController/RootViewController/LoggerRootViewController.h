@@ -2,6 +2,7 @@
  *
  * Modified BSD license.
  *
+ * Based on source code Copyright (c) 2012 Kieran Lafferty
  * Copyright (c) 2012-2013 Sung-Taek, Kim <stkim1@colorfulglue.com> All Rights
  * Reserved.
  *
@@ -38,74 +39,9 @@
  *
  */
 
-#import "ViewController.h"
-#import "LoggerViewController.h"
-#import "KGNoise.h"
+#import "KLNoteViewController.h"
 
-@implementation ViewController
--(void)dealloc
-{
-	self.viewControllerData = nil;
-	[super dealloc];
-}
-
--(void)loadView
-{
-	CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
-	CGRect viewFrame = (CGRect){CGPointZero,appFrame.size};
-	
-	KGNoiseRadialGradientView *noiseView = \
-		[[KGNoiseRadialGradientView alloc]
-		 initWithFrame:viewFrame];
-    noiseView.backgroundColor = [UIColor colorWithRed:0.814 green:0.798 blue:0.747 alpha:1.000];
-    noiseView.alternateBackgroundColor = [UIColor colorWithRed:1.000 green:0.986 blue:0.945 alpha:1.000];
-    noiseView.noiseOpacity = 0.3;
-	
-    [self setView:noiseView];
-	[noiseView release],noiseView = nil;
-}
-
-- (void)viewDidLoad
-{
-	self.viewControllerData = [NSMutableArray arrayWithCapacity:6];
-	for(int i = 0; i < 6;i++)
-	{
-		LoggerViewController *vc = \
-			[[LoggerViewController alloc]
-			 initWithNibName:@"LoggerViewController"
-			 bundle:[NSBundle mainBundle]];
-		[self.viewControllerData addObject:vc];
-		[vc release],vc = nil;
-	}
-   
-	[super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
-}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-- (NSInteger)numberOfControllerCardsInNoteView:(KLNoteViewController*) noteView
-{
-    return  [self.viewControllerData count];
-}
-
-- (UIViewController *)noteView:(KLNoteViewController*)noteView
-viewControllerForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    return [self.viewControllerData objectAtIndex:indexPath.row];
-}
-
--(void) noteViewController:(KLNoteViewController*) noteViewController
-   didUpdateControllerCard:(KLControllerCard*)controllerCard
-			toDisplayState:(KLControllerCardState) toState
-		  fromDisplayState:(KLControllerCardState) fromState
-{
-
-}
-
+@interface LoggerRootViewController : KLNoteViewController
+@property (nonatomic, strong) NSMutableArray* viewControllerData;
 
 @end
