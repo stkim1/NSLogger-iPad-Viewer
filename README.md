@@ -12,7 +12,17 @@ iPad 2 or iPad mini<br/>
 
 ##Status
 
-UI WORK-IN-PROGRESS.
+UI WORK-IN-PROGRESS.  
+Bonjour-Over-Bluetooth W.I.P.
+
+There are four Bluetooth APIs opened in iOS  
+1. [CoreBluetooth](http://developer.apple.com/library/ios/#documentation/CoreBluetooth/Reference/CoreBluetooth_Framework/_index.html)  
+2. [External Accessary](http://developer.apple.com/library/ios/#documentation/ExternalAccessory/Reference/ExternalAccessoryFrameworkReference/_index.ht]ml)  
+3. [GameKit](http://developer.apple.com/library/ios/#documentation/GameKit/Reference/GameKit_Collection/_index.html)  
+4. [Bonjour over Bluetooth](http://developer.apple.com/library/ios/#qa/qa1753/_index.html#//apple_ref/doc/uid/DTS40011315)  
+
+The only one that works with least amount of clutter and provides best possible use case is, so far in my opinion, the last one. Though it's the hardest path to pursue.
+
 
 ##Documents
 As soon as ver 1.0 comes out, iPad viewer will go to [the main repository](https://github.com/fpillet/NSLogger) with documents.<br/>
@@ -79,4 +89,4 @@ Lucida Grande, Lucida Grande Copyright (c) 1997, 2000, Bigelow & Holmes Inc. U.S
 <a href="http://www.styleseven.com">Digital-7</a> Copyright (c) 2008, Sizenko Alexander, Style-7 All rights reserved.</pre>
 
 _VER. 0.2_<br/>
-_Updated : Apr. 11, 2013_
+_Updated : Apr. 19, 2013_
