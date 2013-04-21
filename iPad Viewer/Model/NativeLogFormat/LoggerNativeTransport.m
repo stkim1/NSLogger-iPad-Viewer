@@ -39,6 +39,8 @@
  *
  */
 
+#include <dns_sd.h>
+#include <dns_util.h>
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <netinet/in.h>
@@ -48,17 +50,32 @@
 #import "LoggerNativeMessage.h"
 
 /* Local prototypes */
-static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CFDataRef address, const void *data, void *info);
+static void
+AcceptSocketCallback(CFSocketRef, CFSocketCallBackType, CFDataRef, const void*, void*);
+
+
+@interface LoggerNativeTransport()
+static void
+ServiceRegisterCallback(DNSServiceRef,DNSServiceFlags,DNSServiceErrorType,const char*,const char*,const char*,void*);
+-(void)startListening;
+-(void)destorySockets;
+- (void)didNotRegisterWithError:(DNSServiceErrorType)errorCode;
+- (void)didRegisterWithDomain:(const char *)domain name:(const char *)name;
+@end
 
 @implementation LoggerNativeTransport
-
+{
+	BOOL				_useBluetooth;
+	DNSServiceRef		_sdServiceRef;
+}
 @synthesize listenerPort, listenerSocket_ipv4, listenerSocket_ipv6;
 @synthesize publishBonjourService;
+@synthesize useBluetooth = _useBluetooth;
 
 - (void)dealloc
 {
+	[self destorySockets];
 	[listenerThread cancel];
-	[bonjourService release];
 	[bonjourServiceName release];
 	[super dealloc];
 }
@@ -77,8 +94,11 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 	if (publishBonjourService)
 	{
 		NSString *name = bonjourServiceName;
+#warning fix!
+#if 0
 		if (![name length])
 			name = [bonjourService name];
+#endif
 		if ([name length])
 			return [NSString stringWithFormat:NSLocalizedString(@"Bonjour (%@, port %d%s)", @"Named Bonjour transport info string"),
 					name,
@@ -135,9 +155,52 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 	return [self.certManager loadEncryptionCertificate:&loadingError];
 }
 
+
+static void
+ServiceRegisterCallback(DNSServiceRef			sdRef,
+						DNSServiceFlags			flags,
+						DNSServiceErrorType		errorCode,
+						const char				*name,
+						const char				*regtype,
+						const char				*domain,
+						void					*context)
+
+{
+	NSLog(@"%s %s %s %s",__PRETTY_FUNCTION__,name,regtype, domain);
+
+	LoggerNativeTransport *callbackSelf = (LoggerNativeTransport *) context;
+    assert([callbackSelf isKindOfClass:[LoggerNativeTransport class]]);
+    assert(sdRef == callbackSelf->_sdServiceRef);
+    assert(flags & kDNSServiceFlagsAdd);
+	
+    if (errorCode == kDNSServiceErr_NoError)
+	{
+		NSLog(@"errorCode : kDNSServiceErr_NoError");
+		NSLog(@"service is now assigned");
+
+		// We're assuming SRV records over unicast DNS here, so the first result packet we get
+        // will contain all the information we're going to get.  In a more dynamic situation
+        // (for example, multicast DNS or long-lived queries in Back to My Mac) we'd would want
+        // to leave the query running.
+        
+		// we only need to find out whether the service is registered. unregsitering is not concerned.
+		if (flags & kDNSServiceFlagsAdd)
+		{
+            [callbackSelf didRegisterWithDomain:domain name:name];
+        }
+
+    } else {
+		NSLog(@"errorCode is NOT kDNSServiceErr_NoError");
+        [callbackSelf didNotRegisterWithError:errorCode];
+    }
+}
+
 - (BOOL)setup
 {
 	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
+	int yes = 1;
+	DNSServiceErrorType errorType	= kDNSServiceErr_NoError;
+
 	@try
 	{
 		CFSocketContext context = {0, self, NULL, NULL, NULL};
@@ -167,7 +230,6 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 		}
 		
 		// set socket options & addresses
-		int yes = 1;
 		setsockopt(CFSocketGetNative(listenerSocket_ipv4), SOL_SOCKET, SO_REUSEADDR, (void *)&yes, sizeof(yes));
 		setsockopt(CFSocketGetNative(listenerSocket_ipv6), SOL_SOCKET, SO_REUSEADDR, (void *)&yes, sizeof(yes));
 		
@@ -230,6 +292,9 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 			// The service type is nslogger-ssl (now the default), or nslogger for backwards
 			// compatibility with pre-1.0.
 			NSString *serviceType = (NSString *)(secure ? LOGGER_SERVICE_TYPE_SSL : LOGGER_SERVICE_TYPE);
+
+			// when bonjour is on, and bluetooth to be used
+			DNSServiceFlags serviceFlag = (_useBluetooth) ? kDNSServiceFlagsIncludeP2P : 0;
 			
 			// The service name is either the one defined in the prefs, of by default
 			// the local computer name (as defined in the sharing prefs panel
@@ -240,15 +305,30 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 			
 			[bonjourServiceName release];
 			bonjourServiceName = [serviceName retain];
+
+			errorType =
+			DNSServiceRegister(&(self->_sdServiceRef),		// sdRef
+							   serviceFlag,					// flags
+							   kDNSServiceInterfaceIndexAny,// interfaceIndex. kDNSServiceInterfaceIndexP2P does not have meanning when serving
+							   bonjourServiceName.UTF8String,// name
+							   serviceType.UTF8String,		// regtype
+							   "",							// domain
+							   NULL,						// host
+							   htons(listenerPort),			// port. just for bt init
+							   0,							// txtLen
+							   NULL,						// txtRecord
+							   ServiceRegisterCallback,		// callBack,
+							   (void *)(self)				// context
+							   );
 			
-			bonjourService =
-			[[NSNetService alloc]
-			 initWithDomain:@""
-			 type:(NSString *)serviceType
-			 name:(NSString *)serviceName
-			 port:listenerPort];
-			[bonjourService setDelegate:self];
-			[bonjourService publish];
+			if (errorType != kDNSServiceErr_NoError)
+			{
+				@throw [NSException
+						exceptionWithName:@"CFSocketCreate"
+						reason:NSLocalizedString(@"Failed announce Bonjour service (DNSServiceRegister failed)", nil)
+						userInfo:nil];
+			}
+			
 		}
 		else
 		{
@@ -281,17 +361,8 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 		 forKey:kTransportError];
 		
 		[self reportErrorToManager:errorStatus];
-		
-		if (listenerSocket_ipv4 != NULL)
-		{
-			CFRelease(listenerSocket_ipv4);
-			listenerSocket_ipv4 = NULL;
-		}
-		if (listenerSocket_ipv6 != NULL)
-		{
-			CFRelease(listenerSocket_ipv6);
-			listenerSocket_ipv6 = NULL;
-		}
+		[self destorySockets];
+
 		return NO;
 	}
 	@finally
@@ -301,7 +372,7 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 	return YES;
 }
 
-- (void)listenerThread
+- (void)startListening
 {
 	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
 	
@@ -428,7 +499,7 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 		[self reportStatusToManager:[self status]];
 		
 		[NSThread
-		 detachNewThreadSelector:@selector(listenerThread)
+		 detachNewThreadSelector:@selector(startListening)
 		 toTarget:self
 		 withObject:nil];
 	}
@@ -452,6 +523,30 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 	[self startup];
 }
 
+-(void)destorySockets
+{
+	// stop DNS-SD service, stop Bonjour service
+	if (self->_sdServiceRef != NULL)
+	{
+        DNSServiceRefDeallocate(self->_sdServiceRef);
+        self->_sdServiceRef = NULL;
+    }
+	
+	// close listener sockets (removing input sources)
+	if (listenerSocket_ipv4)
+	{
+		CFSocketInvalidate(listenerSocket_ipv4);
+		CFRelease(listenerSocket_ipv4);
+		listenerSocket_ipv4 = NULL;
+	}
+	if (listenerSocket_ipv6)
+	{
+		CFSocketInvalidate(listenerSocket_ipv6);
+		CFRelease(listenerSocket_ipv6);
+		listenerSocket_ipv6 = NULL;
+	}
+}
+
 - (void)shutdown
 {
 	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
@@ -469,25 +564,7 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 		return;
 	}
 
-	// stop Bonjour service
-	[bonjourService setDelegate:nil];
-	[bonjourService stop];
-	[bonjourService release];
-	bonjourService = nil;
-
-	// close listener sockets (removing input sources)
-	if (listenerSocket_ipv4)
-	{
-		CFSocketInvalidate(listenerSocket_ipv4);
-		CFRelease(listenerSocket_ipv4);
-		listenerSocket_ipv4 = NULL;
-	}
-	if (listenerSocket_ipv6)
-	{
-		CFSocketInvalidate(listenerSocket_ipv6);
-		CFRelease(listenerSocket_ipv6);
-		listenerSocket_ipv6 = NULL;
-	}
+	[self destorySockets];
 
 	// shutdown all connections
 	while ([connections count])
@@ -735,24 +812,38 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 	}	
 }
 
+
 // -----------------------------------------------------------------------------
-// NSNetService delegate
+#pragma mark - DNS-SD callback response
 // -----------------------------------------------------------------------------
-- (void)netService:(NSNetService *)sender didNotPublish:(NSDictionary *)errorDict
+- (void)didNotRegisterWithError:(DNSServiceErrorType)errorCode
 {
 	[self shutdown];
-	
-	int errorCode = [[errorDict objectForKey:NSNetServicesErrorCode] integerValue];
-	if (errorCode == NSNetServicesCollisionError)
-		self.failureReason = NSLocalizedString(@"Duplicate Bonjour service name on your network", @"");
-	else if (errorCode == NSNetServicesBadArgumentError)
-		self.failureReason = NSLocalizedString(@"Bonjour bad argument - please report bug.", @"");
-	else if (errorCode == NSNetServicesInvalidError)
-		self.failureReason = NSLocalizedString(@"Bonjour invalid configuration - please report bug.", @"");
-	else
-		self.failureReason = [NSString stringWithFormat:NSLocalizedString(@"Bonjour error %d", @""), errorCode];
-	failed = YES;
 
+	switch (errorCode)
+	{
+		case kDNSServiceErr_NameConflict:{
+			self.failureReason = NSLocalizedString(@"Duplicate Bonjour service name on your network", @"");
+			break;
+		}
+		case kDNSServiceErr_BadParam:{
+			self.failureReason = NSLocalizedString(@"Bonjour bad argument - please report bug.", @"");
+			break;
+		}
+		case kDNSServiceErr_Invalid:{
+			self.failureReason = NSLocalizedString(@"Bonjour invalid configuration - please report bug.", @"");
+			break;
+		}
+		default:{
+			self.failureReason = [NSString stringWithFormat:NSLocalizedString(@"Bonjour error %d", @""), errorCode];
+			break;
+		}
+	}
+	
+	MTLog(@"service failed %@",self.failureReason);
+	
+	failed = YES;
+	
 	NSDictionary *status = [self status];
 	
 	NSMutableDictionary *errorStatus = \
@@ -760,24 +851,29 @@ static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CF
 	
 	[errorStatus
 	 setObject:
-		 [NSError
-		  errorWithDomain:@"NSLogger"
-		  code:errorCode
-		  userInfo:@{NSLocalizedDescriptionKey:NSLocalizedString(@"NSLogger NSNetService failure", @"")}]
+	 [NSError
+	  errorWithDomain:@"NSLogger"
+	  code:errorCode
+	  userInfo:@{NSLocalizedDescriptionKey:NSLocalizedString(@"NSLogger NSNetService failure", @"")}]
 	 forKey:kTransportError];
 	
 	[self reportErrorToManager:errorStatus];
+
 }
 
-- (void)netServiceDidPublish:(NSNetService *)sender
+- (void)didRegisterWithDomain:(const char *)domain name:(const char *)name
 {
+	MTLog(@"service registration success domain[%s]  name[%s]",domain,name);
+
 	ready = YES;
 	[self reportStatusToManager:[self status]];
 }
 
+
 @end
 
-static void AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CFDataRef address, const void *data, void *info)
+static void
+AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CFDataRef address, const void *data, void *info)
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	@try

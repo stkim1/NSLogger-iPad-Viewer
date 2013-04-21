@@ -101,11 +101,13 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 {
 	// unencrypted Bonjour service (for backwards compatibility)
 	LoggerNativeTransport *t;
+
 	t = [[LoggerNativeTransport alloc] init];
 	t.transManager = self;
 	t.prefManager = [self prefManager];
 	t.certManager = self.certManager;
 	t.publishBonjourService = YES;
+	t.useBluetooth = YES;
 	t.secure = NO;
 	t.tag = 0;
 	[self.transports addObject:t];
@@ -117,6 +119,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 	t.prefManager = [self prefManager];
 	t.certManager = self.certManager;
 	t.publishBonjourService = YES;
+	t.useBluetooth = YES;
 	t.secure = YES;
 	t.tag = 1;
 	[self.transports addObject:t];

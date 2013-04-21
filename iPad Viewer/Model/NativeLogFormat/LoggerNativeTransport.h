@@ -41,10 +41,9 @@
 
 #import "LoggerTransport.h"
 
-@interface LoggerNativeTransport : LoggerTransport <NSNetServiceDelegate, NSStreamDelegate>
+@interface LoggerNativeTransport : LoggerTransport <NSStreamDelegate>
 {
 	NSThread			*listenerThread;
-	NSNetService		*bonjourService;
 	CFSocketRef			listenerSocket_ipv4;
 	CFSocketRef			listenerSocket_ipv6;
 	NSString			*bonjourServiceName;
@@ -53,6 +52,7 @@
 }
 
 @property (nonatomic, assign) int listenerPort;
+@property (nonatomic, assign) BOOL useBluetooth;
 @property (nonatomic, assign) BOOL publishBonjourService;
 @property (nonatomic, readonly) CFSocketRef listenerSocket_ipv4;
 @property (nonatomic, readonly) CFSocketRef listenerSocket_ipv6;

@@ -1,8 +1,8 @@
 //
 //  main.m
-//  BonjourBluetooth
+//  NSLogger Bluetooth iPhone Test (ARC)
 //
-//  Created by Almighty Kim on 4/18/13.
+//  Created by Almighty Kim on 4/21/13.
 //  Copyright (c) 2013 Colorful Glue. All rights reserved.
 //
 

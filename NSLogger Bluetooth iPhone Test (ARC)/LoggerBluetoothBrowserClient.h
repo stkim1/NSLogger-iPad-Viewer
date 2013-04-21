@@ -38,55 +38,11 @@
  *
  */
 
-#import "AppDelegate.h"
-#import "ViewController.h"
-#import "LoggerNativeBluetoothTransport.h"
+#include <stdio.h>
+#include <stdbool.h>
 
-@implementation AppDelegate
-
-- (void)dealloc
-{
-	[_transport release];
-	[_window release];
-	[_viewController release];
-    [super dealloc];
-}
-
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-	LoggerNativeBluetoothTransport * transport = [[LoggerNativeBluetoothTransport alloc] init];
-	self.transport = transport;
-	[transport release];
-	
-    self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
-	self.viewController = [[[ViewController alloc] initWithNibName:@"ViewController" bundle:nil] autorelease];
-	self.window.rootViewController = self.viewController;
-    [self.window makeKeyAndVisible];
-    return YES;
-}
-
-- (void)applicationWillResignActive:(UIApplication *)application
-{
-	[self.transport stop];
-}
-
-- (void)applicationDidEnterBackground:(UIApplication *)application
-{
-}
-
-- (void)applicationWillEnterForeground:(UIApplication *)application
-{
-}
-
-- (void)applicationDidBecomeActive:(UIApplication *)application
-{
-	application.idleTimerDisabled = YES;
-	[self.transport start];
-
-}
-
-- (void)applicationWillTerminate:(UIApplication *)application
-{
-}
-
-@end
+#ifndef BLUETOOTH_BROWSER
+#define BLUETOOTH_BROWSER
+void
+start_browsing(bool ssl_connection);
+#endif
