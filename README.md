@@ -12,8 +12,8 @@ iPad 2 or iPad mini<br/>
 
 ##Status
 
-UI W.I.P.
-Bonjour-Over-Bluetooth Client W.I.P.
+UI W.I.P.  
+Bonjour-Over-Bluetooth Client W.I.P.  
 Bonjour-Over-Bluetooth Server Done.
 
 There are four Bluetooth APIs opened in iOS  
@@ -22,7 +22,7 @@ There are four Bluetooth APIs opened in iOS
 3. [GameKit](http://developer.apple.com/library/ios/#documentation/GameKit/Reference/GameKit_Collection/_index.html)  
 4. [Bonjour over Bluetooth](http://developer.apple.com/library/ios/#qa/qa1753/_index.html#//apple_ref/doc/uid/DTS40011315)  
 
-The one that is clutter-free and provides best possible use case is, so far in my opinion, the last one.
+The one that is most clutter-free and provides best possible use case is, so far in my opinion, the last one.
 
 
 

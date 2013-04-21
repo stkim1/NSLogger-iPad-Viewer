@@ -2,9 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:iPad Viewer/iPad Viewer.xcodeproj">
+      location = "group:NSLogger Bluetooth iPhone Test (ARC)/NSLogger Bluetooth iPhone Test (ARC).xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:UIProtoWork/UIProtoWork.xcodeproj">
+      location = "group:iPad Viewer/iPad Viewer.xcodeproj">
    </FileRef>
 </Workspace>
