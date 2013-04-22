@@ -38,11 +38,12 @@
  *
  */
 
+#ifndef BLUETOOTH_BROWSER
+#define BLUETOOTH_BROWSER
+
 #include <stdio.h>
 #include <stdbool.h>
 
-#ifndef BLUETOOTH_BROWSER
-#define BLUETOOTH_BROWSER
-void
-start_browsing(bool ssl_connection);
+void start_browsing(bool ssl_connection);
+void stop_browsing(void);
 #endif

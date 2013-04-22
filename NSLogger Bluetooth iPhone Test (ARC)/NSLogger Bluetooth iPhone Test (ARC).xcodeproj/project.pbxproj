@@ -18,8 +18,7 @@
 		047EB4C61723B9A8006B0A25 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 047EB4C51723B9A8006B0A25 /* Default-568h@2x.png */; };
 		047EB4C91723B9A8006B0A25 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 047EB4C81723B9A8006B0A25 /* ViewController.m */; };
 		047EB4CC1723B9A8006B0A25 /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 047EB4CA1723B9A8006B0A25 /* ViewController.xib */; };
-		047EB4D41723B9D5006B0A25 /* LoggerBluetoothBrowserClient.c in Sources */ = {isa = PBXBuildFile; fileRef = 047EB4D21723B9D5006B0A25 /* LoggerBluetoothBrowserClient.c */; };
-		047EB4D71723BA40006B0A25 /* libresolv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 047EB4D61723BA40006B0A25 /* libresolv.dylib */; };
+		047EB4D41723B9D5006B0A25 /* LoggerBluetoothBrowserClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 047EB4D21723B9D5006B0A25 /* LoggerBluetoothBrowserClient.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,10 +38,9 @@
 		047EB4C71723B9A8006B0A25 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		047EB4C81723B9A8006B0A25 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		047EB4CB1723B9A8006B0A25 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController.xib; sourceTree = "<group>"; };
-		047EB4D21723B9D5006B0A25 /* LoggerBluetoothBrowserClient.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LoggerBluetoothBrowserClient.c; sourceTree = "<group>"; };
+		047EB4D21723B9D5006B0A25 /* LoggerBluetoothBrowserClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerBluetoothBrowserClient.m; sourceTree = "<group>"; };
 		047EB4D31723B9D5006B0A25 /* LoggerBluetoothBrowserClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerBluetoothBrowserClient.h; sourceTree = "<group>"; };
 		047EB4D51723B9F8006B0A25 /* LoggerCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LoggerCommon.h; path = "../../Prototypes/Bluetooth iPhone Test App (ARC)/NSLogger-Client/LoggerCommon.h"; sourceTree = "<group>"; };
-		047EB4D61723BA40006B0A25 /* libresolv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libresolv.dylib; path = usr/lib/libresolv.dylib; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,7 +48,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				047EB4D71723BA40006B0A25 /* libresolv.dylib in Frameworks */,
 				047EB4B01723B9A8006B0A25 /* UIKit.framework in Frameworks */,
 				047EB4B21723B9A8006B0A25 /* Foundation.framework in Frameworks */,
 				047EB4B41723B9A8006B0A25 /* CoreGraphics.framework in Frameworks */,
@@ -63,10 +60,9 @@
 		047EB4A31723B9A8006B0A25 = {
 			isa = PBXGroup;
 			children = (
-				047EB4D61723BA40006B0A25 /* libresolv.dylib */,
 				047EB4D51723B9F8006B0A25 /* LoggerCommon.h */,
-				047EB4D21723B9D5006B0A25 /* LoggerBluetoothBrowserClient.c */,
 				047EB4D31723B9D5006B0A25 /* LoggerBluetoothBrowserClient.h */,
+				047EB4D21723B9D5006B0A25 /* LoggerBluetoothBrowserClient.m */,
 				047EB4B51723B9A8006B0A25 /* NSLogger Bluetooth iPhone Test (ARC) */,
 				047EB4AE1723B9A8006B0A25 /* Frameworks */,
 				047EB4AD1723B9A8006B0A25 /* Products */,
@@ -187,7 +183,7 @@
 				047EB4BC1723B9A8006B0A25 /* main.m in Sources */,
 				047EB4C01723B9A8006B0A25 /* AppDelegate.m in Sources */,
 				047EB4C91723B9A8006B0A25 /* ViewController.m in Sources */,
-				047EB4D41723B9D5006B0A25 /* LoggerBluetoothBrowserClient.c in Sources */,
+				047EB4D41723B9D5006B0A25 /* LoggerBluetoothBrowserClient.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -275,7 +271,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "NSLogger Bluetooth iPhone Test (ARC)/NSLogger Bluetooth iPhone Test (ARC)-Prefix.pch";
 				INFOPLIST_FILE = "NSLogger Bluetooth iPhone Test (ARC)/NSLogger Bluetooth iPhone Test (ARC)-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -287,7 +283,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "NSLogger Bluetooth iPhone Test (ARC)/NSLogger Bluetooth iPhone Test (ARC)-Prefix.pch";
 				INFOPLIST_FILE = "NSLogger Bluetooth iPhone Test (ARC)/NSLogger Bluetooth iPhone Test (ARC)-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -312,6 +308,7 @@
 				047EB4D11723B9A8006B0A25 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

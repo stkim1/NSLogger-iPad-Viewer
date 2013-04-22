@@ -25,6 +25,7 @@
 
 - (void)applicationWillResignActive:(UIApplication *)application
 {
+	stop_browsing();
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
@@ -37,7 +38,7 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
-	start_browsing(false);
+	start_browsing(true);
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
