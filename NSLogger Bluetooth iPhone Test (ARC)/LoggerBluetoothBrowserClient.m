@@ -50,6 +50,8 @@ static CFSocketRef					sdResolvSocket;
 static DNSServiceRef				sdBrowserRef;
 static CFSocketRef					sdBrowserSocket;
 
+static const char * const			bluetooth_local_domain	= "local";
+
 static void
 SDRefResolveReply(DNSServiceRef,DNSServiceFlags,uint32_t,DNSServiceErrorType,const char*,const char*,uint16_t,uint16_t,const unsigned char*,void*);
 
@@ -284,7 +286,7 @@ start_browsing(bool ssl_connection)
 						 kDNSServiceFlagsIncludeP2P,
 						 kDNSServiceInterfaceIndexP2P,
 						 regType,
-						 NULL,
+						 bluetooth_local_domain,
 						 SDRefBrowseReply,
 						 NULL);
 	printf("DNSServiceBrowse result %d\n",errorType);
