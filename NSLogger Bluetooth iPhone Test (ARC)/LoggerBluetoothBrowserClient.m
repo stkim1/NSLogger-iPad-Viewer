@@ -248,11 +248,11 @@ SDRefBrowseReply(DNSServiceRef			sdRef,
 // regarding our DNSServiceRef.  We just turn around and call DNSServiceProcessResult,
 // which does all of the heavy lifting (and would typically call QueryRecordCallback).
 void
-SDRefBrowseSocket(CFSocketRef				s,
-					CFSocketCallBackType    type,
-					CFDataRef               address,
-					const void				*data,
-					void					*info)
+SDRefBrowseSocket(CFSocketRef			s,
+				  CFSocketCallBackType	type,
+				  CFDataRef				address,
+				  const void			*data,
+				  void					*info)
 {
 	DNSServiceErrorType err = 0;
 	err = DNSServiceProcessResult(sdBrowserRef);
@@ -280,13 +280,13 @@ start_browsing(bool ssl_connection)
 
     // Create the DNSServiceRef to run our query.
 	errorType =
-	DNSServiceBrowse(&sdBrowserRef,
-					 kDNSServiceFlagsIncludeP2P,
-					 kDNSServiceInterfaceIndexP2P,
-					 regType,
-					 NULL,
-					 SDRefBrowseReply,
-					 NULL);
+		DNSServiceBrowse(&sdBrowserRef,
+						 kDNSServiceFlagsIncludeP2P,
+						 kDNSServiceInterfaceIndexP2P,
+						 regType,
+						 NULL,
+						 SDRefBrowseReply,
+						 NULL);
 	printf("DNSServiceBrowse result %d\n",errorType);
 
     // Create a CFSocket to handle incoming messages associated with the

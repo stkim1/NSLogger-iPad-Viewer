@@ -41,10 +41,10 @@ Throw 'em at [@stkim1](http://twitter.com/stkim1)
 
 ##Screen Shots
 ### iPhone Client Over Bluetooth (13/04/21)
-<img width="480" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ios_13_04_21.png" />
+<img width="320" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ios_13_04_21.png" />
 
 ###iPad Viwer (13/04/11)
-<img width="480" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/sim_13_04_11.png" />
+<img width="576" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/sim_13_04_11.png" />
 
 ##License
 <pre>Modified BSD license.

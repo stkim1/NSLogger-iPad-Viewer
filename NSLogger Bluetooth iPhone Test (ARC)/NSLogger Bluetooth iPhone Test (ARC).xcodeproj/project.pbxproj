@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0437E5591726C5C300AE380A /* LoggerClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 0437E5571726C5C300AE380A /* LoggerClient.m */; };
 		047EB4B01723B9A8006B0A25 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 047EB4AF1723B9A8006B0A25 /* UIKit.framework */; };
 		047EB4B21723B9A8006B0A25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 047EB4B11723B9A8006B0A25 /* Foundation.framework */; };
 		047EB4B41723B9A8006B0A25 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 047EB4B31723B9A8006B0A25 /* CoreGraphics.framework */; };
@@ -22,6 +23,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0437E5561726C5C300AE380A /* LoggerClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerClient.h; sourceTree = "<group>"; };
+		0437E5571726C5C300AE380A /* LoggerClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerClient.m; sourceTree = "<group>"; };
+		0437E5581726C5C300AE380A /* LoggerCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerCommon.h; sourceTree = "<group>"; };
 		047EB4AC1723B9A8006B0A25 /* NSLogger Bluetooth iPhone Test (ARC).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "NSLogger Bluetooth iPhone Test (ARC).app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		047EB4AF1723B9A8006B0A25 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		047EB4B11723B9A8006B0A25 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -40,7 +44,6 @@
 		047EB4CB1723B9A8006B0A25 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController.xib; sourceTree = "<group>"; };
 		047EB4D21723B9D5006B0A25 /* LoggerBluetoothBrowserClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerBluetoothBrowserClient.m; sourceTree = "<group>"; };
 		047EB4D31723B9D5006B0A25 /* LoggerBluetoothBrowserClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerBluetoothBrowserClient.h; sourceTree = "<group>"; };
-		047EB4D51723B9F8006B0A25 /* LoggerCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LoggerCommon.h; path = "../../Prototypes/Bluetooth iPhone Test App (ARC)/NSLogger-Client/LoggerCommon.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,12 +60,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0437E5551726C5B000AE380A /* NSLoggerClient */ = {
+			isa = PBXGroup;
+			children = (
+				0437E5561726C5C300AE380A /* LoggerClient.h */,
+				0437E5571726C5C300AE380A /* LoggerClient.m */,
+				0437E5581726C5C300AE380A /* LoggerCommon.h */,
+			);
+			name = NSLoggerClient;
+			sourceTree = "<group>";
+		};
 		047EB4A31723B9A8006B0A25 = {
 			isa = PBXGroup;
 			children = (
-				047EB4D51723B9F8006B0A25 /* LoggerCommon.h */,
 				047EB4D31723B9D5006B0A25 /* LoggerBluetoothBrowserClient.h */,
 				047EB4D21723B9D5006B0A25 /* LoggerBluetoothBrowserClient.m */,
+				0437E5551726C5B000AE380A /* NSLoggerClient */,
 				047EB4B51723B9A8006B0A25 /* NSLogger Bluetooth iPhone Test (ARC) */,
 				047EB4AE1723B9A8006B0A25 /* Frameworks */,
 				047EB4AD1723B9A8006B0A25 /* Products */,
@@ -184,6 +197,7 @@
 				047EB4C01723B9A8006B0A25 /* AppDelegate.m in Sources */,
 				047EB4C91723B9A8006B0A25 /* ViewController.m in Sources */,
 				047EB4D41723B9D5006B0A25 /* LoggerBluetoothBrowserClient.m in Sources */,
+				0437E5591726C5C300AE380A /* LoggerClient.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
