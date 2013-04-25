@@ -1,9 +1,11 @@
 #NSLogger-iPad-Viewer
 
 
-NSLogger viewer app on iPad
+NSLogger viewer app on iPad  
 
-Derived from [Florent Pillet's NSLogger](https://github.com/fpillet/NSLogger), NSLogger iPad is an in-field logging tool to monitor your mobile apps' behavior outside of office.
+Derived from [Florent Pillet's NSLogger](https://github.com/fpillet/NSLogger), NSLogger iPad is an in-field logging tool to monitor your mobile application's behavior in unfabricated, real-world environments. NSLogger-iPad-Viewer makes use of Bluetooth connection to transmit an application's logging traces.
+
+This is extremely useful to monitor how your application behaves on cellular network, handles GPS data, and/or, treats large data exchange with backend.
 
 ##Minimum Requirements
 iOS 5.1 and upward<br/>
@@ -11,19 +13,22 @@ iPad 2 or iPad mini<br/>
 <sup>*</sup>iCloud not supported.
 
 ##Status
+UI (W.I.P.) : Multiple views to show connections to viewer  
+Bonjour-Over-Bluetooth Client (W.I.P. 80% done) : Finalizing Bluetooth handling  
 
-UI (W.I.P.)  
-Bonjour-Over-Bluetooth Client (W.I.P.)  
-Bonjour-Over-Bluetooth Server Done.
-
-There are three Bluetooth frameworks and one API opened in iOS  
+## Bluetooth Connection
+There are three Bluetooth frameworks and one API publicly opened in iOS  
 1. [CoreBluetooth](http://developer.apple.com/library/ios/#documentation/CoreBluetooth/Reference/CoreBluetooth_Framework/_index.html)  
 2. [External Accessary](http://developer.apple.com/library/ios/#documentation/ExternalAccessory/Reference/ExternalAccessoryFrameworkReference/_index.ht]ml)  
 3. [GameKit](http://developer.apple.com/library/ios/#documentation/GameKit/Reference/GameKit_Collection/_index.html)  
 4. [Bonjour over Bluetooth (DNS-SD)](http://developer.apple.com/library/ios/#qa/qa1753/_index.html#//apple_ref/doc/uid/DTS40011315)  
 
-The one that is most clutter-free and provides best possible use case is, so far in my opinion, the last one. Unfortunately, its lower level API than CFNetService/NSNetService that, it takes some time to hustle with.
+The one that is most clutter-free and provides best possible use case is, so far in my opinion, the last one. It requires no additional framework, library, and does not ask user to choose bluetooth connection. It simply finds the nearest possible service on Bluetooth interface and makes use of it.  
 
+### How to run demo
+1. Run iPad Viewer with WiFi off and Bluetooth on.  
+2. Run iOS client with Bluetooth on. (It's up to use to leave WiFi or cellular on).      
+3. Start logging.  
 
 
 ##Documents
@@ -43,7 +48,7 @@ Throw 'em at [@stkim1](http://twitter.com/stkim1)
 
 ###iPad Viwer (13/04/25)
 
-<sup>*</sup>Look at the Bluetooth mark on top right corner.
+<sup>*</sup>Look at the Bluetooth mark on top right corner. :)  
 
 <img width="576" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ios_13_04_25.png" />
 
