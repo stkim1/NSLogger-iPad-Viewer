@@ -55,6 +55,14 @@
 // use of -[NSString stringWithFormat:arguments:]
 #define	ALLOW_COCOA_USE			1
 
+// This option is only temporary. As being optimized 
+#define LOG_TO_BLUETOOTH_CONNECTION	1
+
+#if LOG_TO_BLUETOOTH_CONNECTION
+#include <dns_util.h>
+#include <dns_sd.h>
+#endif
+
 /* -----------------------------------------------------------------
  * Logger option flags & default options
  * -----------------------------------------------------------------
@@ -66,6 +74,9 @@ enum {
 	kLoggerOption_BrowseOnlyLocalDomain				= 0x08,
 	kLoggerOption_UseSSL							= 0x10,
 	kLoggerOption_CaptureSystemConsole				= 0x20
+#if LOG_TO_BLUETOOTH_CONNECTION
+	,kLoggerOption_LogToBluetoothConnection			= 0x40
+#endif
 };
 
 #define LOGGER_DEFAULT_OPTIONS	(kLoggerOption_BufferLogsUntilConnection |	\
@@ -80,6 +91,21 @@ enum {
  */
 typedef struct
 {
+/*------------------------------------------------------------------------------
+ *						Bluetooth Client Addition
+ * This members are for bluetooth connection, and subjected to be optimized
+ *----------------------------------------------------------------------------*/
+#if LOG_TO_BLUETOOTH_CONNECTION
+	DNSServiceRef dnssdServiceBrowser;                // dns-sd browser service reference
+	CFSocketRef dnssdBrowserSocket;                   // browser service socket to tie in the current runloop
+	CFRunLoopSourceRef dnssdBrowserRunLoop;           // browser service callback runloop
+
+	DNSServiceRef dnssdServiceResolver;               // dns-sd resolver reference
+	CFSocketRef dnssdResolverSocket;                  // resolver reference socket to tie in the current runloop
+	CFRunLoopSourceRef dnssdResolverRunLoop;          // resolver service callback runloop
+#endif
+/*----------------------------------------------------------------------------*/
+	
 	CFStringRef bufferFile;							// If non-NULL, all buffering is done to the specified file instead of in-memory
 	CFStringRef host;								// Viewer host to connect to (instead of using Bonjour)
 	UInt32 port;									// port on the viewer host

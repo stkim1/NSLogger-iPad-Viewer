@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0409688217284FF3001F9185 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0409688117284FF3001F9185 /* CFNetwork.framework */; };
+		0409688417284FF8001F9185 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0409688317284FF8001F9185 /* SystemConfiguration.framework */; };
+		0424F1311728B549007D33C9 /* LoggerClientViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0424F12F1728B549007D33C9 /* LoggerClientViewController.m */; };
+		0424F1321728B549007D33C9 /* LoggerTestAppViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0424F1301728B549007D33C9 /* LoggerTestAppViewController.xib */; };
 		0437E5591726C5C300AE380A /* LoggerClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 0437E5571726C5C300AE380A /* LoggerClient.m */; };
 		047EB4B01723B9A8006B0A25 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 047EB4AF1723B9A8006B0A25 /* UIKit.framework */; };
 		047EB4B21723B9A8006B0A25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 047EB4B11723B9A8006B0A25 /* Foundation.framework */; };
@@ -17,12 +21,14 @@
 		047EB4C21723B9A8006B0A25 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 047EB4C11723B9A8006B0A25 /* Default.png */; };
 		047EB4C41723B9A8006B0A25 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 047EB4C31723B9A8006B0A25 /* Default@2x.png */; };
 		047EB4C61723B9A8006B0A25 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 047EB4C51723B9A8006B0A25 /* Default-568h@2x.png */; };
-		047EB4C91723B9A8006B0A25 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 047EB4C81723B9A8006B0A25 /* ViewController.m */; };
-		047EB4CC1723B9A8006B0A25 /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 047EB4CA1723B9A8006B0A25 /* ViewController.xib */; };
-		047EB4D41723B9D5006B0A25 /* LoggerBluetoothBrowserClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 047EB4D21723B9D5006B0A25 /* LoggerBluetoothBrowserClient.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0409688117284FF3001F9185 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		0409688317284FF8001F9185 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		0424F12E1728B549007D33C9 /* LoggerClientViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerClientViewController.h; sourceTree = "<group>"; };
+		0424F12F1728B549007D33C9 /* LoggerClientViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerClientViewController.m; sourceTree = "<group>"; };
+		0424F1301728B549007D33C9 /* LoggerTestAppViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LoggerTestAppViewController.xib; sourceTree = "<group>"; };
 		0437E5561726C5C300AE380A /* LoggerClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerClient.h; sourceTree = "<group>"; };
 		0437E5571726C5C300AE380A /* LoggerClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerClient.m; sourceTree = "<group>"; };
 		0437E5581726C5C300AE380A /* LoggerCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerCommon.h; sourceTree = "<group>"; };
@@ -39,11 +45,6 @@
 		047EB4C11723B9A8006B0A25 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		047EB4C31723B9A8006B0A25 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		047EB4C51723B9A8006B0A25 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
-		047EB4C71723B9A8006B0A25 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		047EB4C81723B9A8006B0A25 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
-		047EB4CB1723B9A8006B0A25 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController.xib; sourceTree = "<group>"; };
-		047EB4D21723B9D5006B0A25 /* LoggerBluetoothBrowserClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerBluetoothBrowserClient.m; sourceTree = "<group>"; };
-		047EB4D31723B9D5006B0A25 /* LoggerBluetoothBrowserClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerBluetoothBrowserClient.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +52,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0409688417284FF8001F9185 /* SystemConfiguration.framework in Frameworks */,
+				0409688217284FF3001F9185 /* CFNetwork.framework in Frameworks */,
 				047EB4B01723B9A8006B0A25 /* UIKit.framework in Frameworks */,
 				047EB4B21723B9A8006B0A25 /* Foundation.framework in Frameworks */,
 				047EB4B41723B9A8006B0A25 /* CoreGraphics.framework in Frameworks */,
@@ -73,8 +76,6 @@
 		047EB4A31723B9A8006B0A25 = {
 			isa = PBXGroup;
 			children = (
-				047EB4D31723B9D5006B0A25 /* LoggerBluetoothBrowserClient.h */,
-				047EB4D21723B9D5006B0A25 /* LoggerBluetoothBrowserClient.m */,
 				0437E5551726C5B000AE380A /* NSLoggerClient */,
 				047EB4B51723B9A8006B0A25 /* NSLogger Bluetooth iPhone Test (ARC) */,
 				047EB4AE1723B9A8006B0A25 /* Frameworks */,
@@ -93,6 +94,8 @@
 		047EB4AE1723B9A8006B0A25 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0409688317284FF8001F9185 /* SystemConfiguration.framework */,
+				0409688117284FF3001F9185 /* CFNetwork.framework */,
 				047EB4AF1723B9A8006B0A25 /* UIKit.framework */,
 				047EB4B11723B9A8006B0A25 /* Foundation.framework */,
 				047EB4B31723B9A8006B0A25 /* CoreGraphics.framework */,
@@ -103,11 +106,11 @@
 		047EB4B51723B9A8006B0A25 /* NSLogger Bluetooth iPhone Test (ARC) */ = {
 			isa = PBXGroup;
 			children = (
+				0424F12E1728B549007D33C9 /* LoggerClientViewController.h */,
+				0424F12F1728B549007D33C9 /* LoggerClientViewController.m */,
+				0424F1301728B549007D33C9 /* LoggerTestAppViewController.xib */,
 				047EB4BE1723B9A8006B0A25 /* AppDelegate.h */,
 				047EB4BF1723B9A8006B0A25 /* AppDelegate.m */,
-				047EB4C71723B9A8006B0A25 /* ViewController.h */,
-				047EB4C81723B9A8006B0A25 /* ViewController.m */,
-				047EB4CA1723B9A8006B0A25 /* ViewController.xib */,
 				047EB4B61723B9A8006B0A25 /* Supporting Files */,
 			);
 			path = "NSLogger Bluetooth iPhone Test (ARC)";
@@ -182,7 +185,7 @@
 				047EB4C21723B9A8006B0A25 /* Default.png in Resources */,
 				047EB4C41723B9A8006B0A25 /* Default@2x.png in Resources */,
 				047EB4C61723B9A8006B0A25 /* Default-568h@2x.png in Resources */,
-				047EB4CC1723B9A8006B0A25 /* ViewController.xib in Resources */,
+				0424F1321728B549007D33C9 /* LoggerTestAppViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -195,9 +198,8 @@
 			files = (
 				047EB4BC1723B9A8006B0A25 /* main.m in Sources */,
 				047EB4C01723B9A8006B0A25 /* AppDelegate.m in Sources */,
-				047EB4C91723B9A8006B0A25 /* ViewController.m in Sources */,
-				047EB4D41723B9D5006B0A25 /* LoggerBluetoothBrowserClient.m in Sources */,
 				0437E5591726C5C300AE380A /* LoggerClient.m in Sources */,
+				0424F1311728B549007D33C9 /* LoggerClientViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -210,14 +212,6 @@
 				047EB4B91723B9A8006B0A25 /* en */,
 			);
 			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		047EB4CA1723B9A8006B0A25 /* ViewController.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				047EB4CB1723B9A8006B0A25 /* en */,
-			);
-			name = ViewController.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

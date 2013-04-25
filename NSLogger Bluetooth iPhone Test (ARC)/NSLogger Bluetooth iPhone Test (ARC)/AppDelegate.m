@@ -7,9 +7,7 @@
 //
 
 #import "AppDelegate.h"
-
-#import "ViewController.h"
-#import "LoggerBluetoothBrowserClient.h"
+#import "LoggerClientViewController.h"
 
 @implementation AppDelegate
 
@@ -17,15 +15,14 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
-	self.viewController = [[ViewController alloc] initWithNibName:@"ViewController" bundle:nil];
-	self.window.rootViewController = self.viewController;
+
+	self.window.rootViewController = [[LoggerClientViewController alloc] initWithNibName:@"LoggerTestAppViewController" bundle:nil];
     [self.window makeKeyAndVisible];
     return YES;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
 {
-	stop_browsing();
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
@@ -38,7 +35,6 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
-	start_browsing(true);
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
