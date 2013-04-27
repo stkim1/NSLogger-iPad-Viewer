@@ -95,7 +95,7 @@
 // Set to 0 to disable internal debug completely
 // Set to 1 to activate console logs when running the logger itself
 // Set to 2 to see every logging call issued by the app, too
-#define LOGGER_DEBUG 1
+#define LOGGER_DEBUG 0
 #ifdef NSLog
 	#undef NSLog
 #endif
@@ -152,6 +152,11 @@ static void LoggerServiceBrowserCallBack(CFNetServiceBrowserRef browser, CFOptio
 
 
 #if LOG_TO_BLUETOOTH_CONNECTION
+// DNS-SD Bluetooth management
+static void LoggerStartDnsSdBluetooth(Logger*);
+static void LoggerStopDnsSdBluetooth(Logger*);
+static void LoggerTryConnectBluetooth(Logger*);
+
 // DNS-SD browser management
 static BOOL LoggerStartDnsSdBrowserService(Logger*);
 static void LoggerStopDnsSdBrowserService(Logger*);
@@ -159,7 +164,7 @@ static void LoggerDnsSdBrowserServiceReply(DNSServiceRef,DNSServiceFlags,uint32_
 static void LoggerDnsSdBrowserSocketCallBack(CFSocketRef,CFSocketCallBackType,CFDataRef,const void*,void*);
 
 // DNS-SD resolver management
-static void LoggerStartDnsSdResolverService(Logger*,const char*,const char*,const char*);
+static BOOL LoggerStartDnsSdResolverService(Logger*,uint32_t,const char*,const char*,const char*);
 static void LoggerStopDnsSdResolverService(Logger*);
 static void LoggerDnsSdResolverServiceReply(DNSServiceRef,DNSServiceFlags,uint32_t,DNSServiceErrorType,const char*,const char*,uint16_t,uint16_t,const unsigned char*,void*);
 static void LoggerDnsSdResolverSocketCallBack(CFSocketRef,CFSocketCallBackType,CFDataRef,const void*,void*);
@@ -557,11 +562,23 @@ static void *LoggerWorkerThread(Logger *logger)
 	// Create the runloop source that lets us know when remote (host, Bonjour) settings change
 	LoggerPrepareRunloopSource(logger, &logger->remoteOptionsChangedSource, &LoggerRemoteSettingsChanged);
 	
+	
+	// when Bluetooth option is chosen, it is neither necessary to conduct reachability check,
+	// nor reasonable to allow. Let's override.
+#if LOG_TO_BLUETOOTH_CONNECTION
+	if(logger->options & kLoggerOption_LogToBluetoothConnection)
+	{
+		LoggerStartDnsSdBluetooth(logger);
+	}
+	else
+#endif
 	// Start Reachability (when needed), which determines when we take the next step
 	// (once Reachability status is known, we'll decide to either start Bonjour browsing or
 	// try connecting to a direct host)
 	LoggerStartReachabilityChecking(logger);
 
+	
+	
 	// Run logging thread until LoggerStop() is called
 	NSTimeInterval timeout = 0.10;
 	while (!logger->quit)
@@ -578,6 +595,9 @@ static void *LoggerWorkerThread(Logger *logger)
 	}
 
 	// Cleanup
+#if LOG_TO_BLUETOOTH_CONNECTION
+	LoggerStopDnsSdBluetooth(logger);
+#endif
 	LoggerStopBonjourBrowsing(logger);
 	LoggerStopReachabilityChecking(logger);
 	LoggerStopReconnectTimer(logger);
@@ -1281,24 +1301,9 @@ static void LoggerStartBonjourBrowsing(Logger *logger)
 		logger->bonjourDomainBrowser != NULL ||
 		!(logger->options & kLoggerOption_BrowseBonjour))
 		return;
-
-	LOGGERDBG(CFSTR("LoggerStartBonjourBrowsing"));
-
 	
-	// Bluetooth connection check should come first because 1. it does not requires
-	// reachability check, and 2) Bonjour-Over-BT always browses on local domain.
-#if LOG_TO_BLUETOOTH_CONNECTION
-	if (logger->options & kLoggerOption_LogToBluetoothConnection)
-	{
-		LOGGERDBG(CFSTR("Logger configured to search services only on local domain via Bluetooth interface."));
-		if(!LoggerStartDnsSdBrowserService(logger))
-		{
-			LOGGERDBG(CFSTR("*** Logger: could not browse for bluetooth services on domain local., no remote host configured: reverting to console logging. ***"));
-			logger->options |= kLoggerOption_LogToConsole;
-		}
-	}
-	else
-#endif
+	LOGGERDBG(CFSTR("LoggerStartBonjourBrowsing"));
+	
 	if (logger->options & kLoggerOption_BrowseOnlyLocalDomain)
 	{
 		LOGGERDBG(CFSTR("Logger configured to search only the local domain, searching for services on: local."));
@@ -1341,10 +1346,6 @@ static void LoggerStopBonjourBrowsing(Logger *logger)
 		CFRelease(logger->bonjourDomainBrowser);
 		logger->bonjourDomainBrowser = NULL;
 	}
-
-#if LOG_TO_BLUETOOTH_CONNECTION
-	LoggerStopDnsSdBrowserService(logger);
-#endif
 	
 	// stop browsing for services
 	CFIndex idx;
@@ -1467,6 +1468,73 @@ static void LoggerServiceBrowserCallBack (CFNetServiceBrowserRef browser,
 
 #if LOG_TO_BLUETOOTH_CONNECTION
 // -----------------------------------------------------------------------------
+#pragma mark - DNS-SD Bluetooth Connection management
+// -----------------------------------------------------------------------------
+static void LoggerStartDnsSdBluetooth(Logger *logger)
+{
+	LOGGERDBG(CFSTR("LoggerStartDnsSdBluetooth : configured to search services only on Bluetooth interface."));
+	if(!LoggerStartDnsSdBrowserService(logger))
+	{
+		LOGGERDBG(CFSTR("*** Logger: could not browse for bluetooth services on domain local., no remote host configured: reverting to console logging. ***"));
+		logger->options |= kLoggerOption_LogToConsole;
+	}
+}
+
+static void LoggerStopDnsSdBluetooth(Logger *logger)
+{
+	LOGGERDBG(CFSTR("LoggerStopDnsSdBluetooth : stop"));
+	LoggerStopDnsSdResolverService(logger);
+	LoggerStopDnsSdBrowserService(logger);
+}
+
+static void LoggerTryConnectBluetooth(Logger *logger)
+{
+	LOGGERDBG(CFSTR("LoggerTryConnectBluetooth"));
+
+	// If we already have a connection established or being attempted, stop here
+	if (logger->logStream != NULL)
+	{
+		LOGGERDBG(CFSTR("-> another connection is opened or in progress, giving up for now"));
+		return;
+	}
+	
+	// If there is a host to directly connect to, try it now (this will happen before
+	// Bonjour kicks in, Bonjour being handled as a fallback solution if direct Host
+	// fails)
+	if (logger->host != NULL && logger->port)
+	{
+		LOGGERDBG(CFSTR("-> Trying to open direct connection to host %@ port %u"), logger->host, logger->port);
+		CFStreamCreatePairWithSocketToHost(NULL, logger->host, logger->port, NULL, &logger->logStream);
+		if (logger->logStream == NULL)
+		{
+			// Create stream failed
+			LOGGERDBG(CFSTR("-> failed."));
+			if (logger->logStream != NULL)
+			{
+				CFRelease(logger->logStream);
+				logger->logStream = NULL;
+			}
+		}
+		else if (LoggerConfigureAndOpenStream(logger))
+		{
+			// open is now in progress
+			return;
+		}
+		LoggerStartReconnectTimer(logger);
+	}
+	
+	// Finally, if Bonjour is enabled and not started yet, start it now.
+	if (logger->options & kLoggerOption_LogToBluetoothConnection)
+	{
+		if (logger->dnssdServiceBrowser == NULL)
+		{
+			LoggerStopDnsSdBluetooth(logger);
+			LoggerStartDnsSdBluetooth(logger);
+		}
+	}
+}
+
+// -----------------------------------------------------------------------------
 #pragma mark - DNS-SD Browser over Bluetooth
 // -----------------------------------------------------------------------------
 static BOOL LoggerStartDnsSdBrowserService(Logger *logger)
@@ -1520,7 +1588,6 @@ static BOOL LoggerStartDnsSdBrowserService(Logger *logger)
 				
 				logger->dnssdBrowserRunLoop = CFSocketCreateRunLoopSource(NULL,logger->dnssdBrowserSocket, 0);
 				CFRunLoopAddSource(CFRunLoopGetCurrent(), logger->dnssdBrowserRunLoop, kCFRunLoopCommonModes);
-				CFRelease(logger->dnssdBrowserRunLoop);
 				
 				result = YES;
 			}
@@ -1539,13 +1606,12 @@ static BOOL LoggerStartDnsSdBrowserService(Logger *logger)
 
 static void LoggerStopDnsSdBrowserService(Logger *logger)
 {
-	// stop resolvers first
+	// check to stop resolvers first if any
 	LoggerStopDnsSdResolverService(logger);
 
 	if(logger->dnssdBrowserRunLoop != NULL)
 	{
-		CFRunLoopRemoveSource(CFRunLoopGetCurrent(), logger->dnssdBrowserRunLoop, kCFRunLoopCommonModes);
-		logger->dnssdBrowserRunLoop = NULL;
+		LoggerDisposeRunloopSource(&logger->dnssdBrowserRunLoop);
 	}
 	
 	if (logger->dnssdBrowserSocket != NULL)
@@ -1581,7 +1647,7 @@ static void LoggerDnsSdBrowserServiceReply(DNSServiceRef		sdRef,
 		if(flags & kDNSServiceFlagsAdd)
 		{
 			// start resolve service with callback values
-			LoggerStartDnsSdResolverService(logger,serviceName, regtype, replyDomain);
+			LoggerStartDnsSdResolverService(logger,interfaceIndex,serviceName, regtype, replyDomain);
 		}
     }
 	else
@@ -1623,11 +1689,13 @@ static void LoggerDnsSdBrowserSocketCallBack(CFSocketRef			socket,
 #pragma mark - DNS-SD Resolve Service
 //------------------------------------------------------------------------------
 // Starts a resolve.  Starting a resolve on a service that is currently resolving is a no-op.
-static void LoggerStartDnsSdResolverService(Logger				*logger,
-											const char			*serviceName,
-											const char			*regtype,
-											const char			*replyDomain)
+static BOOL LoggerStartDnsSdResolverService(Logger		*logger,
+											uint32_t	interfaceIndex,
+											const char	*serviceName,
+											const char	*regtype,
+											const char	*replyDomain)
 {
+	BOOL result = NO;
 	DNSServiceErrorType errorCode;
     int                 fd;
     CFSocketContext     context = { 0, (void *)logger, NULL, NULL, NULL };
@@ -1638,7 +1706,7 @@ static void LoggerStartDnsSdResolverService(Logger				*logger,
         errorCode =
 			DNSServiceResolve(&logger->dnssdServiceResolver,
 							  kDNSServiceFlagsIncludeP2P,
-							  kDNSServiceInterfaceIndexP2P,
+							  interfaceIndex,
 							  serviceName,
 							  regtype,
 							  replyDomain,
@@ -1650,37 +1718,44 @@ static void LoggerStartDnsSdResolverService(Logger				*logger,
 		if (errorCode == kDNSServiceErr_NoError)
 		{
 			assert(logger->dnssdServiceResolver != NULL);
-			fd = DNSServiceRefSockFD(logger->dnssdServiceResolver);
-			assert(fd >= 0);
-
 			assert(logger->dnssdResolverSocket == NULL);
-			logger->dnssdResolverSocket =
-				CFSocketCreateWithNative(NULL,
-										 fd,
-										 kCFSocketReadCallBack,
-										 LoggerDnsSdResolverSocketCallBack,
-										 &context);
-			assert(logger->dnssdResolverSocket != NULL);
 			
-			socketFlag = CFSocketGetSocketFlags(logger->dnssdResolverSocket);
-			socketFlag = socketFlag &~ (CFOptionFlags)kCFSocketCloseOnInvalidate;
-			CFSocketSetSocketFlags(logger->dnssdResolverSocket,socketFlag);
-
-			logger->dnssdResolverRunLoop = CFSocketCreateRunLoopSource(NULL,logger->dnssdResolverSocket, 0);
-			CFRunLoopAddSource(CFRunLoopGetCurrent(), logger->dnssdResolverRunLoop, kCFRunLoopCommonModes);
-			CFRelease(logger->dnssdResolverRunLoop);
+			fd = DNSServiceRefSockFD(logger->dnssdServiceResolver);
+			if(fd >= 0)
+			{
+				logger->dnssdResolverSocket =
+					CFSocketCreateWithNative(NULL,
+											 fd,
+											 kCFSocketReadCallBack,
+											 LoggerDnsSdResolverSocketCallBack,
+											 &context);
+				
+				if(logger->dnssdResolverSocket != NULL);
+				{
+					socketFlag = CFSocketGetSocketFlags(logger->dnssdResolverSocket);
+					socketFlag = socketFlag &~ (CFOptionFlags)kCFSocketCloseOnInvalidate;
+					CFSocketSetSocketFlags(logger->dnssdResolverSocket,socketFlag);
+					
+					logger->dnssdResolverRunLoop = CFSocketCreateRunLoopSource(NULL,logger->dnssdResolverSocket, 0);
+					CFRunLoopAddSource(CFRunLoopGetCurrent(), logger->dnssdResolverRunLoop, kCFRunLoopCommonModes);
+					
+					result = YES;
+				}
+			}
 		}
-		
-		// if anything goes wrong, destory resolve stack
-        if (errorCode != kDNSServiceErr_NoError)
+
+		// if anything goes wrong, destory resolver service stack
+        if (!result)
 		{
 			LoggerStopDnsSdResolverService(logger);
         }
     }
 	else
 	{
-		LOGGERDBG(CFSTR("*** Logger: a resolve service is already running. pass this service found by browser ***"));
+		LOGGERDBG(CFSTR("*** Logger: a resolve service is already running. Ignore this service found by browser ***"));
 	}
+
+	return result;
 }
 
 static void LoggerStopDnsSdResolverService(Logger *logger)
@@ -1688,8 +1763,7 @@ static void LoggerStopDnsSdResolverService(Logger *logger)
 	
 	if(logger->dnssdResolverRunLoop != NULL)
 	{
-		CFRunLoopRemoveSource(CFRunLoopGetCurrent(), logger->dnssdResolverRunLoop, kCFRunLoopCommonModes);
-		logger->dnssdResolverRunLoop = NULL;
+		LoggerDisposeRunloopSource(&logger->dnssdResolverRunLoop);
 	}
 	
 	if (logger->dnssdResolverSocket != NULL)
@@ -1726,37 +1800,20 @@ static void LoggerDnsSdResolverServiceReply(DNSServiceRef			sdRef,
 
     if (errorCode == kDNSServiceErr_NoError)
 	{
-
-		LOGGERDBG(CFSTR("-> Trying to open direct connection to host %@ port %u"), logger->host, logger->port);
-		// TODO : check if kCFStringEncodingUTF8 is fine
-		logger->host = CFStringCreateWithCString(kCFAllocatorDefault,hosttarget,kCFStringEncodingUTF8);
-		logger->port = ntohs(port);
-
-		CFStreamCreatePairWithSocketToHost(NULL, logger->host, logger->port, NULL, &logger->logStream);
-		if (logger->logStream == NULL)
+		if(logger->host == NULL && strlen(hosttarget) && port)
 		{
-			// Create stream failed
-			LOGGERDBG(CFSTR("-> failed."));
-			if (logger->logStream != NULL)
-			{
-				CFRelease(logger->logStream);
-				logger->logStream = NULL;
-			}
+			LOGGERDBG(CFSTR("-> Trying to open direct connection to host %@ port %u"), logger->host, logger->port);
+			// @@@ TODO: check if kCFStringEncodingUTF8 is fine
+			logger->host = CFStringCreateWithCString(kCFAllocatorDefault,hosttarget,kCFStringEncodingUTF8);
+			logger->port = ntohs(port);
+			
+			LoggerTryConnectBluetooth(logger);
 		}
-		else if (LoggerConfigureAndOpenStream(logger))
-		{
-			// open is now in progress
-			return;
-		}
-		LoggerStartReconnectTimer(logger);
-
-		
     }
 	else
 	{
 		LOGGERDBG(CFSTR("*** Logger: could not process dns-sd resolve services on bluetooth local. domain. remove resolve service ***"));
 		LoggerStopDnsSdResolverService(logger);
-
 	}
 }
 
@@ -1779,10 +1836,7 @@ static void LoggerDnsSdResolverSocketCallBack(CFSocketRef			socket,
 		LoggerStopDnsSdResolverService(logger);
     }
 }
-
-
 #endif
-
 
 // -----------------------------------------------------------------------------
 #pragma mark -
@@ -1797,13 +1851,21 @@ static void LoggerRemoteSettingsChanged(Logger *logger)
 
 	
 #if LOG_TO_BLUETOOTH_CONNECTION
-	if(logger->host == NULL && logger->options & kLoggerOption_LogToBluetoothConnection)
+	if(logger->host == NULL && !(logger->options & kLoggerOption_LogToBluetoothConnection))
 	{
-		LoggerStopDnsSdBrowserService(logger);
-		LoggerStartDnsSdBrowserService(logger);
+		// developer doesn't want bluetooth connection
+		LoggerStopDnsSdBluetooth(logger);
 	}
 	else
+	{
+		if(logger->options & kLoggerOption_LogToBluetoothConnection)
+		{
+			LoggerTryConnectBluetooth(logger);
+			return;
+		}
+	}
 #endif
+
 	if (logger->host == NULL && !(logger->options & kLoggerOption_BrowseBonjour))
 	{
 		// developer doesn't want any network connection
@@ -1966,6 +2028,13 @@ static void LoggerTimedReconnectCallback(CFRunLoopTimerRef timer, void *info)
 	if (logger->logStream == NULL)
 	{
 		LOGGERDBG(CFSTR("-> trying to reconnect to host %@"), logger->host);
+#if LOG_TO_BLUETOOTH_CONNECTION
+		if(logger->options & kLoggerOption_LogToBluetoothConnection)
+		{
+			LoggerTryConnectBluetooth(logger);
+		}
+		else
+#endif
 		LoggerTryConnect(logger);
 	}
 	else
@@ -2187,6 +2256,9 @@ static void LoggerWriteStreamCallback(CFWriteStreamRef ws, CFStreamEventType eve
 			// write existing buffer contents
 			LOGGERDBG(CFSTR("Logger CONNECTED"));
 			logger->connected = YES;
+#if LOG_TO_BLUETOOTH_CONNECTION
+			LoggerStopDnsSdBluetooth(logger);
+#endif
 			LoggerStopBonjourBrowsing(logger);
 			LoggerStopReconnectTimer(logger);
 			if (logger->bufferWriteStream != NULL)

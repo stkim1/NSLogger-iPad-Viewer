@@ -102,7 +102,7 @@ enum {
 typedef struct
 {
 /*------------------------------------------------------------------------------
- *					Bonjour-over-Bluetooth Client Addition
+ *					DNS-SD-over-Bluetooth Addition
  *
  * DNS-SD provides three functionalities for Bluetooth; publishing, browsing, 
  * and resolving. Publishing is for NSLogger Viewer, so let's focus on browsing 

@@ -40,6 +40,7 @@
 	IBOutlet UITextField *viewerPortField;
 	IBOutlet UISwitch *browseBonjour;
 	IBOutlet UISwitch *browseLocalDomainOnly;
+	IBOutlet UISwitch *connecToBluetooth;
 
 	NSTimer *sendTimer;
 	NSArray *tagsArray;

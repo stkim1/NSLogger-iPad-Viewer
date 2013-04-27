@@ -83,25 +83,25 @@
 		port = MAX(0, MIN(port, 65535));
 		viewerPortField.text = [NSString stringWithFormat:@"%d", port];
 
-		if ([host length] && port != 0)
-			LoggerSetViewerHost(NULL, (__bridge CFStringRef)host, (UInt32)port);
-		else
+		if(connecToBluetooth.on)
+		{
 			LoggerSetViewerHost(NULL, NULL, 0);
+		}
+		else
+		{
+			if ([host length] && port != 0)
+				LoggerSetViewerHost(NULL, (__bridge CFStringRef)host, (UInt32)port);
+			else
+				LoggerSetViewerHost(NULL, NULL, 0);
+		}
 
-#if 0
-		LoggerSetOptions(NULL,						// configure the default logger
-						 kLoggerOption_BufferLogsUntilConnection |
-						 kLoggerOption_UseSSL |
-						 (browseBonjour.on ? kLoggerOption_BrowseBonjour : 0) |
-						 (browseLocalDomainOnly.on ? kLoggerOption_BrowseOnlyLocalDomain : 0));
-#else
 		LoggerSetOptions(NULL,
-						 kLoggerOption_LogToBluetoothConnection |
 						 kLoggerOption_BufferLogsUntilConnection |
 						 kLoggerOption_UseSSL |
-						 kLoggerOption_BrowseBonjour | 0);
-		
-#endif
+						 (connecToBluetooth.on ? kLoggerOption_LogToBluetoothConnection:
+						  ((browseBonjour.on ? kLoggerOption_BrowseBonjour : 0)|
+						   (browseLocalDomainOnly.on ? kLoggerOption_BrowseOnlyLocalDomain : 0)))
+						 );
 
 		// Start logging random messages
 		counter = 0;
