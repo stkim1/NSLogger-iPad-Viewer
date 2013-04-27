@@ -44,13 +44,14 @@ Stay tuned.
 ###Questions
 Throw 'em at [@stkim1](http://twitter.com/stkim1)
 
-##Screen Shots
-
-###iPad Viwer (13/04/25)
-
+##Screen Shots (13/04/27)
 <sup>*</sup>Look at the Bluetooth mark on top right corner. :)  
 
-<img width="576" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ios_13_04_25.png" />
+### iPhone Client
+<img width="320" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/iphone_13_04_27.png" />
+
+###iPad Viwer 
+<img width="576" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ipad_13_04_27.png" />
 
 ##License
 <pre>Modified BSD license.
