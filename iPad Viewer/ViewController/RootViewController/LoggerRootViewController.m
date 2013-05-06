@@ -42,6 +42,7 @@
 #import "LoggerRootViewController.h"
 #import "KGNoise.h"
 #import "LoggerMessageViewController.h"
+#import "LoggerPreferenceViewController.h"
 
 @implementation LoggerRootViewController
 -(void)dealloc
@@ -68,16 +69,21 @@
 - (void)viewDidLoad
 {
 	self.viewControllerData = [NSMutableArray arrayWithCapacity:1];
-	
-	for(int i = 0; i < 1;i++)
-	{
-		LoggerMessageViewController *vc = \
-			[[LoggerMessageViewController alloc]
-			 initWithNibName:@"LoggerMessageViewController"
-			 bundle:[NSBundle mainBundle]];
-		[self.viewControllerData addObject:vc];
-		[vc release],vc = nil;
-	}
+
+/*
+	LoggerMessageViewController *vc = \
+		[[LoggerMessageViewController alloc]
+		 initWithNibName:@"LoggerMessageViewController"
+		 bundle:[NSBundle mainBundle]];
+	[self.viewControllerData addObject:vc];
+	[vc release],vc = nil;
+*/
+	LoggerPreferenceViewController *preference = \
+		[[LoggerPreferenceViewController alloc]
+		 initWithNibName:@"LoggerPreferenceViewController"
+		 bundle:[NSBundle mainBundle]];
+	[self.viewControllerData addObject:preference];
+	[preference release],preference = nil;
 
 	[super viewDidLoad];
 }

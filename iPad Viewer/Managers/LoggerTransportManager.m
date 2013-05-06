@@ -201,6 +201,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 // -----------------------------------------------------------------------------
 -(void)presentNotification:(NSDictionary *)aNotiDict forKey:(NSString *)aKey
 {
+#if 0
 	if([NSThread isMainThread])
 	{
 		[[NSNotificationCenter defaultCenter]
@@ -217,6 +218,18 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 			 userInfo:aNotiDict];
 		});
 	}
+#else
+	// with usage of [NSNotificationCenter addObserverForName:object:queue:usingBlock:]
+	// you can send your notification from any thread you desire and catch it on a
+	// specific thread, in this case, main thread.
+	// further, we can enqueu such notification that notification sender is not blocked by
+	// a corresponding observer's method being executed simultaneously.
+	[[NSNotificationQueue defaultQueue]
+	 enqueueNotification:[NSNotification notificationWithName:aKey object:self userInfo:aNotiDict]
+	 postingStyle:NSPostASAP
+	 coalesceMask:NSNotificationNoCoalescing
+	 forModes:nil];
+#endif
 }
 
 - (void)presentTransportStatus:(NSDictionary *)aStatusDict

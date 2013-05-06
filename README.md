@@ -24,7 +24,6 @@ Stay tuned.
 
 ##Status
 UI (W.I.P.) : Multiple views to show connections to viewer  
-Bonjour-Over-Bluetooth Logging (W.I.P. 90%) : Finalizing Bluetooth handling on Client's side.
 
 ###Questions
 Throw 'em at [@stkim1](http://twitter.com/stkim1)
@@ -99,5 +98,5 @@ Lucida Grande, Lucida Grande Copyright (c) 1997, 2000, Bigelow & Holmes Inc. U.S
 <a href="http://www.levien.com/type/myfonts/inconsolata.html">Inconsolata</a> Copyright 2006 Raph Levien. Released under the Apache 2 license.
 <a href="http://www.styleseven.com">Digital-7</a> Copyright (c) 2008, Sizenko Alexander, Style-7 All rights reserved.</pre>
 
-_VER. 0.3.9_<br/>
-_Updated : Apr. 27, 2013_
+_VER. 0.4.0_<br/>
+_Updated : May 6, 2013_

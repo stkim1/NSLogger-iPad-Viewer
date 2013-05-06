@@ -47,9 +47,7 @@
 #import "LoggerMarkerCell.h"
 #import "LoggerClientInfoCell.h"
 #import "LoggerConstModel.h"
-
-
-#define VIEWCONTROLLER_TITLE_HEIGHT		79.f
+#import "LoggerConstView.h"
 
 @interface LoggerMessageViewController ()
 @property (nonatomic, retain) NSFetchedResultsController	*messageFetchResultController;

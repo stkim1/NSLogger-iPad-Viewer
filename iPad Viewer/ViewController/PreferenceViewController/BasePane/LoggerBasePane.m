@@ -2,7 +2,6 @@
  *
  * Modified BSD license.
  *
- * Based on source code copyright (c) 2010-2012 Florent Pillet,
  * Copyright (c) 2012-2013 Sung-Taek, Kim <stkim1@colorfulglue.com> All Rights
  * Reserved.
  *
@@ -38,45 +37,72 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
+#import "LoggerBasePane.h"
 
-#import <Foundation/Foundation.h>
+@interface LoggerBasePane ()
+@end
 
-/*-----                     Logger Message Cell Constants               ------*/
+@implementation LoggerBasePane
 
-#define MAX_DATA_LINES					16		// max number of data lines to show
+-(NSString *)nibName
+{
+	return @"LoggerBasePane";
+}
 
-#define MINIMUM_CELL_HEIGHT				30.0f
-#define INDENTATION_TAB_WIDTH			10.0f	// in pixels
+-(void)startViewDestruction
+{
+	[super startViewDestruction];
 
-#define TIMESTAMP_COLUMN_WIDTH			85.0f
-#define	DEFAULT_THREAD_COLUMN_WIDTH		85.f
+	self.itemTable.dataSource = nil;
+	self.itemTable.delegate = nil;
+	self.itemTable = nil;
+}
 
-#define MSG_CELL_PORTRAIT_WIDTH			768.f
-#define MSG_CELL_PORTRAIT_MAX_HEIGHT	1004.f
+//------------------------------------------------------------------------------
+#pragma mark - UITableViewDataSource Delegate Methods
+//------------------------------------------------------------------------------
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+	return 0;
+}
 
-#define MSG_CELL_LANDSCAPE_WDITH		1024.f
-#define MSG_CELL_LANDSCALE_MAX_HEIGHT	748.f
+- (NSInteger)tableView:(UITableView *)aTableView
+ numberOfRowsInSection:(NSInteger)aSection
+{
+	return 0;
+}
 
-#define MSG_CELL_TOP_PADDING			2.f
-#define MSG_CELL_TOP_BOTTOM_PADDING		(MSG_CELL_TOP_PADDING + MSG_CELL_TOP_PADDING)
+- (UITableViewCell *)tableView:(UITableView *)aTableView
+		 cellForRowAtIndexPath:(NSIndexPath *)anIndexPath
+{
+	return nil;
+}
 
-#define MSG_CELL_LEFT_PADDING			4.f
-#define MSG_CELL_SIDE_PADDING			(MSG_CELL_LEFT_PADDING + MSG_CELL_LEFT_PADDING)
+//------------------------------------------------------------------------------
+#pragma mark - UITableViewDelegate Delegate Methods
+//------------------------------------------------------------------------------
+- (CGFloat)tableView:(UITableView *)aTableView
+heightForRowAtIndexPath:(NSIndexPath *)anIndexPath
+{
+	return 0.f;
+}
 
-#define MSG_TRUNCATE_THREADHOLD_LENGTH	2048
+- (CGFloat)tableView:(UITableView *)tableView
+heightForHeaderInSection:(NSInteger)section
+{
+	return 0.f;
+}
 
-#define VIEWCONTROLLER_TITLE_HEIGHT		79.f
+- (CGFloat)tableView:(UITableView *)tableView
+heightForFooterInSection:(NSInteger)section
+{
+	return 0.f;
+}
 
-extern NSString * const kBottomHintText;
-extern NSString * const kBottomHintData;
+- (void)tableView:(UITableView *)tableView
+didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	NSLog(@"index %@",[indexPath description]);
+}
 
-extern NSString * const kDefaultFontName;
-#define DEFAULT_FONT_SIZE				11.f
-
-extern NSString * const kTagAndLevelFontName;
-#define DEFAULT_TAG_LEVEL_SIZE			11.f
-
-extern NSString * const kMonospacedFontName;
-#define DEFAULT_MONOSPACED_SIZE			11.f
-
-extern NSString * const kMessageAttributesChangedNotification;
+@end

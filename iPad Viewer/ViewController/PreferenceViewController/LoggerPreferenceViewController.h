@@ -2,7 +2,6 @@
  *
  * Modified BSD license.
  *
- * Based on source code copyright (c) 2010-2012 Florent Pillet,
  * Copyright (c) 2012-2013 Sung-Taek, Kim <stkim1@colorfulglue.com> All Rights
  * Reserved.
  *
@@ -39,44 +38,9 @@
  *
  */
 
-#import <Foundation/Foundation.h>
+#import "BaseViewController.h"
 
-/*-----                     Logger Message Cell Constants               ------*/
-
-#define MAX_DATA_LINES					16		// max number of data lines to show
-
-#define MINIMUM_CELL_HEIGHT				30.0f
-#define INDENTATION_TAB_WIDTH			10.0f	// in pixels
-
-#define TIMESTAMP_COLUMN_WIDTH			85.0f
-#define	DEFAULT_THREAD_COLUMN_WIDTH		85.f
-
-#define MSG_CELL_PORTRAIT_WIDTH			768.f
-#define MSG_CELL_PORTRAIT_MAX_HEIGHT	1004.f
-
-#define MSG_CELL_LANDSCAPE_WDITH		1024.f
-#define MSG_CELL_LANDSCALE_MAX_HEIGHT	748.f
-
-#define MSG_CELL_TOP_PADDING			2.f
-#define MSG_CELL_TOP_BOTTOM_PADDING		(MSG_CELL_TOP_PADDING + MSG_CELL_TOP_PADDING)
-
-#define MSG_CELL_LEFT_PADDING			4.f
-#define MSG_CELL_SIDE_PADDING			(MSG_CELL_LEFT_PADDING + MSG_CELL_LEFT_PADDING)
-
-#define MSG_TRUNCATE_THREADHOLD_LENGTH	2048
-
-#define VIEWCONTROLLER_TITLE_HEIGHT		79.f
-
-extern NSString * const kBottomHintText;
-extern NSString * const kBottomHintData;
-
-extern NSString * const kDefaultFontName;
-#define DEFAULT_FONT_SIZE				11.f
-
-extern NSString * const kTagAndLevelFontName;
-#define DEFAULT_TAG_LEVEL_SIZE			11.f
-
-extern NSString * const kMonospacedFontName;
-#define DEFAULT_MONOSPACED_SIZE			11.f
-
-extern NSString * const kMessageAttributesChangedNotification;
+@interface LoggerPreferenceViewController : BaseViewController
+<UITableViewDataSource,UITableViewDelegate>
+@property (nonatomic, assign) IBOutlet UITableView *preferenceTable;
+@end
