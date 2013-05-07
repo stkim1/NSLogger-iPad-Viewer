@@ -29,7 +29,6 @@
 
 @interface LoggerBaseCell : UITableViewCell
 @property (nonatomic, assign) id<LoggerTableCellEventHandler> delegate;
-@property (nonatomic, retain) id cellData;
 + (NSString *)reuseIdentifier;
 + (NSString *)nibName;
 + (CGFloat)rowHeight;

@@ -45,6 +45,9 @@
 #import "SynthesizeSingleton.h"
 #import <zlib.h>
 
+static NSString * const kTransportNotificationKey = @"notiKey";
+static NSString * const kTransportNotificationUserInfo = @"userInfo";
+
 @interface LoggerTransportManager()
 @property (nonatomic, retain) LoggerCertManager *certManager;
 @property (nonatomic, retain) NSMutableArray	*transports;
@@ -53,7 +56,7 @@
 - (void)destoryTransports;
 - (void)startTransports;
 - (void)stopTransports;
-- (void)presentNotification:(NSDictionary *)aNotiDict forKey:(NSString *)aKey;
+-(void)presentNotificationOnMainThread:(NSDictionary *)aNotiDict;
 @end
 
 @implementation LoggerTransportManager
@@ -102,17 +105,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 	// unencrypted Bonjour service (for backwards compatibility)
 	LoggerNativeTransport *t;
 
-	t = [[LoggerNativeTransport alloc] init];
-	t.transManager = self;
-	t.prefManager = [self prefManager];
-	t.certManager = self.certManager;
-	t.publishBonjourService = YES;
-	t.useBluetooth = YES;
-	t.secure = NO;
-	t.tag = 0;
-	[self.transports addObject:t];
-	[t release];
-
 	// SSL Bonjour service
 	t = [[LoggerNativeTransport alloc] init];
 	t.transManager = self;
@@ -121,6 +113,18 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 	t.publishBonjourService = YES;
 	t.useBluetooth = YES;
 	t.secure = YES;
+	t.tag = 0;
+	[self.transports addObject:t];
+	[t release];
+	
+	// non-SSL bonjour Service
+	t = [[LoggerNativeTransport alloc] init];
+	t.transManager = self;
+	t.prefManager = [self prefManager];
+	t.certManager = self.certManager;
+	t.publishBonjourService = YES;
+	t.useBluetooth = YES;
+	t.secure = NO;
 	t.tag = 1;
 	[self.transports addObject:t];
 	[t release];
@@ -173,75 +177,59 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 
 -(void)appStarted
 {
-	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
-	[self performSelector:@selector(createTransports) withObject:nil afterDelay:0];
+	[self createTransports];
 }
 
 -(void)appBecomeActive
 {
-	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
-	[self performSelector:@selector(startTransports) withObject:nil afterDelay:0];
+	[self startTransports];
 }
 
 -(void)appResignActive
 {
-	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
-	[self performSelector:@selector(stopTransports) withObject:nil afterDelay:0];
+	[self stopTransports];
 }
 
 -(void)appWillTerminate
 {
-	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
-	[self performSelector:@selector(destoryTransports) withObject:nil afterDelay:0];	
+	[self destoryTransports];
 }
-
 
 // -----------------------------------------------------------------------------
 #pragma mark - Handling Report from Transport
 // -----------------------------------------------------------------------------
--(void)presentNotification:(NSDictionary *)aNotiDict forKey:(NSString *)aKey
+-(void)presentNotificationOnMainThread:(NSDictionary *)aNotiDict
 {
-#if 0
 	if([NSThread isMainThread])
 	{
 		[[NSNotificationCenter defaultCenter]
-		 postNotificationName:aKey
+		 postNotificationName:[aNotiDict valueForKey:kTransportNotificationKey]
 		 object:self
-		 userInfo:aNotiDict];
+		 userInfo:[aNotiDict valueForKey:kTransportNotificationUserInfo]];
 	}
 	else
 	{
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:aKey
-			 object:self
-			 userInfo:aNotiDict];
-		});
+		[self
+		 performSelectorOnMainThread:_cmd
+		 withObject:aNotiDict
+		 waitUntilDone:NO];
 	}
-#else
-	// with usage of [NSNotificationCenter addObserverForName:object:queue:usingBlock:]
-	// you can send your notification from any thread you desire and catch it on a
-	// specific thread, in this case, main thread.
-	// further, we can enqueu such notification that notification sender is not blocked by
-	// a corresponding observer's method being executed simultaneously.
-	[[NSNotificationQueue defaultQueue]
-	 enqueueNotification:[NSNotification notificationWithName:aKey object:self userInfo:aNotiDict]
-	 postingStyle:NSPostASAP
-	 coalesceMask:NSNotificationNoCoalescing
-	 forModes:nil];
-#endif
 }
 
 - (void)presentTransportStatus:(NSDictionary *)aStatusDict
 {
-	[self presentNotification:aStatusDict
-	 forKey:kShowTransportStatusNotification];
+	[self
+	 presentNotificationOnMainThread:
+		@{kTransportNotificationKey: kShowTransportStatusNotification
+		,kTransportNotificationUserInfo:aStatusDict}];
 }
 
 - (void)presentTransportError:(NSDictionary *)anErrorDict
 {
-	[self presentNotification:anErrorDict
-	 forKey:kShowTransportErrorNotification];
+	[self
+	 presentNotificationOnMainThread:
+	 @{kTransportNotificationKey: kShowTransportErrorNotification
+	 ,kTransportNotificationUserInfo:anErrorDict}];
 }
 
 // -----------------------------------------------------------------------------

@@ -42,6 +42,10 @@
 #import "LoggerStatusCell.h"
 #import "LoggerConstModel.h"
 
+@interface LoggerStatusCell()
+@property (nonatomic, retain) NSDictionary *statusData;
+@end
+
 @implementation LoggerStatusCell
 + (CGFloat)rowHeight
 {
@@ -53,6 +57,12 @@
 	[super finishConstruction];
 	self.bluetoothLabel.text = NSLocalizedString(@"Bluetooth", nil);
 	self.portLabel.text = NSLocalizedString(@"Port", nil);
+}
+
+-(void)dealloc
+{
+	self.statusData = nil;
+	[super dealloc];
 }
 
 
@@ -68,17 +78,34 @@
 
 -(void)configureForData:(id)dataObject
 {
-	self.cellData = dataObject;
+	self.statusData = dataObject;
 	
 	BOOL showSSLBadge = [[dataObject valueForKey:kTransportSecure] boolValue];
 	BOOL transportReady = [[dataObject valueForKey:kTransportReady] boolValue];
+	BOOL transportActivated = [[dataObject valueForKey:kTransportActivated] boolValue];
 	BOOL openningFailed = [[dataObject valueForKey:kTransportFailed] boolValue];
+	BOOL bluetoothUsed = [[dataObject valueForKey:kTransportBluetooth] boolValue];
+	BOOL bonjourPublished  = [[dataObject valueForKey:kTransportBluetooth] boolValue];	
 	NSString *infoString = [dataObject valueForKey:kTransportInfoString];
 	NSString *statusString = [dataObject valueForKey:kTransportStatusString];
+	
 
 	[self.sslBadge setHidden:!showSSLBadge];
 	self.portStatus.text = statusString;
 	self.portInfo.text = infoString;
+	
+	[self.portOnOff setOn:transportActivated animated:NO];
+	if(transportActivated)
+	{
+		[self.bluetoothOnOff setOn:bluetoothUsed animated:NO];
+	}
+	else
+	{
+		[self.bluetoothOnOff setOn:NO animated:NO];
+	}
+	
+	[self.bluetoothOnOff setHidden:!bonjourPublished];
+	[self.bluetoothLabel setHidden:!bonjourPublished];
 	
 	if(openningFailed)
 	{
@@ -95,12 +122,5 @@
 			[self.statusLED setImage:[UIImage imageNamed:@"NSLoggerResource.bundle/Icon/status_disconnected.png"]];
 		}
 	}
-
-	
 }
-
-
-
-
-
 @end

@@ -53,37 +53,42 @@
 -(void)completeInstanceCreation
 {
 	[super completeInstanceCreation];
+	
 	self.statusValues = \
 		[NSMutableArray arrayWithObjects:
 			@{kTransportTag:[NSNumber numberWithInt:0]
 			,kTransportSecure:[NSNumber numberWithBool:TRUE]
 			,kTransportReady:[NSNumber numberWithBool:FALSE]
+			,kTransportActivated:[NSNumber numberWithBool:FALSE]
 			,kTransportFailed:[NSNumber numberWithBool:FALSE]
+			,kTransportBluetooth:[NSNumber numberWithBool:TRUE]
+			,kTransportBonjour:[NSNumber numberWithBool:TRUE]
 			,kTransportInfoString:@"(Bonjour, SSL)"
 			,kTransportStatusString:@"Opening port..."}
 		 
 			,@{kTransportTag:[NSNumber numberWithInt:1]
 			,kTransportSecure:[NSNumber numberWithBool:FALSE]
 			,kTransportReady:[NSNumber numberWithBool:FALSE]
+			,kTransportActivated:[NSNumber numberWithBool:FALSE]
 			,kTransportFailed:[NSNumber numberWithBool:FALSE]
+			,kTransportBluetooth:[NSNumber numberWithBool:TRUE]
+			,kTransportBonjour:[NSNumber numberWithBool:TRUE]
 			,kTransportInfoString:@"(Bonjour)"
 			,kTransportStatusString:@"Opening port..."}
-		 
+ 
 			,@{kTransportTag:[NSNumber numberWithInt:2]
 			,kTransportSecure:[NSNumber numberWithBool:TRUE]
 			,kTransportReady:[NSNumber numberWithBool:FALSE]
+			,kTransportActivated:[NSNumber numberWithBool:FALSE]
 			,kTransportFailed:[NSNumber numberWithBool:FALSE]
+			,kTransportBluetooth:[NSNumber numberWithBool:NO]
+			,kTransportBonjour:[NSNumber numberWithBool:NO]
 			,kTransportInfoString:@"(Direct TCP)"
 			,kTransportStatusString:@"Opening port..."}
 	 , nil];
-}
-
--(void)finishViewConstruction
-{
-	[super finishViewConstruction];
 	
 	__block LoggerStatusPane *blockSelf = self;
-
+	
 	[[NSNotificationCenter defaultCenter]
 	 addObserverForName:kShowTransportStatusNotification
 	 object:[LoggerTransportManager sharedTransportManager]
@@ -93,25 +98,23 @@
 	 }];
 }
 
--(void)startViewDestruction
+-(void)beginInstanceDestruction
 {
-	[super startViewDestruction];
-
+	[super beginInstanceDestruction];
+	self.statusValues = nil;
+	
 	[[NSNotificationCenter defaultCenter]
 	 removeObserver:self
 	 name:kShowTransportStatusNotification
 	 object:[LoggerTransportManager sharedTransportManager]];
 }
 
--(void)beginInstanceDestruction
-{
-	[super beginInstanceDestruction];
-	self.statusValues = nil;
-}
-
 -(void)updateStatus:(NSNotification *)aNotification
 {
 	NSDictionary *portStatus = [aNotification userInfo];
+
+	MTLog(@"%@",portStatus);
+	
 	int32_t portTag = [[portStatus valueForKey:kTransportTag] intValue];
 	[self.statusValues replaceObjectAtIndex:portTag withObject:portStatus];
 	[self.itemTable

@@ -54,15 +54,16 @@ extern NSString * const kShowTransportErrorNotification;
 extern NSString * const kTransportTag;
 extern NSString * const kTransportSecure;
 extern NSString * const kTransportReady;
+extern NSString * const kTransportActivated;
 extern NSString * const kTransportFailed;
 extern NSString * const kTransportInfoString;
 extern NSString * const kTransportStatusString;
 extern NSString * const kTransportError;
+extern NSString * const kTransportBluetooth;
+extern NSString * const kTransportBonjour;
 
 // client status value
 extern NSString * const kShowClientConnectedNotification;
 extern NSString * const kShowClientDisconnectedNotification;
 extern NSString * const kClientHash;
 extern NSString * const kClientRunCount;
-
-

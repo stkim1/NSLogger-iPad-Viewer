@@ -131,13 +131,7 @@
 
 - (NSDictionary *)status
 {
-	return
-		@{kTransportTag:[NSNumber numberWithInt:[self tag]],
-		kTransportSecure:[NSNumber numberWithBool:[self secure]],
-		kTransportReady:[NSNumber numberWithBool:[self ready]],
-		kTransportFailed:[NSNumber numberWithBool:[self failed]],
-		kTransportInfoString:[self transportInfoString],
-		kTransportStatusString:[self transportStatusString]};
+	return nil;
 }
 
 //------------------------------------------------------------------------------

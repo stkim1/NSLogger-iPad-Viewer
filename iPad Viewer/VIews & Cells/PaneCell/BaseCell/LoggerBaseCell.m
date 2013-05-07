@@ -73,7 +73,6 @@
 
 - (void)dealloc
 {
-	self.cellData = nil;
 	self.delegate = nil;
 	[super dealloc];
 }

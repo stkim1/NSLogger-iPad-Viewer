@@ -55,12 +55,8 @@ AcceptSocketCallback(CFSocketRef, CFSocketCallBackType, CFDataRef, const void*, 
 
 
 @interface LoggerNativeTransport()
-static void
-ServiceRegisterCallback(DNSServiceRef,DNSServiceFlags,DNSServiceErrorType,const char*,const char*,const char*,void*);
 -(void)startListening;
 -(void)destorySockets;
-- (void)didNotRegisterWithError:(DNSServiceErrorType)errorCode;
-- (void)didRegisterWithDomain:(const char *)domain name:(const char *)name;
 @end
 
 @implementation LoggerNativeTransport
@@ -85,8 +81,8 @@ ServiceRegisterCallback(DNSServiceRef,DNSServiceFlags,DNSServiceErrorType,const 
 //------------------------------------------------------------------------------
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<%@ %p listenerPort=%d publishBonjourService=%d secure=%d>",
-			[self class], self, listenerPort, (int)publishBonjourService, (int)secure];
+	return [NSString stringWithFormat:@"<%@ %p listenerPort=%d publishBonjourService=%d secure=%d>"
+			,[self class] ,self ,listenerPort ,(int)publishBonjourService ,(int)secure];
 }
 
 - (NSString *)transportInfoString
@@ -94,23 +90,26 @@ ServiceRegisterCallback(DNSServiceRef,DNSServiceFlags,DNSServiceErrorType,const 
 	if (publishBonjourService)
 	{
 		NSString *name = bonjourServiceName;
-#warning fix!
-#if 0
-		if (![name length])
-			name = [bonjourService name];
-#endif
 		if ([name length])
-			return [NSString stringWithFormat:NSLocalizedString(@"Bonjour (%@, port %d%s)", @"Named Bonjour transport info string"),
-					name,
-					listenerPort,
-					secure ? ", SSL" : ""];
-		return [NSString stringWithFormat:NSLocalizedString(@"Bonjour (port %d%s)", @"Bonjour transport (default name) info string"),
-				listenerPort,
-				secure ? ", SSL" : ""];
+		{
+			return [NSString
+					stringWithFormat:
+					NSLocalizedString(@"Bonjour (%@, port %d%s)", @"Named Bonjour transport info string")
+					,name
+					,listenerPort
+					,secure ? ", SSL" : ""];
+		}
+
+		return [NSString
+				stringWithFormat:NSLocalizedString(@"Bonjour (port %d%s)", @"Bonjour transport (default name) info string")
+				,listenerPort
+				,secure ? ", SSL" : ""];
 	}
-	return [NSString stringWithFormat:NSLocalizedString(@"TCP/IP (port %d%s)", @"TCP/IP transport info string"),
-			listenerPort,
-			secure ? ", SSL" : ""];
+
+	return [NSString
+			stringWithFormat:NSLocalizedString(@"TCP/IP (port %d%s)", @"TCP/IP transport info string")
+			,listenerPort
+			,secure ? ", SSL" : ""];
 }
 
 - (NSString *)transportStatusString
@@ -118,9 +117,13 @@ ServiceRegisterCallback(DNSServiceRef,DNSServiceFlags,DNSServiceErrorType,const 
 	if (failed)
 	{
 		if (failureReason != nil)
+		{
 			return failureReason;
+		}
+		
 		return NSLocalizedString(@"Failed opening service", @"Transport failed opening - unknown reason");
 	}
+	
 	if (active && ready)
 	{
 		__block NSInteger numConnected = 0;
@@ -131,14 +134,33 @@ ServiceRegisterCallback(DNSServiceRef,DNSServiceFlags,DNSServiceErrorType,const 
 
 		if (numConnected == 0)
 			return NSLocalizedString(@"Ready to accept connections", @"Transport ready status");
+		
 		if (numConnected == 1)
 			return NSLocalizedString(@"1 active connection", @"1 active connection for transport");
+		
 		return [NSString stringWithFormat:NSLocalizedString(@"%d active connections", @"Number of active connections for transport"), numConnected];
 	}
+	
 	if (active)
 		return NSLocalizedString(@"Opening service", @"Transport status: opening");
+
 	return NSLocalizedString(@"Unavailable", @"Transport status: service unavailable");
 }
+
+- (NSDictionary *)status
+{
+	return
+		@{kTransportTag:[NSNumber numberWithInt:[self tag]]
+		,kTransportSecure:[NSNumber numberWithBool:[self secure]]
+		,kTransportReady:[NSNumber numberWithBool:[self ready]]
+		,kTransportActivated:[NSNumber numberWithBool:[self active]]
+		,kTransportFailed:[NSNumber numberWithBool:[self failed]]
+		,kTransportBluetooth:[NSNumber numberWithBool:[self useBluetooth]]
+		,kTransportBonjour:[NSNumber numberWithBool:[self publishBonjourService]]
+		,kTransportInfoString:[self transportInfoString]
+		,kTransportStatusString:[self transportStatusString]};
+}
+
 
 //------------------------------------------------------------------------------
 #pragma mark - Property Controls
@@ -153,46 +175,6 @@ ServiceRegisterCallback(DNSServiceRef,DNSServiceFlags,DNSServiceErrorType,const 
 	 */
 	NSError *loadingError = nil;
 	return [self.certManager loadEncryptionCertificate:&loadingError];
-}
-
-
-static void
-ServiceRegisterCallback(DNSServiceRef			sdRef,
-						DNSServiceFlags			flags,
-						DNSServiceErrorType		errorCode,
-						const char				*name,
-						const char				*regtype,
-						const char				*domain,
-						void					*context)
-
-{
-	NSLog(@"%s %s %s %s",__PRETTY_FUNCTION__,name,regtype, domain);
-
-	LoggerNativeTransport *callbackSelf = (LoggerNativeTransport *) context;
-    assert([callbackSelf isKindOfClass:[LoggerNativeTransport class]]);
-    assert(sdRef == callbackSelf->_sdServiceRef);
-    assert(flags & kDNSServiceFlagsAdd);
-	
-    if (errorCode == kDNSServiceErr_NoError)
-	{
-		NSLog(@"errorCode : kDNSServiceErr_NoError");
-		NSLog(@"service is now assigned");
-
-		// We're assuming SRV records over unicast DNS here, so the first result packet we get
-        // will contain all the information we're going to get.  In a more dynamic situation
-        // (for example, multicast DNS or long-lived queries in Back to My Mac) we'd would want
-        // to leave the query running.
-        
-		// we only need to find out whether the service is registered. unregsitering is not concerned.
-		if (flags & kDNSServiceFlagsAdd)
-		{
-            [callbackSelf didRegisterWithDomain:domain name:name];
-        }
-
-    } else {
-		NSLog(@"errorCode is NOT kDNSServiceErr_NoError");
-        [callbackSelf didNotRegisterWithError:errorCode];
-    }
 }
 
 - (BOOL)setup
@@ -221,12 +203,13 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
 											 kCFSocketAcceptCallBack,
 											 &AcceptSocketCallback,
 											 &context);
-		
+
 		if (listenerSocket_ipv4 == NULL || listenerSocket_ipv6 == NULL)
 		{
-			@throw [NSException exceptionWithName:@"CFSocketCreate"
-										   reason:NSLocalizedString(@"Failed creating listener socket (CFSocketCreate failed)", @"")
-										 userInfo:nil];
+			@throw [NSException
+					exceptionWithName:@"CFSocketCreate"
+					reason:NSLocalizedString(@"Failed creating listener socket (CFSocketCreate failed)", nil)
+					userInfo:nil];
 		}
 		
 		// set socket options & addresses
@@ -246,7 +229,7 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
 		{
 			@throw [NSException
 					exceptionWithName:@"CFSocketSetAddress"
-					reason:NSLocalizedString(@"Failed setting IPv4 socket address", @"")
+					reason:NSLocalizedString(@"Failed setting IPv4 socket address", nil)
 					userInfo:nil];
 		}
 		
@@ -267,12 +250,12 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
 		addr6.sin6_port = htons(listenerPort);
 		memcpy(&(addr6.sin6_addr), &in6addr_any, sizeof(addr6.sin6_addr));
 		NSData *address6 = [NSData dataWithBytes:&addr6 length:sizeof(addr6)];
-		
+
 		if (CFSocketSetAddress(listenerSocket_ipv6, (CFDataRef)address6) != kCFSocketSuccess)
 		{
 			@throw [NSException
 					exceptionWithName:@"CFSocketSetAddress"
-					reason:NSLocalizedString(@"Failed setting IPv6 socket address", @"")
+					reason:NSLocalizedString(@"Failed setting IPv6 socket address", nil)
 					userInfo:nil];
 		}
 		
@@ -302,66 +285,76 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
 			NSString *serviceName = [self.prefManager bonjourServiceName];
 			if (serviceName == nil || ![serviceName isKindOfClass:[NSString class]])
 				serviceName = @"";
-			
+
+			[serviceName retain];
 			[bonjourServiceName release];
-			bonjourServiceName = [serviceName retain];
+			bonjourServiceName = serviceName;
 
 			errorType =
-			DNSServiceRegister(&(self->_sdServiceRef),		// sdRef
-							   serviceFlag,					// flags
-							   kDNSServiceInterfaceIndexAny,// interfaceIndex. kDNSServiceInterfaceIndexP2P does not have meanning when serving
-							   bonjourServiceName.UTF8String,// name
-							   serviceType.UTF8String,		// regtype
-							   "",							// domain
-							   NULL,						// host
-							   htons(listenerPort),			// port. just for bt init
-							   0,							// txtLen
-							   NULL,						// txtRecord
-							   ServiceRegisterCallback,		// callBack,
-							   (void *)(self)				// context
-							   );
+				DNSServiceRegister(&(self->_sdServiceRef),		// sdRef
+								   serviceFlag,					// flags
+								   kDNSServiceInterfaceIndexAny,// interfaceIndex. kDNSServiceInterfaceIndexP2P does not have meanning when serving
+								   bonjourServiceName.UTF8String,// name
+								   serviceType.UTF8String,		// regtype
+								   NULL,						// domain
+								   NULL,						// host
+								   htons(listenerPort),			// port. just for bt init
+								   0,							// txtLen
+								   NULL,						// txtRecord
+								   NULL,						// callBack
+								   (void *)(self)				// context
+								   );
 			
+			//unfortunately, DNSServiceRegister never calls its callback.
 			if (errorType != kDNSServiceErr_NoError)
 			{
-				@throw [NSException
-						exceptionWithName:@"CFSocketCreate"
-						reason:NSLocalizedString(@"Failed announce Bonjour service (DNSServiceRegister failed)", nil)
-						userInfo:nil];
+				NSString *failReason = nil;
+				
+				switch (errorType)
+				{
+					case kDNSServiceErr_NameConflict:{
+						failReason = NSLocalizedString(@"Duplicate Bonjour service name on your network", @"");
+						break;
+					}
+					case kDNSServiceErr_BadParam:{
+						failReason = NSLocalizedString(@"Bonjour bad argument - please report bug.", @"");
+						break;
+					}
+					case kDNSServiceErr_Invalid:{
+						failReason = NSLocalizedString(@"Bonjour invalid configuration - please report bug.", @"");
+						break;
+					}
+					default:{
+						failReason = [NSString stringWithFormat:NSLocalizedString(@"Bonjour error %d", @""), errorType];
+						break;
+					}
+				}
+				
+				@throw
+					[NSException
+					 exceptionWithName:@"Bonjour Service"
+					 reason:[NSString stringWithFormat:@"%@\n\n%@",NSLocalizedString(@"Failed announce Bonjour service (DNSServiceRegister failed)", nil),failReason]
+					 userInfo:nil];
 			}
 			
 		}
-		else
-		{
-			ready = YES;
-		}
-		
+
+		ready = YES;
+
 	}
 	@catch (NSException * e)
 	{
 		failed = YES;
-		if (publishBonjourService)
-			self.failureReason = NSLocalizedString(@"Failed creating sockets for Bonjour%s service.", @"");
-		else
-			self.failureReason = [NSString stringWithFormat:NSLocalizedString(@"Failed listening on port %d (port busy?)",@""), listenerPort];
-		
-		
-		NSDictionary *status = [self status];
-		
-		NSMutableDictionary *errorStatus = \
-		[NSMutableDictionary dictionaryWithDictionary:status];
-		
-		[errorStatus
-		 setObject:
-		 [NSError
-		  errorWithDomain:@"NSLogger"
-		  code:0
-		  userInfo:
-		  @{NSLocalizedDescriptionKey:[e name],
-		  NSLocalizedFailureReasonErrorKey:[e reason]}]
-		 forKey:kTransportError];
+
+		self.failureReason = [e reason];
+
+		NSDictionary *errorStatus =
+			@{NSLocalizedDescriptionKey:[e name]
+			,NSLocalizedFailureReasonErrorKey:[e reason]};
+
+		[self destorySockets];
 		
 		[self reportErrorToManager:errorStatus];
-		[self destorySockets];
 
 		return NO;
 	}
@@ -811,64 +804,6 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
 		[pool release];
 	}	
 }
-
-
-// -----------------------------------------------------------------------------
-#pragma mark - DNS-SD callback response
-// -----------------------------------------------------------------------------
-- (void)didNotRegisterWithError:(DNSServiceErrorType)errorCode
-{
-	[self shutdown];
-
-	switch (errorCode)
-	{
-		case kDNSServiceErr_NameConflict:{
-			self.failureReason = NSLocalizedString(@"Duplicate Bonjour service name on your network", @"");
-			break;
-		}
-		case kDNSServiceErr_BadParam:{
-			self.failureReason = NSLocalizedString(@"Bonjour bad argument - please report bug.", @"");
-			break;
-		}
-		case kDNSServiceErr_Invalid:{
-			self.failureReason = NSLocalizedString(@"Bonjour invalid configuration - please report bug.", @"");
-			break;
-		}
-		default:{
-			self.failureReason = [NSString stringWithFormat:NSLocalizedString(@"Bonjour error %d", @""), errorCode];
-			break;
-		}
-	}
-	
-	MTLog(@"service failed %@",self.failureReason);
-	
-	failed = YES;
-	
-	NSDictionary *status = [self status];
-	
-	NSMutableDictionary *errorStatus = \
-		[NSMutableDictionary dictionaryWithDictionary:status];
-	
-	[errorStatus
-	 setObject:
-	 [NSError
-	  errorWithDomain:@"NSLogger"
-	  code:errorCode
-	  userInfo:@{NSLocalizedDescriptionKey:NSLocalizedString(@"NSLogger NSNetService failure", @"")}]
-	 forKey:kTransportError];
-	
-	[self reportErrorToManager:errorStatus];
-
-}
-
-- (void)didRegisterWithDomain:(const char *)domain name:(const char *)name
-{
-	MTLog(@"service registration success domain[%s]  name[%s]",domain,name);
-
-	ready = YES;
-	[self reportStatusToManager:[self status]];
-}
-
 
 @end
 

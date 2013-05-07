@@ -47,10 +47,13 @@ NSString * const kShowTransportErrorNotification = @"ShowTransportError";
 NSString * const kTransportTag			= @"tag";
 NSString * const kTransportSecure		= @"secure";
 NSString * const kTransportReady		= @"ready";
+NSString * const kTransportActivated	= @"active";
 NSString * const kTransportFailed		= @"failed";
 NSString * const kTransportInfoString	= @"transportInfoString";
 NSString * const kTransportStatusString	= @"transportStatusString";
 NSString * const kTransportError		= @"transportError";
+NSString * const kTransportBluetooth	= @"transportBluetooth";
+NSString * const kTransportBonjour		= @"transportBonjour";
 
 // client status value
 NSString * const kShowClientConnectedNotification = @"ShowClientConnected";

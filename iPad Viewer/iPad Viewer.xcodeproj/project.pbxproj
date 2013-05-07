@@ -663,12 +663,12 @@
 		04A4EEE71738002700479F0E /* PreferenceViewController */ = {
 			isa = PBXGroup;
 			children = (
-				04A4EEE81738002700479F0E /* BasePane */,
-				04A4EEEC1738002700479F0E /* GeneralPane */,
-				04A4EEEF1738002700479F0E /* LicensePane */,
 				04A4EEF21738002700479F0E /* LoggerPreferenceViewController.h */,
 				04A4EEF31738002700479F0E /* LoggerPreferenceViewController.m */,
 				04A4EEF41738002700479F0E /* LoggerPreferenceViewController.xib */,
+				04A4EEE81738002700479F0E /* BasePane */,
+				04A4EEEC1738002700479F0E /* GeneralPane */,
+				04A4EEEF1738002700479F0E /* LicensePane */,
 				04A4EEF51738002700479F0E /* NetworkPane */,
 				04A4EEF81738002700479F0E /* RepositoryPane */,
 				04A4EEFB1738002700479F0E /* StatusPane */,
