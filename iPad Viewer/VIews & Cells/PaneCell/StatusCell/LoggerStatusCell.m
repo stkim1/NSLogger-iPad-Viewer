@@ -89,7 +89,6 @@
 	NSString *infoString = [dataObject valueForKey:kTransportInfoString];
 	NSString *statusString = [dataObject valueForKey:kTransportStatusString];
 	
-
 	[self.sslBadge setHidden:!showSSLBadge];
 	self.portStatus.text = statusString;
 	self.portInfo.text = infoString;

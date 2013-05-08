@@ -43,18 +43,19 @@
 @implementation LoggerLicenseCell
 + (CGFloat)rowHeight
 {
-	return 800.f;
+	return 1014.f;
 }
 
--(void)finishConstruction
+-(IBAction)stkim1:(id)sender
 {
-	[super finishConstruction];
-	[self.licenseView setFont:[UIFont fontWithName:@"Inconsolata" size:12.f]];
+	[[UIApplication sharedApplication] openURL:[NSURL URLWithString: @"https://twitter.com/stkim1"]];
 }
 
--(void)dealloc
+-(IBAction)fpillet:(id)sender
 {
-	self.licenseView = nil;
-	[super dealloc];
+	[[UIApplication sharedApplication] openURL:[NSURL URLWithString: @"https://twitter.com/fpillet"]];	
 }
+
+
+
 @end

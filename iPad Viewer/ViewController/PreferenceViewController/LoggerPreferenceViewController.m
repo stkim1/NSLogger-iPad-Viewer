@@ -117,7 +117,6 @@ static NSString * const kItemClass = @"item_class";
 	self.preferenceItems = nil;
 }
 
-
 //------------------------------------------------------------------------------
 #pragma mark - Instance Methods
 //------------------------------------------------------------------------------

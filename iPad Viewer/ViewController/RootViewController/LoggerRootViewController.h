@@ -42,6 +42,5 @@
 #import "KLNoteViewController.h"
 
 @interface LoggerRootViewController : KLNoteViewController
-@property (nonatomic, strong) NSMutableArray* viewControllerData;
-
+@property (nonatomic, strong) NSMutableArray* messageViewControllerStack;
 @end

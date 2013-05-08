@@ -42,11 +42,10 @@
 #import "NullStringCheck.h"
 
 @interface BaseViewController : UIViewController
-@property (nonatomic, readonly ) BOOL isOSGreaterThan6;
+@property (nonatomic, readonly) BOOL isSystemVersionSixth;
 - (void)completeInstanceCreation;
 - (void)beginInstanceDestruction;
 - (void)finishViewConstruction;
 - (void)startViewDestruction;
 - (void)dislodgeViewForMemWarning;
-- (IBAction)popFromParentViewController;
 @end

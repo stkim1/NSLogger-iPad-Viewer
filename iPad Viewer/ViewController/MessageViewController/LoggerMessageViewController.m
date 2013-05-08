@@ -55,31 +55,31 @@
 @end
 
 @implementation LoggerMessageViewController
-{
-	NSFetchedResultsController	*_messageFetchResultController;
-	UITableView					*_tableView;
-}
-@synthesize messageFetchResultController = _messageFetchResultController;
-@synthesize tableView = _tableView;
-
 //------------------------------------------------------------------------------
 #pragma mark - Inherited Methods
 //------------------------------------------------------------------------------
+-(id)initWithHashCode:(uLong)aClientHash dataManager:(LoggerDataManager *)aDataManager
+{
+	self = [super initWithNibName:@"LoggerMessageViewController" bundle:[NSBundle mainBundle]];
+	if(self)
+	{
+		_clientHash = aClientHash;
+		_dataManager = aDataManager;
+	}
+	return self;
+}
+
 -(void)completeInstanceCreation
 {
-	
-	MTLog(@"%s",__PRETTY_FUNCTION__);
-	
 	[super completeInstanceCreation];
-	[self setDataManager:[LoggerDataManager sharedDataManager]];
-	
-	[[NSNotificationCenter defaultCenter]
+	/*
+	 
+	 [[NSNotificationCenter defaultCenter]
 	 addObserver:self
 	 selector:@selector(readMessages:)
 	 name:kShowClientConnectedNotification
 	 object:nil];
-	
-	/*
+
 	 [[NSNotificationCenter defaultCenter]
 	 addObserver:self
 	 selector:nil//@selector(deleteMessages:)
@@ -208,8 +208,6 @@
 {
 	[super beginInstanceDestruction];
 	self.dataManager = nil;
-
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 //------------------------------------------------------------------------------
@@ -230,18 +228,12 @@
 }
 
 
--(void)readMessages:(NSNotification *)aNotification
-{
-	NSDictionary *userInfo = [aNotification userInfo];
-	
-	MTLog(@"userInfo %@",userInfo);
-	
-	uLong clientHash = [[userInfo objectForKey:kClientHash] integerValue];
-	int32_t runCount = [[userInfo objectForKey:kClientRunCount] integerValue];
-	
-	self.clientInfo = nil;
-	self.clientInfo = userInfo;
-	
+-(void)startMonitoringRun:(int32_t)aLatestRun
+{	
+	uLong clientHash = _clientHash;
+	int32_t runCount = aLatestRun;
+	_runCount = aLatestRun;
+
 	assert([self.dataManager messageDisplayContext] != nil);
 	
 	if(_messageFetchResultController != nil)

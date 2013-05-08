@@ -41,10 +41,9 @@
 #import "BaseViewController.h"
 
 @implementation BaseViewController{
-	BOOL		_isOSGreaterThan6;
+	BOOL		_isSystemVersionSixth;
 }
-@synthesize isOSGreaterThan6 = _isOSGreaterThan6;
-
+@synthesize isSystemVersionSixth = _isSystemVersionSixth;
 -(id)init
 {
 	self = [super init];
@@ -54,6 +53,16 @@
 		[self completeInstanceCreation];
 	}
 	
+	return self;
+}
+
+- (id)initWithCoder:(NSCoder *)aDecoder
+{
+	self = [super initWithCoder:aDecoder];
+	if (self)
+	{
+		[self completeInstanceCreation];
+	}
 	return self;
 }
 
@@ -68,8 +77,9 @@
 	return self;
 }
 
-
+//------------------------------------------------------------------------------
 #pragma mark view lifecycle method
+//------------------------------------------------------------------------------
 -(void)loadView
 {
 	[super loadView];
@@ -86,7 +96,7 @@
 {
 	[super didReceiveMemoryWarning];
     BOOL shouldDislodge = !(self.isViewLoaded && self.view.window);
-    if(self.isOSGreaterThan6 && shouldDislodge)
+    if([self isSystemVersionSixth] && shouldDislodge)
     {
         [self dislodgeViewForMemWarning];
     }
@@ -99,11 +109,12 @@
 	[super dealloc];
 }
 
-
+//------------------------------------------------------------------------------
 #pragma mark - Instance constructon done
+//------------------------------------------------------------------------------
 -(void)completeInstanceCreation
 {
-	_isOSGreaterThan6 =\
+	_isSystemVersionSixth =\
 		([[[UIDevice currentDevice]
 		   systemVersion]
 		  compare:@"6.0"
@@ -116,12 +127,16 @@
 {
 }
 
+//------------------------------------------------------------------------------
 #pragma mark - child class view contruction
+//------------------------------------------------------------------------------
 -(void)finishViewConstruction
 {
 }
 
+//------------------------------------------------------------------------------
 #pragma mark child class view destruction
+//------------------------------------------------------------------------------
 - (void)startViewDestruction
 {
 }
@@ -133,16 +148,5 @@
     [self startViewDestruction];
     self.view = nil;
 }
-
-
-#pragma mark child class navigation popper
--(IBAction)popFromParentViewController
-{
-	BOOL shouldAnimate = (self.isViewLoaded && self.view.window);
-	
-	if(self.navigationController != nil)
-		[self.navigationController popViewControllerAnimated:shouldAnimate];
-}
-
 
 @end

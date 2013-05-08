@@ -22,6 +22,7 @@
  */
 
 #import <UIKit/UIKit.h>
+#import "BaseViewController.h"
 
 //------------------------------------------------------------------------------
 #pragma mark - KLControllerCardDelegate
@@ -90,7 +91,7 @@ didUpdatePanPercentage:(CGFloat)percentage;
 #pragma mark - KLNoteViewController
 //------------------------------------------------------------------------------
 //KLNoteViewController manages the cards interfacing between the various cards
-@interface KLNoteViewController : UIViewController  <KLControllerCardDelegate>
+@interface KLNoteViewController : BaseViewController  <KLControllerCardDelegate>
 {
 	NSInteger totalCards;
 }

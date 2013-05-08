@@ -44,15 +44,15 @@
 #import "LoggerMessageViewController.h"
 #import "LoggerPreferenceViewController.h"
 
-@implementation LoggerRootViewController
--(void)dealloc
-{
-	self.viewControllerData = nil;
-	[super dealloc];
-}
+@interface LoggerRootViewController()
+-(void)updateMessageViewControllerStack:(NSNotification *)aNotification;
+@end
 
--(void)loadView
+@implementation LoggerRootViewController
+-(void)finishViewConstruction
 {
+	[super finishViewConstruction];
+
 	CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
 	CGRect viewFrame = (CGRect){CGPointZero,appFrame.size};
 	
@@ -64,39 +64,51 @@
     noiseView.noiseOpacity = 0.3;	
     [self setView:noiseView];
 	[noiseView release],noiseView = nil;
+	
+	self.messageViewControllerStack = [NSMutableArray arrayWithCapacity:1];
+	
+	// register self
+	[[NSNotificationCenter defaultCenter]
+	 addObserver:self
+	 selector:@selector(updateMessageViewControllerStack:)
+	 name:kShowClientConnectedNotification
+	 object:nil];
 }
 
 - (void)viewDidLoad
 {
-	self.viewControllerData = [NSMutableArray arrayWithCapacity:1];
-
-/*
-	LoggerMessageViewController *vc = \
-		[[LoggerMessageViewController alloc]
-		 initWithNibName:@"LoggerMessageViewController"
-		 bundle:[NSBundle mainBundle]];
-	[self.viewControllerData addObject:vc];
-	[vc release],vc = nil;
-*/
 	LoggerPreferenceViewController *preference = \
 		[[LoggerPreferenceViewController alloc]
 		 initWithNibName:@"LoggerPreferenceViewController"
 		 bundle:[NSBundle mainBundle]];
-	[self.viewControllerData addObject:preference];
+	[self.messageViewControllerStack addObject:preference];
 	[preference release],preference = nil;
 
 	[super viewDidLoad];
 }
 
+-(void)startViewDestruction
+{
+	[self startViewDestruction];
+
+	[self.messageViewControllerStack removeAllObjects];
+	self.messageViewControllerStack = nil;
+	
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+//------------------------------------------------------------------------------
+#pragma mark - KLNoteViewController Data Source methods
+//------------------------------------------------------------------------------
 - (NSInteger)numberOfControllerCardsInNoteView:(KLNoteViewController*) noteView
 {
-    return  [self.viewControllerData count];
+    return  [self.messageViewControllerStack count];
 }
 
 - (UIViewController *)noteView:(KLNoteViewController*)noteView
 viewControllerForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return [self.viewControllerData objectAtIndex:indexPath.row];
+    return [self.messageViewControllerStack objectAtIndex:indexPath.row];
 }
 
 -(void) noteViewController:(KLNoteViewController*) noteViewController
@@ -105,6 +117,52 @@ viewControllerForRowAtIndexPath:(NSIndexPath *)indexPath
 		  fromDisplayState:(KLControllerCardState) fromState
 {
 	
+}
+
+//------------------------------------------------------------------------------
+#pragma mark - LoggerRootViewController methods
+//------------------------------------------------------------------------------
+
+-(void)updateMessageViewControllerStack:(NSNotification *)aNotification
+{
+	NSDictionary *userInfo = [aNotification userInfo];
+	
+	MTLog(@"userInfo %@",userInfo);
+	
+	uLong clientHash = [[userInfo objectForKey:kClientHash] integerValue];
+	int32_t runCount = [[userInfo objectForKey:kClientRunCount] integerValue];
+	
+	__block LoggerMessageViewController *messageViewController = nil;
+	
+	[self.messageViewControllerStack enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+		
+		if([obj isKindOfClass:[LoggerPreferenceViewController class]])
+		{
+			return;
+		}
+
+		if([(LoggerMessageViewController *)obj clientHash] == clientHash){
+			messageViewController = (LoggerMessageViewController *)obj;
+			*stop = TRUE;
+		}
+	}];
+	
+	if(messageViewController == nil)
+	{
+		LoggerMessageViewController *vc = \
+			[[LoggerMessageViewController alloc]
+			 initWithHashCode:clientHash
+			 dataManager:[LoggerDataManager sharedDataManager]];
+		[self.messageViewControllerStack addObject:vc];
+		messageViewController = vc;
+		[vc release],vc = nil;
+	}
+	
+	[self reloadData];
+	// Do any additional setup after loading the view.
+	[self reloadInputViews];
+	
+	[messageViewController startMonitoringRun:runCount];
 }
 
 @end

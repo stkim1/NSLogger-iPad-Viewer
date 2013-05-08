@@ -58,42 +58,22 @@
 
 //Drawing information for the navigation controllers
 - (CGFloat)defaultVerticalOriginForControllerCard:(KLControllerCard *)controllerCard atIndex:(NSInteger)index;
-
 - (CGFloat)scalingFactorForIndex:(NSInteger)index;
 @end
 
 @implementation KLNoteViewController
-
-- (id)initWithCoder:(NSCoder *)aDecoder
+- (void)completeInstanceCreation
 {
-	self = [super initWithCoder:aDecoder];
-	if (!self)
-	{
-		return nil;
-	}
+	[super completeInstanceCreation];
 	[self configureDefaultSettings];
-	return self;
 }
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+-(void)beginInstanceDestruction
 {
-	self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-	if (!self)
-	{
-		return nil;
-	}
-	[self configureDefaultSettings];
-	return self;
-}
-
--(void)dealloc
-{
+	[super beginInstanceDestruction];
 	self.cardShadowColor = nil;
 	self.controllerCards = nil;
-	
-	[super dealloc];
 }
-
 
 
 - (void)configureDefaultSettings
@@ -134,7 +114,7 @@
 {
 
 	//Populate the navigation controllers to the controller stack
-	[self reloadData];
+	[self reloadData]; 
 
 	[super viewDidLoad];
 

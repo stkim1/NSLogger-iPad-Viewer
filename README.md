@@ -99,4 +99,4 @@ Lucida Grande, Lucida Grande Copyright (c) 1997, 2000, Bigelow & Holmes Inc. U.S
 <a href="http://www.styleseven.com">Digital-7</a> Copyright (c) 2008, Sizenko Alexander, Style-7 All rights reserved.</pre>
 
 _VER. 0.4.0_<br/>
-_Updated : May 6, 2013_
+_Updated : May 8, 2013_

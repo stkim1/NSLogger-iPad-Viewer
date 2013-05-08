@@ -87,15 +87,12 @@
 			,kTransportStatusString:@"Opening port..."}
 	 , nil];
 	
-	__block LoggerStatusPane *blockSelf = self;
 	
 	[[NSNotificationCenter defaultCenter]
-	 addObserverForName:kShowTransportStatusNotification
-	 object:[LoggerTransportManager sharedTransportManager]
-	 queue:[NSOperationQueue mainQueue]
-	 usingBlock:^(NSNotification *notification){
-		 [blockSelf updateStatus:notification];
-	 }];
+	 addObserver:self
+	 selector:@selector(updateStatus:)
+	 name:kShowTransportStatusNotification
+	 object:[LoggerTransportManager sharedTransportManager]];
 }
 
 -(void)beginInstanceDestruction
@@ -111,10 +108,7 @@
 
 -(void)updateStatus:(NSNotification *)aNotification
 {
-	NSDictionary *portStatus = [aNotification userInfo];
-
-	MTLog(@"%@",portStatus);
-	
+	NSDictionary *portStatus = [aNotification userInfo];	
 	int32_t portTag = [[portStatus valueForKey:kTransportTag] intValue];
 	[self.statusValues replaceObjectAtIndex:portTag withObject:portStatus];
 	[self.itemTable

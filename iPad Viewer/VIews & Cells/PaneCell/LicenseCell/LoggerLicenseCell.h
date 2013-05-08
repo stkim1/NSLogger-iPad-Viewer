@@ -40,5 +40,7 @@
 #import "LoggerBaseCell.h"
 
 @interface LoggerLicenseCell : LoggerBaseCell
-@property (nonatomic, assign) IBOutlet UITextView *licenseView;
+
+-(IBAction)stkim1:(id)sender;
+-(IBAction)fpillet:(id)sender;
 @end
