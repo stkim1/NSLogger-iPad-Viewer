@@ -575,12 +575,11 @@ MTLog(@"transport:didEstablishConnection: (%lx)[%d]",theConnection.clientHash, t
 				 _runMessageSaveChain:0
 				 flushDisplayContext:YES
 				 withMainThreadBlock:^(NSError *saveError){
-					[[NSNotificationCenter defaultCenter]
-					 postNotificationName:kShowClientConnectedNotification
-					 object:[LoggerTransportManager sharedTransportManager]
-					 userInfo:
-						 @{kClientHash:[NSNumber numberWithUnsignedLong:clientHash]
-						 ,kClientRunCount:[NSNumber numberWithInt:lastRunCount]}];
+					 [[LoggerTransportManager sharedTransportManager]
+					  presentTransportStatus:
+					  @{kClientHash:[NSNumber numberWithUnsignedLong:clientHash]
+					  ,kClientRunCount:[NSNumber numberWithInt:lastRunCount]}
+					  forKey:kShowClientConnectedNotification];
 				}];
 			}
 		}
@@ -819,12 +818,11 @@ didDisconnectRemote:(LoggerConnection *)theConnection
 				// when connection gets finished, flush off processing/saving MOC of NMOs
 				[self _runMessageSaveChain:(DEFAULT_SAVING_BLOCK_SIZE + 1)
 				 withMainThreadBlock:^(NSError *saveError){
-					[[NSNotificationCenter defaultCenter]
-					 postNotificationName:kShowClientDisconnectedNotification
-					 object:[LoggerTransportManager sharedTransportManager]
-					 userInfo:
-					 @{kClientHash:[NSNumber numberWithUnsignedLong:clientHash]
-					 ,kClientRunCount:[NSNumber numberWithInt:lastRunCount]}];
+					[[LoggerTransportManager sharedTransportManager]
+					 presentTransportStatus:
+						 @{kClientHash:[NSNumber numberWithUnsignedLong:clientHash]
+						 ,kClientRunCount:[NSNumber numberWithInt:lastRunCount]}
+					 forKey:kShowClientDisconnectedNotification];
 				}];
 			}
 		}

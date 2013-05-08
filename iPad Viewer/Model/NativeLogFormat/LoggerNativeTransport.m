@@ -55,8 +55,12 @@ AcceptSocketCallback(CFSocketRef, CFSocketCallBackType, CFDataRef, const void*, 
 
 
 @interface LoggerNativeTransport()
+static void
+ServiceRegisterCallback(DNSServiceRef,DNSServiceFlags,DNSServiceErrorType,const char*,const char*,const char*,void*);
 -(void)startListening;
 -(void)destorySockets;
+- (void)didNotRegisterWithError:(DNSServiceErrorType)errorCode;
+- (void)didRegisterWithDomain:(const char *)domain name:(const char *)name;
 @end
 
 @implementation LoggerNativeTransport
@@ -175,6 +179,45 @@ AcceptSocketCallback(CFSocketRef, CFSocketCallBackType, CFDataRef, const void*, 
 	 */
 	NSError *loadingError = nil;
 	return [self.certManager loadEncryptionCertificate:&loadingError];
+}
+
+static void
+ServiceRegisterCallback(DNSServiceRef			sdRef,
+						DNSServiceFlags			flags,
+						DNSServiceErrorType		errorCode,
+						const char				*name,
+						const char				*regtype,
+						const char				*domain,
+						void					*context)
+
+{
+	MTLog(@"%s %s %s %s",__PRETTY_FUNCTION__,name,regtype, domain);
+	
+	LoggerNativeTransport *callbackSelf = (LoggerNativeTransport *) context;
+    assert([callbackSelf isKindOfClass:[LoggerNativeTransport class]]);
+    assert(sdRef == callbackSelf->_sdServiceRef);
+    assert(flags & kDNSServiceFlagsAdd);
+	
+    if (errorCode == kDNSServiceErr_NoError)
+	{
+		NSLog(@"errorCode : kDNSServiceErr_NoError");
+		NSLog(@"service is now assigned");
+		
+		// We're assuming SRV records over unicast DNS here, so the first result packet we get
+        // will contain all the information we're going to get.  In a more dynamic situation
+        // (for example, multicast DNS or long-lived queries in Back to My Mac) we'd would want
+        // to leave the query running.
+        
+		// we only need to find out whether the service is registered. unregsitering is not concerned.
+		if (flags & kDNSServiceFlagsAdd)
+		{
+            [callbackSelf didRegisterWithDomain:domain name:name];
+        }
+		
+    } else {
+		NSLog(@"errorCode is NOT kDNSServiceErr_NoError");
+        [callbackSelf didNotRegisterWithError:errorCode];
+    }
 }
 
 - (BOOL)setup
@@ -301,11 +344,11 @@ AcceptSocketCallback(CFSocketRef, CFSocketCallBackType, CFDataRef, const void*, 
 								   htons(listenerPort),			// port. just for bt init
 								   0,							// txtLen
 								   NULL,						// txtRecord
-								   NULL,						// callBack
+								   ServiceRegisterCallback,		// callBack
 								   (void *)(self)				// context
 								   );
-			
-			//unfortunately, DNSServiceRegister never calls its callback.
+
+			//unfortunately, DNSServiceRegister never calls its callback,ServiceRegisterCallback
 			if (errorType != kDNSServiceErr_NoError)
 			{
 				NSString *failReason = nil;
@@ -805,6 +848,45 @@ AcceptSocketCallback(CFSocketRef, CFSocketCallBackType, CFDataRef, const void*, 
 	}	
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - DNS-SD callback response
+//------------------------------------------------------------------------------
+- (void)didNotRegisterWithError:(DNSServiceErrorType)errorCode
+{
+	[self shutdown];
+	
+	switch (errorCode)
+	{
+		case kDNSServiceErr_NameConflict:{
+			self.failureReason = NSLocalizedString(@"Duplicate Bonjour service name on your network", @"");
+			break;
+		}
+		case kDNSServiceErr_BadParam:{
+			self.failureReason = NSLocalizedString(@"Bonjour bad argument - please report bug.", @"");
+			break;
+		}
+		case kDNSServiceErr_Invalid:{
+			self.failureReason = NSLocalizedString(@"Bonjour invalid configuration - please report bug.", @"");
+			break;
+		}
+		default:{
+			self.failureReason = [NSString stringWithFormat:NSLocalizedString(@"Bonjour error %d", @""), errorCode];
+			break;
+		}
+	}
+
+	MTLog(@"service failed %@",self.failureReason);
+	failed = YES;
+	[self reportErrorToManager:[self status]];	
+}
+
+- (void)didRegisterWithDomain:(const char *)domain name:(const char *)name
+{
+	MTLog(@"service registration success domain[%s]  name[%s]",domain,name);
+	
+	ready = YES;
+	[self reportStatusToManager:[self status]];
+}
 @end
 
 static void

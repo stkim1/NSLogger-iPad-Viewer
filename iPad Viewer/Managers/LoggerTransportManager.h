@@ -52,6 +52,8 @@
 + (LoggerTransportManager *)sharedTransportManager;
 
 
+-(void)presentTransportStatus:(NSDictionary *)aStatusDict forKey:(NSString *)aKey;
+
 // presnet status of a transport to view layer
 - (void)presentTransportStatus:(NSDictionary *)aStatusDict;
 - (void)presentTransportError:(NSDictionary *)anErrorDict;

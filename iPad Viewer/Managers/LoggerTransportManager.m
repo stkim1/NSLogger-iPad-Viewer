@@ -216,6 +216,15 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 	}
 }
 
+-(void)presentTransportStatus:(NSDictionary *)aStatusDict
+					   forKey:(NSString *)aKey
+{
+	[self
+	 presentNotificationOnMainThread:
+		 @{kTransportNotificationKey:aKey
+		 ,kTransportNotificationUserInfo:aStatusDict}];
+}
+
 - (void)presentTransportStatus:(NSDictionary *)aStatusDict
 {
 	[self
