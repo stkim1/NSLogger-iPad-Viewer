@@ -40,7 +40,7 @@ There are three Bluetooth frameworks and one API publicly opened in iOS
 The one that is most clutter-free and provides best possible use case is, so far in my opinion, the last one. It requires no additional framework, library, and does not ask user to choose bluetooth connection. It simply finds the nearest possible service on Bluetooth interface and makes use of it.  
 
 
-##Screen Shots (13/04/27)
+##Screen Shots (13/05/09)
 ### How to run demo
 1. Run iPad Viewer with WiFi off and Bluetooth on.  
 2. Run iOS client with Bluetooth on. (It's up to use to leave WiFi or cellular on).      
@@ -101,4 +101,4 @@ Lucida Grande, Lucida Grande Copyright (c) 1997, 2000, Bigelow & Holmes Inc. U.S
 <a href="http://www.styleseven.com">Digital-7</a> Copyright (c) 2008, Sizenko Alexander, Style-7 All rights reserved.</pre>
 
 _VER. 0.4.0_<br/>
-_Updated : May 8, 2013_
+_Updated : May 9, 2013_
