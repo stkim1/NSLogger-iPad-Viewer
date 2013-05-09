@@ -59,7 +59,7 @@
 							</object>
 							<object class="IBUILabel" id="1066280092">
 								<reference key="NSNextResponder" ref="177517875"/>
-								<int key="NSvFlags">293</int>
+								<int key="NSvFlags">-2147483355</int>
 								<string key="NSFrame">{{295, 9}, {178, 30}}</string>
 								<reference key="NSSuperview" ref="177517875"/>
 								<reference key="NSWindow"/>
@@ -97,7 +97,7 @@
 							</object>
 							<object class="IBUIButton" id="875750775">
 								<reference key="NSNextResponder" ref="177517875"/>
-								<int key="NSvFlags">292</int>
+								<int key="NSvFlags">-2147483356</int>
 								<string key="NSFrame">{{7, 8}, {30, 31}}</string>
 								<reference key="NSSuperview" ref="177517875"/>
 								<reference key="NSWindow"/>
@@ -221,7 +221,7 @@
 					</object>
 					<object class="IBUISearchBar" id="38666845">
 						<reference key="NSNextResponder" ref="715708668"/>
-						<int key="NSvFlags">289</int>
+						<int key="NSvFlags">-2147483359</int>
 						<string key="NSFrame">{{576, 13}, {178, 44}}</string>
 						<reference key="NSSuperview" ref="715708668"/>
 						<reference key="NSWindow"/>
@@ -235,7 +235,7 @@
 					</object>
 					<object class="IBUILabel" id="903736730">
 						<reference key="NSNextResponder" ref="715708668"/>
-						<int key="NSvFlags">289</int>
+						<int key="NSvFlags">-2147483359</int>
 						<string key="NSFrame">{{576, 49}, {178, 18}}</string>
 						<reference key="NSSuperview" ref="715708668"/>
 						<reference key="NSWindow"/>
@@ -307,7 +307,7 @@
 						<int key="IBUIContentMode">4</int>
 						<bool key="IBUIUserInteractionEnabled">NO</bool>
 						<string key="targetRuntimeIdentifier">IBIPadFramework</string>
-						<string key="IBUIText">1:24:44</string>
+						<string key="IBUIText">0:00:00</string>
 						<reference key="IBUITextColor" ref="1002746971"/>
 						<nil key="IBUIHighlightedColor"/>
 						<int key="IBUIBaselineAdjustment">1</int>
@@ -337,7 +337,7 @@
 						<int key="IBUIContentMode">4</int>
 						<bool key="IBUIUserInteractionEnabled">NO</bool>
 						<string key="targetRuntimeIdentifier">IBIPadFramework</string>
-						<string key="IBUIText">Run 1 of 2</string>
+						<string key="IBUIText">Run 0 of 0</string>
 						<object class="NSColor" key="IBUITextColor">
 							<int key="NSColorSpace">3</int>
 							<bytes key="NSWhite">MC4zMzMzMzMzMzMzAA</bytes>
@@ -360,7 +360,7 @@
 					</object>
 					<object class="IBUIButton" id="1060178985">
 						<reference key="NSNextResponder" ref="715708668"/>
-						<int key="NSvFlags">292</int>
+						<int key="NSvFlags">-2147483356</int>
 						<string key="NSFrame">{{274, 30}, {20, 30}}</string>
 						<reference key="NSSuperview" ref="715708668"/>
 						<reference key="NSWindow"/>
@@ -385,7 +385,7 @@
 					</object>
 					<object class="IBUIButton" id="15728826">
 						<reference key="NSNextResponder" ref="715708668"/>
-						<int key="NSvFlags">292</int>
+						<int key="NSvFlags">-2147483356</int>
 						<string key="NSFrame">{{474, 30}, {20, 30}}</string>
 						<reference key="NSSuperview" ref="715708668"/>
 						<reference key="NSWindow"/>
@@ -605,11 +605,6 @@
 						<reference key="parent" ref="543366649"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">32</int>
-						<reference key="object" ref="875750775"/>
-						<reference key="parent" ref="177517875"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">33</int>
 						<reference key="object" ref="1066280092"/>
 						<reference key="parent" ref="177517875"/>
@@ -623,6 +618,11 @@
 						<int key="objectID">5</int>
 						<reference key="object" ref="584017180"/>
 						<reference key="parent" ref="543366649"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">32</int>
+						<reference key="object" ref="875750775"/>
+						<reference key="parent" ref="177517875"/>
 					</object>
 				</array>
 			</object>
@@ -688,17 +688,6 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">BaseViewController</string>
 					<string key="superclassName">UIViewController</string>
-					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">popFromParentViewController</string>
-						<string key="NS.object.0">id</string>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<string key="NS.key.0">popFromParentViewController</string>
-						<object class="IBActionInfo" key="NS.object.0">
-							<string key="name">popFromParentViewController</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">./Classes/BaseViewController.h</string>
@@ -723,17 +712,6 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">LoggerMessageViewController</string>
 					<string key="superclassName">BaseViewController</string>
-					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">deletePath:</string>
-						<string key="NS.object.0">id</string>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<string key="NS.key.0">deletePath:</string>
-						<object class="IBActionInfo" key="NS.object.0">
-							<string key="name">deletePath:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</object>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="runCountLabel">UILabel</string>
 						<string key="searchBar">UISearchBar</string>

@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		042DEB2A1716E9CD00088195 /* BaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 042DEB231716E9CD00088195 /* BaseViewController.m */; };
 		042DEB2B1716E9CD00088195 /* BaseViewKeyboardAddition.m in Sources */ = {isa = PBXBuildFile; fileRef = 042DEB261716E9CD00088195 /* BaseViewKeyboardAddition.m */; };
-		042DEB2C1716E9CD00088195 /* LoggerRootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 042DEB291716E9CD00088195 /* LoggerRootViewController.m */; };
 		042DEB381716EA2B00088195 /* KGNoise.m in Sources */ = {isa = PBXBuildFile; fileRef = 042DEB301716EA2B00088195 /* KGNoise.m */; };
 		042DEB391716EA2B00088195 /* license.txt in Resources */ = {isa = PBXBuildFile; fileRef = 042DEB311716EA2B00088195 /* license.txt */; };
 		042DEB3A1716EA2B00088195 /* readme.md in Resources */ = {isa = PBXBuildFile; fileRef = 042DEB321716EA2B00088195 /* readme.md */; };
@@ -60,27 +59,9 @@
 		048444BC16D29AA600FBAA6B /* LoggerDataWrite.m in Sources */ = {isa = PBXBuildFile; fileRef = 048444B416D29AA600FBAA6B /* LoggerDataWrite.m */; };
 		048444BD16D29AA600FBAA6B /* LoggerDataEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 048444B616D29AA600FBAA6B /* LoggerDataEntry.m */; };
 		048444BE16D29AA600FBAA6B /* LoggerDataStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 048444B816D29AA600FBAA6B /* LoggerDataStorage.m */; };
-		04A4EEDB1738001E00479F0E /* LoggerBaseCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A4EEC31738001E00479F0E /* LoggerBaseCell.m */; };
-		04A4EEDC1738001E00479F0E /* LoggerLicenseCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A4EEC61738001E00479F0E /* LoggerLicenseCell.m */; };
-		04A4EEDD1738001E00479F0E /* LoggerLicenseCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 04A4EEC71738001E00479F0E /* LoggerLicenseCell.xib */; };
-		04A4EEDE1738001E00479F0E /* LoggerNetworkBonjourCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A4EECA1738001E00479F0E /* LoggerNetworkBonjourCell.m */; };
-		04A4EEDF1738001E00479F0E /* LoggerNetworkBonjourCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 04A4EECB1738001E00479F0E /* LoggerNetworkBonjourCell.xib */; };
-		04A4EEE01738001E00479F0E /* LoggerNetworkDirectPortCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A4EECE1738001E00479F0E /* LoggerNetworkDirectPortCell.m */; };
-		04A4EEE11738001E00479F0E /* LoggerNetworkDirectPortCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 04A4EECF1738001E00479F0E /* LoggerNetworkDirectPortCell.xib */; };
-		04A4EEE21738001E00479F0E /* LoggerStatusCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A4EED21738001E00479F0E /* LoggerStatusCell.m */; };
-		04A4EEE31738001E00479F0E /* LoggerStatusCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 04A4EED31738001E00479F0E /* LoggerStatusCell.xib */; };
 		04A4EEE41738001E00479F0E /* LoggerClientInfoCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A4EED61738001E00479F0E /* LoggerClientInfoCell.m */; };
 		04A4EEE51738001E00479F0E /* LoggerMarkerCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A4EED81738001E00479F0E /* LoggerMarkerCell.m */; };
 		04A4EEE61738001E00479F0E /* LoggerMessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A4EEDA1738001E00479F0E /* LoggerMessageCell.m */; };
-		04A4EEFE1738002700479F0E /* LoggerBasePane.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A4EEEA1738002700479F0E /* LoggerBasePane.m */; };
-		04A4EEFF1738002700479F0E /* LoggerBasePane.xib in Resources */ = {isa = PBXBuildFile; fileRef = 04A4EEEB1738002700479F0E /* LoggerBasePane.xib */; };
-		04A4EF001738002700479F0E /* LoggerGeneralPane.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A4EEEE1738002700479F0E /* LoggerGeneralPane.m */; };
-		04A4EF011738002700479F0E /* LoggerLicensePane.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A4EEF11738002700479F0E /* LoggerLicensePane.m */; };
-		04A4EF021738002700479F0E /* LoggerPreferenceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A4EEF31738002700479F0E /* LoggerPreferenceViewController.m */; };
-		04A4EF031738002700479F0E /* LoggerPreferenceViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 04A4EEF41738002700479F0E /* LoggerPreferenceViewController.xib */; };
-		04A4EF041738002700479F0E /* LoggerNetworkPane.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A4EEF71738002700479F0E /* LoggerNetworkPane.m */; };
-		04A4EF051738002700479F0E /* LoggerRepoPane.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A4EEFA1738002700479F0E /* LoggerRepoPane.m */; };
-		04A4EF061738002700479F0E /* LoggerStatusPane.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A4EEFD1738002700479F0E /* LoggerStatusPane.m */; };
 		04A8844C17074A4100A64257 /* ICloudSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A8844B17074A4100A64257 /* ICloudSupport.m */; };
 		04D13F5116B56AF4004FDB3A /* LoggerNativeConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 04D13F4C16B56AF4004FDB3A /* LoggerNativeConnection.m */; };
 		04D13F5216B56AF4004FDB3A /* LoggerNativeMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 04D13F4E16B56AF4004FDB3A /* LoggerNativeMessage.m */; };
@@ -95,8 +76,6 @@
 		042DEB231716E9CD00088195 /* BaseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseViewController.m; sourceTree = "<group>"; };
 		042DEB251716E9CD00088195 /* BaseViewKeyboardAddition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseViewKeyboardAddition.h; sourceTree = "<group>"; };
 		042DEB261716E9CD00088195 /* BaseViewKeyboardAddition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseViewKeyboardAddition.m; sourceTree = "<group>"; };
-		042DEB281716E9CD00088195 /* LoggerRootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerRootViewController.h; sourceTree = "<group>"; };
-		042DEB291716E9CD00088195 /* LoggerRootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerRootViewController.m; sourceTree = "<group>"; };
 		042DEB2F1716EA2B00088195 /* KGNoise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KGNoise.h; sourceTree = "<group>"; };
 		042DEB301716EA2B00088195 /* KGNoise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KGNoise.m; sourceTree = "<group>"; };
 		042DEB311716EA2B00088195 /* license.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = license.txt; sourceTree = "<group>"; };
@@ -188,42 +167,12 @@
 		048444B616D29AA600FBAA6B /* LoggerDataEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerDataEntry.m; sourceTree = "<group>"; };
 		048444B716D29AA600FBAA6B /* LoggerDataStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerDataStorage.h; sourceTree = "<group>"; };
 		048444B816D29AA600FBAA6B /* LoggerDataStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerDataStorage.m; sourceTree = "<group>"; };
-		04A4EEC21738001E00479F0E /* LoggerBaseCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerBaseCell.h; sourceTree = "<group>"; };
-		04A4EEC31738001E00479F0E /* LoggerBaseCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerBaseCell.m; sourceTree = "<group>"; };
-		04A4EEC51738001E00479F0E /* LoggerLicenseCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerLicenseCell.h; sourceTree = "<group>"; };
-		04A4EEC61738001E00479F0E /* LoggerLicenseCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerLicenseCell.m; sourceTree = "<group>"; };
-		04A4EEC71738001E00479F0E /* LoggerLicenseCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LoggerLicenseCell.xib; sourceTree = "<group>"; };
-		04A4EEC91738001E00479F0E /* LoggerNetworkBonjourCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerNetworkBonjourCell.h; sourceTree = "<group>"; };
-		04A4EECA1738001E00479F0E /* LoggerNetworkBonjourCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerNetworkBonjourCell.m; sourceTree = "<group>"; };
-		04A4EECB1738001E00479F0E /* LoggerNetworkBonjourCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LoggerNetworkBonjourCell.xib; sourceTree = "<group>"; };
-		04A4EECD1738001E00479F0E /* LoggerNetworkDirectPortCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerNetworkDirectPortCell.h; sourceTree = "<group>"; };
-		04A4EECE1738001E00479F0E /* LoggerNetworkDirectPortCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerNetworkDirectPortCell.m; sourceTree = "<group>"; };
-		04A4EECF1738001E00479F0E /* LoggerNetworkDirectPortCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LoggerNetworkDirectPortCell.xib; sourceTree = "<group>"; };
-		04A4EED11738001E00479F0E /* LoggerStatusCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerStatusCell.h; sourceTree = "<group>"; };
-		04A4EED21738001E00479F0E /* LoggerStatusCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerStatusCell.m; sourceTree = "<group>"; };
-		04A4EED31738001E00479F0E /* LoggerStatusCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LoggerStatusCell.xib; sourceTree = "<group>"; };
 		04A4EED51738001E00479F0E /* LoggerClientInfoCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerClientInfoCell.h; sourceTree = "<group>"; };
 		04A4EED61738001E00479F0E /* LoggerClientInfoCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerClientInfoCell.m; sourceTree = "<group>"; };
 		04A4EED71738001E00479F0E /* LoggerMarkerCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerMarkerCell.h; sourceTree = "<group>"; };
 		04A4EED81738001E00479F0E /* LoggerMarkerCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerMarkerCell.m; sourceTree = "<group>"; };
 		04A4EED91738001E00479F0E /* LoggerMessageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerMessageCell.h; sourceTree = "<group>"; };
 		04A4EEDA1738001E00479F0E /* LoggerMessageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerMessageCell.m; sourceTree = "<group>"; };
-		04A4EEE91738002700479F0E /* LoggerBasePane.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerBasePane.h; sourceTree = "<group>"; };
-		04A4EEEA1738002700479F0E /* LoggerBasePane.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerBasePane.m; sourceTree = "<group>"; };
-		04A4EEEB1738002700479F0E /* LoggerBasePane.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LoggerBasePane.xib; sourceTree = "<group>"; };
-		04A4EEED1738002700479F0E /* LoggerGeneralPane.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerGeneralPane.h; sourceTree = "<group>"; };
-		04A4EEEE1738002700479F0E /* LoggerGeneralPane.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerGeneralPane.m; sourceTree = "<group>"; };
-		04A4EEF01738002700479F0E /* LoggerLicensePane.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerLicensePane.h; sourceTree = "<group>"; };
-		04A4EEF11738002700479F0E /* LoggerLicensePane.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerLicensePane.m; sourceTree = "<group>"; };
-		04A4EEF21738002700479F0E /* LoggerPreferenceViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerPreferenceViewController.h; sourceTree = "<group>"; };
-		04A4EEF31738002700479F0E /* LoggerPreferenceViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerPreferenceViewController.m; sourceTree = "<group>"; };
-		04A4EEF41738002700479F0E /* LoggerPreferenceViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LoggerPreferenceViewController.xib; sourceTree = "<group>"; };
-		04A4EEF61738002700479F0E /* LoggerNetworkPane.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerNetworkPane.h; sourceTree = "<group>"; };
-		04A4EEF71738002700479F0E /* LoggerNetworkPane.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerNetworkPane.m; sourceTree = "<group>"; };
-		04A4EEF91738002700479F0E /* LoggerRepoPane.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerRepoPane.h; sourceTree = "<group>"; };
-		04A4EEFA1738002700479F0E /* LoggerRepoPane.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerRepoPane.m; sourceTree = "<group>"; };
-		04A4EEFC1738002700479F0E /* LoggerStatusPane.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerStatusPane.h; sourceTree = "<group>"; };
-		04A4EEFD1738002700479F0E /* LoggerStatusPane.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerStatusPane.m; sourceTree = "<group>"; };
 		04A8844A17074A4100A64257 /* ICloudSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ICloudSupport.h; sourceTree = "<group>"; };
 		04A8844B17074A4100A64257 /* ICloudSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ICloudSupport.m; sourceTree = "<group>"; };
 		04D13F4B16B56AF4004FDB3A /* LoggerNativeConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerNativeConnection.h; sourceTree = "<group>"; };
@@ -260,7 +209,6 @@
 		040AD41B16ACF5F60072DFAD /* Views & Cells */ = {
 			isa = PBXGroup;
 			children = (
-				04A4EEC01738001E00479F0E /* PaneCell */,
 				04A4EED41738001E00479F0E /* MessageCell */,
 			);
 			path = "Views & Cells";
@@ -283,15 +231,6 @@
 				042DEB261716E9CD00088195 /* BaseViewKeyboardAddition.m */,
 			);
 			path = KeyboardAddition;
-			sourceTree = "<group>";
-		};
-		042DEB271716E9CD00088195 /* RootViewController */ = {
-			isa = PBXGroup;
-			children = (
-				042DEB281716E9CD00088195 /* LoggerRootViewController.h */,
-				042DEB291716E9CD00088195 /* LoggerRootViewController.m */,
-			);
-			path = RootViewController;
 			sourceTree = "<group>";
 		};
 		042DEB2D1716EA2B00088195 /* Vendors */ = {
@@ -541,9 +480,7 @@
 		044FEF8A16AC4A810067FA53 /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
-				04A4EEE71738002700479F0E /* PreferenceViewController */,
 				042DEB211716E9CD00088195 /* BaseViewController */,
-				042DEB271716E9CD00088195 /* RootViewController */,
 				044FEF8B16AC4A810067FA53 /* MessageViewController */,
 			);
 			path = ViewController;
@@ -586,67 +523,6 @@
 			path = DataOperation;
 			sourceTree = "<group>";
 		};
-		04A4EEC01738001E00479F0E /* PaneCell */ = {
-			isa = PBXGroup;
-			children = (
-				04A4EEC11738001E00479F0E /* BaseCell */,
-				04A4EEC41738001E00479F0E /* LicenseCell */,
-				04A4EEC81738001E00479F0E /* NetworkBonjourCell */,
-				04A4EECC1738001E00479F0E /* NetworkDirectPortCell */,
-				04A4EED01738001E00479F0E /* StatusCell */,
-			);
-			path = PaneCell;
-			sourceTree = "<group>";
-		};
-		04A4EEC11738001E00479F0E /* BaseCell */ = {
-			isa = PBXGroup;
-			children = (
-				04A4EEC21738001E00479F0E /* LoggerBaseCell.h */,
-				04A4EEC31738001E00479F0E /* LoggerBaseCell.m */,
-			);
-			path = BaseCell;
-			sourceTree = "<group>";
-		};
-		04A4EEC41738001E00479F0E /* LicenseCell */ = {
-			isa = PBXGroup;
-			children = (
-				04A4EEC51738001E00479F0E /* LoggerLicenseCell.h */,
-				04A4EEC61738001E00479F0E /* LoggerLicenseCell.m */,
-				04A4EEC71738001E00479F0E /* LoggerLicenseCell.xib */,
-			);
-			path = LicenseCell;
-			sourceTree = "<group>";
-		};
-		04A4EEC81738001E00479F0E /* NetworkBonjourCell */ = {
-			isa = PBXGroup;
-			children = (
-				04A4EEC91738001E00479F0E /* LoggerNetworkBonjourCell.h */,
-				04A4EECA1738001E00479F0E /* LoggerNetworkBonjourCell.m */,
-				04A4EECB1738001E00479F0E /* LoggerNetworkBonjourCell.xib */,
-			);
-			path = NetworkBonjourCell;
-			sourceTree = "<group>";
-		};
-		04A4EECC1738001E00479F0E /* NetworkDirectPortCell */ = {
-			isa = PBXGroup;
-			children = (
-				04A4EECD1738001E00479F0E /* LoggerNetworkDirectPortCell.h */,
-				04A4EECE1738001E00479F0E /* LoggerNetworkDirectPortCell.m */,
-				04A4EECF1738001E00479F0E /* LoggerNetworkDirectPortCell.xib */,
-			);
-			path = NetworkDirectPortCell;
-			sourceTree = "<group>";
-		};
-		04A4EED01738001E00479F0E /* StatusCell */ = {
-			isa = PBXGroup;
-			children = (
-				04A4EED11738001E00479F0E /* LoggerStatusCell.h */,
-				04A4EED21738001E00479F0E /* LoggerStatusCell.m */,
-				04A4EED31738001E00479F0E /* LoggerStatusCell.xib */,
-			);
-			path = StatusCell;
-			sourceTree = "<group>";
-		};
 		04A4EED41738001E00479F0E /* MessageCell */ = {
 			isa = PBXGroup;
 			children = (
@@ -658,77 +534,6 @@
 				04A4EEDA1738001E00479F0E /* LoggerMessageCell.m */,
 			);
 			path = MessageCell;
-			sourceTree = "<group>";
-		};
-		04A4EEE71738002700479F0E /* PreferenceViewController */ = {
-			isa = PBXGroup;
-			children = (
-				04A4EEF21738002700479F0E /* LoggerPreferenceViewController.h */,
-				04A4EEF31738002700479F0E /* LoggerPreferenceViewController.m */,
-				04A4EEF41738002700479F0E /* LoggerPreferenceViewController.xib */,
-				04A4EEE81738002700479F0E /* BasePane */,
-				04A4EEEC1738002700479F0E /* GeneralPane */,
-				04A4EEEF1738002700479F0E /* LicensePane */,
-				04A4EEF51738002700479F0E /* NetworkPane */,
-				04A4EEF81738002700479F0E /* RepositoryPane */,
-				04A4EEFB1738002700479F0E /* StatusPane */,
-			);
-			path = PreferenceViewController;
-			sourceTree = "<group>";
-		};
-		04A4EEE81738002700479F0E /* BasePane */ = {
-			isa = PBXGroup;
-			children = (
-				04A4EEE91738002700479F0E /* LoggerBasePane.h */,
-				04A4EEEA1738002700479F0E /* LoggerBasePane.m */,
-				04A4EEEB1738002700479F0E /* LoggerBasePane.xib */,
-			);
-			path = BasePane;
-			sourceTree = "<group>";
-		};
-		04A4EEEC1738002700479F0E /* GeneralPane */ = {
-			isa = PBXGroup;
-			children = (
-				04A4EEED1738002700479F0E /* LoggerGeneralPane.h */,
-				04A4EEEE1738002700479F0E /* LoggerGeneralPane.m */,
-			);
-			path = GeneralPane;
-			sourceTree = "<group>";
-		};
-		04A4EEEF1738002700479F0E /* LicensePane */ = {
-			isa = PBXGroup;
-			children = (
-				04A4EEF01738002700479F0E /* LoggerLicensePane.h */,
-				04A4EEF11738002700479F0E /* LoggerLicensePane.m */,
-			);
-			path = LicensePane;
-			sourceTree = "<group>";
-		};
-		04A4EEF51738002700479F0E /* NetworkPane */ = {
-			isa = PBXGroup;
-			children = (
-				04A4EEF61738002700479F0E /* LoggerNetworkPane.h */,
-				04A4EEF71738002700479F0E /* LoggerNetworkPane.m */,
-			);
-			path = NetworkPane;
-			sourceTree = "<group>";
-		};
-		04A4EEF81738002700479F0E /* RepositoryPane */ = {
-			isa = PBXGroup;
-			children = (
-				04A4EEF91738002700479F0E /* LoggerRepoPane.h */,
-				04A4EEFA1738002700479F0E /* LoggerRepoPane.m */,
-			);
-			path = RepositoryPane;
-			sourceTree = "<group>";
-		};
-		04A4EEFB1738002700479F0E /* StatusPane */ = {
-			isa = PBXGroup;
-			children = (
-				04A4EEFC1738002700479F0E /* LoggerStatusPane.h */,
-				04A4EEFD1738002700479F0E /* LoggerStatusPane.m */,
-			);
-			path = StatusPane;
 			sourceTree = "<group>";
 		};
 		04A8844917074A4100A64257 /* ICloud */ = {
@@ -815,12 +620,6 @@
 				042DEB3A1716EA2B00088195 /* readme.md in Resources */,
 				042DEB3C1716EA2B00088195 /* LICENSE in Resources */,
 				042DEB3D1716EA2B00088195 /* README.md in Resources */,
-				04A4EEDD1738001E00479F0E /* LoggerLicenseCell.xib in Resources */,
-				04A4EEDF1738001E00479F0E /* LoggerNetworkBonjourCell.xib in Resources */,
-				04A4EEE11738001E00479F0E /* LoggerNetworkDirectPortCell.xib in Resources */,
-				04A4EEE31738001E00479F0E /* LoggerStatusCell.xib in Resources */,
-				04A4EEFF1738002700479F0E /* LoggerBasePane.xib in Resources */,
-				04A4EF031738002700479F0E /* LoggerPreferenceViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -870,24 +669,11 @@
 				042F180E170E7D3A007ECDA4 /* LoggerMessageSize.m in Sources */,
 				042DEB2A1716E9CD00088195 /* BaseViewController.m in Sources */,
 				042DEB2B1716E9CD00088195 /* BaseViewKeyboardAddition.m in Sources */,
-				042DEB2C1716E9CD00088195 /* LoggerRootViewController.m in Sources */,
 				042DEB381716EA2B00088195 /* KGNoise.m in Sources */,
 				042DEB3B1716EA2B00088195 /* KLNoteViewController.m in Sources */,
-				04A4EEDB1738001E00479F0E /* LoggerBaseCell.m in Sources */,
-				04A4EEDC1738001E00479F0E /* LoggerLicenseCell.m in Sources */,
-				04A4EEDE1738001E00479F0E /* LoggerNetworkBonjourCell.m in Sources */,
-				04A4EEE01738001E00479F0E /* LoggerNetworkDirectPortCell.m in Sources */,
-				04A4EEE21738001E00479F0E /* LoggerStatusCell.m in Sources */,
 				04A4EEE41738001E00479F0E /* LoggerClientInfoCell.m in Sources */,
 				04A4EEE51738001E00479F0E /* LoggerMarkerCell.m in Sources */,
 				04A4EEE61738001E00479F0E /* LoggerMessageCell.m in Sources */,
-				04A4EEFE1738002700479F0E /* LoggerBasePane.m in Sources */,
-				04A4EF001738002700479F0E /* LoggerGeneralPane.m in Sources */,
-				04A4EF011738002700479F0E /* LoggerLicensePane.m in Sources */,
-				04A4EF021738002700479F0E /* LoggerPreferenceViewController.m in Sources */,
-				04A4EF041738002700479F0E /* LoggerNetworkPane.m in Sources */,
-				04A4EF051738002700479F0E /* LoggerRepoPane.m in Sources */,
-				04A4EF061738002700479F0E /* LoggerStatusPane.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

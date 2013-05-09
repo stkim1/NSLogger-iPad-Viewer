@@ -58,6 +58,24 @@
 	NSString *bufferPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"NSLoggerTempData_iOS.rawnsloggerdata"];
 	LoggerSetBufferFile(NULL, (CFStringRef)bufferPath);
 #endif
+	
+	
+	if(connecToBluetooth.on)
+	{
+		[browseBonjour setOn:NO];
+		[browseBonjour setEnabled:NO];
+
+		[browseLocalDomainOnly setOn:NO];
+		[browseLocalDomainOnly setEnabled:NO];
+	}
+	else
+	{
+		[browseBonjour setOn:YES];
+		[browseBonjour setEnabled:YES];
+		
+		[browseLocalDomainOnly setOn:NO];
+		[browseLocalDomainOnly setEnabled:YES];
+	}
 }
 
 - (IBAction)bonjourSettingChanged
@@ -83,6 +101,22 @@
 		port = MAX(0, MIN(port, 65535));
 		viewerPortField.text = [NSString stringWithFormat:@"%d", port];
 
+		
+		// some cosmetic change
+		if(connecToBluetooth.on)
+		{
+			[browseBonjour setOn:NO];
+			[browseBonjour setEnabled:NO];
+			[browseLocalDomainOnly setEnabled:NO];
+		}
+		else
+		{
+			[browseBonjour setOn:YES];
+			[browseBonjour setEnabled:YES];
+			[browseLocalDomainOnly setEnabled:YES];
+		}
+
+		// erase host names
 		if(connecToBluetooth.on)
 		{
 			LoggerSetViewerHost(NULL, NULL, 0);

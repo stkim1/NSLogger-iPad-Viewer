@@ -23,8 +23,8 @@ Stay tuned.
 2. [NSLogger viewer architecture](http://blog.colorfulglue.com/2013/02/nslogger-viewer-architecture/)
 
 ##Status
-As of today, I'll split two branches to maintain a release & development version.   
-A release (v 0.4 atm) would be highly limited in UI features, but you could capture logging traces.    
+As of today (May 9, 2013), I'll split two branches; release & development.   
+A release version (0.4 atm) would be highly limited in UI features. Its underlying logics are essentially the same as development version and you could capture logging traces.    
 
 
 ###Questions
@@ -51,7 +51,7 @@ The one that is most clutter-free and provides best possible use case is, so far
 <img width="320" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/iphone_13_04_27.png" />
 
 ###iPad Viwer 
-<img width="576" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ipad_13_04_27.png" />
+<img width="576" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ipad_13_05_09.png" />
 
 
 ##License
