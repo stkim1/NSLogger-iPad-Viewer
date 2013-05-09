@@ -48,7 +48,8 @@
 	viewerPortField.text = [ud stringForKey:@"port"];
 	browseBonjour.on = [ud boolForKey:@"browseBonjour"];
 	browseLocalDomainOnly.on = [ud boolForKey:@"localDomain"];
-
+	connecToBluetooth.on = [ud boolForKey:@"bluetooth"];
+	
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(textFieldDidChange:)
 												 name:UITextFieldTextDidChangeNotification
@@ -58,24 +59,7 @@
 	NSString *bufferPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"NSLoggerTempData_iOS.rawnsloggerdata"];
 	LoggerSetBufferFile(NULL, (CFStringRef)bufferPath);
 #endif
-	
-	
-	if(connecToBluetooth.on)
-	{
-		[browseBonjour setOn:NO];
-		[browseBonjour setEnabled:NO];
 
-		[browseLocalDomainOnly setOn:NO];
-		[browseLocalDomainOnly setEnabled:NO];
-	}
-	else
-	{
-		[browseBonjour setOn:YES];
-		[browseBonjour setEnabled:YES];
-		
-		[browseLocalDomainOnly setOn:NO];
-		[browseLocalDomainOnly setEnabled:YES];
-	}
 }
 
 - (IBAction)bonjourSettingChanged
@@ -91,6 +75,35 @@
 	[[NSUserDefaults standardUserDefaults] synchronize];
 }
 
+-(IBAction)connectBluetooth:(UISwitch *)bluetoothSwitch
+{
+	// some cosmetic change
+	if(bluetoothSwitch.on)
+	{
+		[browseBonjour setOn:NO];
+		[browseBonjour setEnabled:NO];
+		[browseLocalDomainOnly setEnabled:NO];
+	}
+	else
+	{
+		[browseBonjour setOn:YES];
+		[browseBonjour setEnabled:YES];
+		[browseLocalDomainOnly setEnabled:YES];
+	}
+
+	browseLocalDomainOnly.enabled = browseBonjour.on;
+	[[NSUserDefaults standardUserDefaults] setBool:browseBonjour.on forKey:@"browseBonjour"];
+	[[NSUserDefaults standardUserDefaults] synchronize];
+
+	[[NSUserDefaults standardUserDefaults] setBool:browseLocalDomainOnly.on forKey:@"localDomain"];
+	[[NSUserDefaults standardUserDefaults] synchronize];
+	
+	[[NSUserDefaults standardUserDefaults] setBool:connecToBluetooth.on forKey:@"bluetooth"];
+	[[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+
+
 - (IBAction)startStopSendingMessages
 {
 	if (sendTimer == nil)
@@ -100,21 +113,6 @@
 		int port = [viewerPortField.text integerValue];
 		port = MAX(0, MIN(port, 65535));
 		viewerPortField.text = [NSString stringWithFormat:@"%d", port];
-
-		
-		// some cosmetic change
-		if(connecToBluetooth.on)
-		{
-			[browseBonjour setOn:NO];
-			[browseBonjour setEnabled:NO];
-			[browseLocalDomainOnly setEnabled:NO];
-		}
-		else
-		{
-			[browseBonjour setOn:YES];
-			[browseBonjour setEnabled:YES];
-			[browseLocalDomainOnly setEnabled:YES];
-		}
 
 		// erase host names
 		if(connecToBluetooth.on)

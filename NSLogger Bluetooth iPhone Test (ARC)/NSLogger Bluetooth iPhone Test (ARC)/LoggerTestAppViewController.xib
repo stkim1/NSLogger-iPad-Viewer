@@ -601,12 +601,12 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
-						<string key="label">browseLocalDomainOnlySettingChanged</string>
+						<string key="label">connectBluetooth:</string>
 						<reference key="source" ref="187368582"/>
 						<reference key="destination" ref="372490531"/>
 						<int key="IBEventType">13</int>
 					</object>
-					<int key="connectionID">40</int>
+					<int key="connectionID">43</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -819,7 +819,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">42</int>
+			<int key="maxID">43</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -833,12 +833,14 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>bonjourSettingChanged</string>
 							<string>browseLocalDomainOnlySettingChanged</string>
+							<string>connectBluetooth:</string>
 							<string>startStopSendingMessages</string>
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>id</string>
 							<string>id</string>
+							<string>UISwitch</string>
 							<string>id</string>
 						</object>
 					</object>
@@ -848,6 +850,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>bonjourSettingChanged</string>
 							<string>browseLocalDomainOnlySettingChanged</string>
+							<string>connectBluetooth:</string>
 							<string>startStopSendingMessages</string>
 						</object>
 						<object class="NSArray" key="dict.values">
@@ -859,6 +862,10 @@
 							<object class="IBActionInfo">
 								<string key="name">browseLocalDomainOnlySettingChanged</string>
 								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">connectBluetooth:</string>
+								<string key="candidateClassName">UISwitch</string>
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">startStopSendingMessages</string>
@@ -952,10 +959,6 @@
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaTouchPlugin.iPhoneOS</string>
 			<integer value="528" key="NS.object.0"/>
-		</object>
-		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">
-			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaTouchPlugin.iPhoneOS</string>
-			<real value="1552" key="NS.object.0"/>
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDevelopmentDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaTouchPlugin.InterfaceBuilder3</string>
