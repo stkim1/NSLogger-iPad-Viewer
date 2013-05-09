@@ -264,7 +264,6 @@ UIColor *defaultTagAndLevelColor = nil;
 	time_t sec = tv.tv_sec;
 	struct tm *t = localtime(&sec);
 
-#warning CACHE_THIS_ITEM
 	NSString *timestampStr;
 	if (tv.tv_usec == 0)
 		timestampStr = [NSString stringWithFormat:@"%02d:%02d:%02d", t->tm_hour, t->tm_min, t->tm_sec];
@@ -277,7 +276,6 @@ UIColor *defaultTagAndLevelColor = nil;
 		timeDeltaStr = StringWithTimeDelta(&td);
 #endif
 	
-#warning CACHE_THIS_ITEM
 	CGSize bounds = [timestampStr
 					 sizeWithFont:displayDefaultFont
 					 forWidth:tr.size.width
@@ -615,7 +613,6 @@ UIColor *defaultTagAndLevelColor = nil;
 				   CGRectGetMinY(cellFrame) + MSG_CELL_TOP_PADDING,
 				   CGRectGetWidth(cellFrame) - (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING),
 				   CGRectGetHeight(cellFrame) - MSG_CELL_TOP_BOTTOM_PADDING);
-	CGFloat fileLineFunctionHeight = 0;
 		
 	[self drawMessageInRect:drawRect highlightedTextColor:nil];
 	

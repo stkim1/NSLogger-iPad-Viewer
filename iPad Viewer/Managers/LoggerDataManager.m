@@ -503,9 +503,7 @@ didEstablishConnection:(LoggerConnection *)theConnection
 				}
 
 				// runcount is 0-based 
-				lastRunCount = [[client connectionStatus] count];
-				
-#warning make sure you encounter no race condition. this is an unprotected value
+				lastRunCount = [[client connectionStatus] count];				
 				[theConnection setReconnectionCount:lastRunCount];
 
 				

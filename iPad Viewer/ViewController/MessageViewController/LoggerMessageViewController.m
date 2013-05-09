@@ -181,7 +181,6 @@
 		[NSEntityDescription
 		 entityForName:@"LoggerMessageData"
 		 inManagedObjectContext:[[self dataManager] messageDisplayContext]];
-#warning possible bug introduction. watchout
 	[request setShouldRefreshRefetchedObjects:NO];
 	[request setEntity:entity];
 	[request setFetchBatchSize:20];

@@ -362,7 +362,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 		for (NSString *key in _dataEntryCache)
 		{
 			LoggerDataEntry *entry = [_dataEntryCache objectForKey:key];
-			#warning cache policy should be revised!!!!
 			if([[entry dataOperations] count] == 0)
 			{
 				[purgeList addObject:key];
@@ -703,7 +702,6 @@ unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation
 	
 	[deleteOperation setDependencyCount:dependencyCount];
 
-	#warning we need to check if there is an op with same dir.
 	[[self operationPool] addObject:deleteOperation];
 
 	// if there is no dependency, try to dispatch the operation

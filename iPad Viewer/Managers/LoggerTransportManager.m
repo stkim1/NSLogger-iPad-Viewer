@@ -87,7 +87,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 			// we load server cert at this point to reduce any delay might happen later
 			// in transport object.
 			[aCertManager loadEncryptionCertificate:&error];
-#warning report error if you find a cert loading error
 			_certManager = aCertManager;
 		}
 		

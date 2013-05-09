@@ -82,7 +82,6 @@
 									 if(lead == NULL)
 									 {
 										 lead = data;
-#warning fix retain error
 										 dispatch_retain(lead);
 									 }
 									 else

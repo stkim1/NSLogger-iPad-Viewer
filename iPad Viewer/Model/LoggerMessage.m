@@ -541,7 +541,6 @@
 	gettimeofday(&timestamp, NULL);
 	type = LOGMSG_TYPE_DISCONNECT;
 
-#warning this is a dirty hack not to circulating around coredata save chain
 	sequence = INT_MAX-2;
 	message = NSLocalizedString(@"Client disconnected", @"");
 	contentsType = kMessageString;
