@@ -23,7 +23,9 @@ Stay tuned.
 2. [NSLogger viewer architecture](http://blog.colorfulglue.com/2013/02/nslogger-viewer-architecture/)
 
 ##Status
-UI (W.I.P.) : Multiple views to show connections to viewer  
+As of today, I'll split two branches to maintain a release & development version.   
+A release (v 0.4 atm) would be highly limited in UI features, but you could capture logging traces.    
+
 
 ###Questions
 Throw 'em at [@stkim1](http://twitter.com/stkim1)
