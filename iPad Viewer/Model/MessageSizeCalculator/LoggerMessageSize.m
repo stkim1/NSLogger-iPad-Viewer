@@ -175,7 +175,6 @@ NSString		*hintForLargeData = nil;
 			CGFloat ratio = fmaxf(1.0f, fmaxf(imgSize.width / sz.width, imgSize.height / (sz.height / 2.0f)));
 			sz.height = ceilf(imgSize.height / ratio);
 			
-			//MTLogVerify(@"---- image size %@ ---- cell size %@ --- ratio %5.2f",NSStringFromCGSize(imgSize),NSStringFromCGSize(sz),ratio);
 			break;
 		}
 		default:

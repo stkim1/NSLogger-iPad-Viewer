@@ -67,12 +67,12 @@
 
 		if (result == NO || error != nil)
 		{
-			MTLogVerify(@"Error excluding '%@' from backup. Error: %@",fileURL, error);
+			MTLog(@"Error excluding '%@' from backup. Error: %@",fileURL, error);
 			return NO;
 		}
 		else
 		{
-			MTLogVerify(@"Excluded '%@' from backup",fileURL);
+			MTLog(@"Excluded '%@' from backup",fileURL);
 			return YES;
 		}
 	}

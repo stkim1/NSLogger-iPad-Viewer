@@ -91,8 +91,6 @@
 
 -(void)dealloc
 {
-	//MTLogAssert(@"%@ dealloc : %@",NSStringFromClass([self class]),_path);
-
 	[_basepath release],_basepath = nil;
 	[_filepath release],_filepath = nil;
 	[_dirPartOfFilepath release],_dirPartOfFilepath = nil;

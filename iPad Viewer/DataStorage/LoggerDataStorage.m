@@ -291,7 +291,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 			}
 			else
 			{
-				MTLogAssert(@"this should never happen ! %@",aPath);
+				MTLog(@"this should never happen ! %@",aPath);
 				return;
 			}
 		}

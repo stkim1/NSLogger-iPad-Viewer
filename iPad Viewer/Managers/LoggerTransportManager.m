@@ -146,13 +146,12 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 
 -(void)destoryTransports
 {
-	MTLogInfo(@"%s",__PRETTY_FUNCTION__);	
+	[self stopTransports];
+	[self.transports removeAllObjects];
 }
 
 -(void)startTransports
 {
-	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
-	
 	// Start and stop transports as needed
 	for (LoggerNativeTransport *transport in self.transports)
 	{
@@ -164,9 +163,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 }
 
 -(void)stopTransports
-{
-	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
-	
+{	
 	// Start and stop transports as needed
 	for (LoggerNativeTransport *transport in self.transports)
 	{

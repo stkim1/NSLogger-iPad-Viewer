@@ -143,7 +143,6 @@ UIColor *defaultTagAndLevelColor = nil;
 
 -(void)dealloc
 {
-	MTLogVerify(@"%@ dealloc",self);
 	self.hostTableView = nil;
 	self.messageData = nil;
 	self.imageData = nil;

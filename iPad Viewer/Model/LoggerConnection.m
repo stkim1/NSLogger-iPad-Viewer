@@ -59,7 +59,7 @@ char sConnectionAssociatedObjectKey = 1;
 {
 	if ((self = [super init]) != nil)
 	{
-		messageProcessingQueue = dispatch_queue_create("com.florentpillet.nslogger.messageProcessingQueue", NULL);
+		messageProcessingQueue = dispatch_queue_create("com.florentpillet.nslogger.messageProcessingQueue", DISPATCH_QUEUE_SERIAL);
 		//parentIndexesStack = [[NSMutableArray alloc] init];
 	}
 	return self;
@@ -69,7 +69,7 @@ char sConnectionAssociatedObjectKey = 1;
 {
 	if ((self = [super init]) != nil)
 	{
-		messageProcessingQueue = dispatch_queue_create("com.florentpillet.nslogger.messageProcessingQueue", NULL);
+		messageProcessingQueue = dispatch_queue_create("com.florentpillet.nslogger.messageProcessingQueue", DISPATCH_QUEUE_SERIAL);
 		//parentIndexesStack = [[NSMutableArray alloc] init];
 		clientAddress = [anAddress copy];
 	}
@@ -217,9 +217,9 @@ char sConnectionAssociatedObjectKey = 1;
 		 */
 
 		/*
-		 stkim1_jan.19,2013
-		 I find this is a perfect spot to pre-calculate data to cache
-		 such as cell height, image size, text representation
+		 * stkim1_jan.19,2013
+		 * I find that this is a perfect place to pre-calculate data to cache
+		 * such as cell height, image size, text representation
 		 */
 
 		[msgs makeObjectsPerformSelector:@selector(formatMessage)];
@@ -229,12 +229,12 @@ char sConnectionAssociatedObjectKey = 1;
 							   ,@selector(connection:didReceiveMessages:range:)))
 		{
 			/*
-			 stkim1_jan.15,2013
-			 range is not really necessary since I got rid of 'message' array
-			 which stores LoggerMessages. Nonetheless, it will be here for 
-			 a while due to 'parentIndexesStack' above.
+			 * stkim1_jan.15,2013
+			 * range is not really necessary since I got rid of 'message' array
+			 * which stores LoggerMessages. Nonetheless, it will be here for
+			 * a while due to 'parentIndexesStack' above.
 			 */
-			
+
 			NSRange range;
 			range = NSMakeRange(0, [msgs count]);
 			[self.delegate connection:self didReceiveMessages:msgs range:range];
@@ -301,27 +301,4 @@ char sConnectionAssociatedObjectKey = 1;
 	//assert([NSThread isMainThread]);
 	return [NSString stringWithFormat:@"%@ @ %@", [self clientAppDescription], [self clientAddressDescription]];
 }
-
-#if 0
-- (NSString *)status
-{
-	// status is being observed by LoggerStatusWindowController and changes once
-	// when the connection gets disconnected
-	NSString *format;
-	if (connected)
-		format = NSLocalizedString(@"%@ connected", @"");
-	else
-		format = NSLocalizedString(@"%@ disconnected", @"");
-	if ([NSThread isMainThread])
-		return [NSString stringWithFormat:format, [self clientDescription]];
-
-	__block NSString *status;
-	
-#warning need to change this queue to transport manage queue
-	dispatch_sync(dispatch_get_main_queue(), ^{
-		status = [[NSString stringWithFormat:format, [self clientDescription]] retain];
-	});
-	return [status autorelease];
-}
-#endif
 @end

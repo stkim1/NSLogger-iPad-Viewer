@@ -39,26 +39,12 @@
  */
 
 #ifdef DEBUG
-	#define MTLogVerify(args...) NSLog(@"%@",[NSString stringWithFormat:args])
-	#define MTLogInfo(args...)   NSLog(@"%@",[NSString stringWithFormat:args])
-	#define MTLogDebug(args...)  NSLog(@"%@",[NSString stringWithFormat:args])
-	#define MTLogError(args...)  NSLog(@"%@",[NSString stringWithFormat:args])
-	#define MTLogAssert(args...) NSLog(@"%@",[NSString stringWithFormat:args])
-
 	#define MTLog(args...)       NSLog(@"%@",[NSString stringWithFormat:args])
-
 	#define MTAssert(cond,desc...)	\
 		NSAssert(cond, @"%@", [NSString stringWithFormat: desc])
-
 	#define MTDealloc(__POINTER) \
 		do{ MTLog(@"%@ dealloc",self); [super dealloc]; } while(0)
 #else
-
-	#define MTLogVerify(args...)
-	#define MTLogInfo(args...)
-	#define MTLogDebug(args...)
-	#define MTLogError(args...)
-	#define MTLogAssert(args...)
 	#define MTLog(args...)
 	#define MTAssert(cond,desc...)	assert(cond)
 	#define MTDealloc(__POINTER)	do { [super dealloc]; } while(0)

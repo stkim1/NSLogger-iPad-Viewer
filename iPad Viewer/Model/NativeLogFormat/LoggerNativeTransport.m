@@ -53,7 +53,6 @@
 static void
 AcceptSocketCallback(CFSocketRef, CFSocketCallBackType, CFDataRef, const void*, void*);
 
-
 @interface LoggerNativeTransport()
 static void
 ServiceRegisterCallback(DNSServiceRef,DNSServiceFlags,DNSServiceErrorType,const char*,const char*,const char*,void*);
@@ -172,10 +171,10 @@ ServiceRegisterCallback(DNSServiceRef,DNSServiceFlags,DNSServiceErrorType,const 
 - (BOOL)canDoSSL
 {
 	/*
-	 stkim1_dec.11,2012
-	 by the time transport object reaches this point server cert must be loaded
-	 and ready. If an error ever occured, it should have been reported.
-	 All we want atm is to know whether it's ok to go with SSL
+	 * stkim1_dec.11,2012
+	 * by the time transport object reaches this point encryption certificate 
+	 * must have been loaded and ready. If an error ever occured, it should 
+	 * have been reported. All we want is to know if it's ok to go with SSL
 	 */
 	return [self.certManager isEncryptionCertificateAvailable];
 }
@@ -439,13 +438,13 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
 	@catch (NSException * e)
 	{
 #ifdef DEBUG
-		MTLogAssert(@"listenerThread catched exception %@", e);
+		MTLog(@"listenerThread catched exception %@", e);
 #endif
 	}
 	@finally
 	{
 #ifdef DEBUG
-		MTLogInfo(@"Exiting listenerThread for transport %@", description);
+		MTLog(@"Exiting listenerThread for transport %@", description);
 #endif
 		[pool release];
 		listenerThread = nil;
@@ -831,7 +830,7 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
 	}
 	@catch (NSException * e)
 	{
-		MTLogAssert(@"error happens : %@",[e reason]);
+		MTLog(@"error happens : %@",[e reason]);
 	}
 	@finally
 	{
@@ -963,7 +962,7 @@ AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CFDataRef addr
 	@catch (NSException * e)
 	{
 #ifdef DEBUG
-		MTLogAssert(@"LoggerNativeTransport %p: exception catched in AcceptSocketCallback: %@", info, e);
+		MTLog(@"LoggerNativeTransport %p: exception catched in AcceptSocketCallback: %@", info, e);
 #endif
 	}
 	@finally

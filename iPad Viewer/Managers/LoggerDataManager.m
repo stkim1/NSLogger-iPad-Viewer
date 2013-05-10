@@ -503,7 +503,9 @@ didEstablishConnection:(LoggerConnection *)theConnection
 				}
 
 				// runcount is 0-based 
-				lastRunCount = [[client connectionStatus] count];				
+				lastRunCount = [[client connectionStatus] count];
+				
+				// @@@ TODO: we should avoid set a client's run count in a connection 
 				[theConnection setReconnectionCount:lastRunCount];
 
 				MTLog(@"%s (%lx)[%d]",__PRETTY_FUNCTION__,theConnection.clientHash, theConnection.reconnectionCount);
@@ -613,6 +615,8 @@ didReceiveMessages:(NSArray *)theMessages
 
 					//run count of the connection
 					[messageData setClientHash:		[NSNumber numberWithUnsignedLong:[theConnection clientHash]]];
+
+					// @@@ TODO: find a way to retrieve client run count from LoggerClientData
 					[messageData setRunCount:		[NSNumber numberWithInt:[theConnection reconnectionCount]]];
 
 					[messageData setTimestamp:		[NSNumber numberWithUnsignedLongLong:tm64]];
