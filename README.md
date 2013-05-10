@@ -40,17 +40,16 @@ There are three Bluetooth frameworks and one API publicly opened in iOS
 The one that is most clutter-free and provides best possible use case is, so far in my opinion, the last one. It requires no additional framework, library, and does not ask user to choose bluetooth connection. It simply finds the nearest possible service on Bluetooth interface and makes use of it.  
 
 
-##Screen Shots (13/05/09)
+##Screen Shots 
 ### How to run demo
 1. Run iPad Viewer with WiFi off and Bluetooth on.  
 2. Run iOS client with Bluetooth on. (It's up to use to leave WiFi or cellular on).      
 3. Start logging. Look at the Bluetooth mark on top right corner. :)  
 
-
-### iPhone Client
+### iPhone Client (13/04/27)
 <img width="320" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/iphone_13_04_27.png" />
 
-###iPad Viwer 
+###iPad Viwer (13/05/09)
 <img width="576" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ipad_13_05_09.png" />
 
 
