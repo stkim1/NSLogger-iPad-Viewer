@@ -13,7 +13,7 @@ iPad 2 / iPad mini or higher
 You will see them at [the main repository](https://github.com/fpillet/NSLogger). All pull requests and issues are only accepted from there.  
 
 ##Status
-As of today (May 9, 2013), I'll split two branches; release & development.   
+As of today (May 9, 2013), I split the repo into two branches; release & development.   
 A release version of 0.4 would be highly limited in terms of UI. Nontheless, its underlying logics are essentially the same as the development version and you could capture logging traces with WiFi/Bluetooth connection.    
 
 ###Questions
