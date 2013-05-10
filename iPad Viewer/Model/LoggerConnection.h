@@ -129,10 +129,6 @@ didDisconnectWithMessage:(LoggerMessage *)theMessage;
 - (NSString *)clientAddressDescription;
 - (NSString *)clientDescription;
 
-#ifdef CHECK_DUPLICATED_CONNECTION
-- (BOOL)isNewRunOfClient:(LoggerConnection *)aConnection;
-#endif
-
 @end
 
 extern char sConnectionAssociatedObjectKey;

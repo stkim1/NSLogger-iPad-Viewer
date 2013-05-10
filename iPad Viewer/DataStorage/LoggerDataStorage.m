@@ -212,37 +212,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 	return self;
 }
 
-#ifdef NO_SINGLETONE_DATASTORAGE
--(void)dealloc
-{
-	
-	// need to dealloc arrays
-	dispatch_sync(_highPriorityOperationQueue, ^{
-		[_dataEntryCache removeAllObjects],[_dataEntryCache release],_dataEntryCache = nil;
-		[_basepath release],_basepath = nil;
-		
-		[_operationPool removeAllObjects];
-		[_operationPool release];
-		_operationPool = nil;
-		
-		[_readOperationSlot removeAllObjects];
-		[_readOperationSlot release];
-		_readOperationSlot = nil;
-		
-		[_writeOperationSlot removeAllObjects];
-		[_writeOperationSlot release];
-		_writeOperationSlot = nil;
-	});
-	
-	dispatch_release(_lowPriorityOperationQueue),_lowPriorityOperationQueue = NULL;
-    dispatch_release(_highPriorityOperationQueue),_highPriorityOperationQueue = NULL;
-	dispatch_release(_operationDispatcherQueue),_operationDispatcherQueue = NULL;
-	
-	[super dealloc];
-	
-}
-#endif
-
 //------------------------------------------------------------------------------
 #pragma mark - App life cycle handlers
 //------------------------------------------------------------------------------
