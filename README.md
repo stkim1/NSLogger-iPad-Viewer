@@ -1,51 +1,30 @@
 #NSLogger-iPad-Viewer
 
+Derived from [Florent Pillet's NSLogger](https://github.com/fpillet/NSLogger), NSLogger iPad Viewer is an in-field logging tool to monitor your mobile application's behavior in unfabricated, real-world environments. NSLogger iPad Viewer makes use of Bluetooth connection to transmit an application's logging traces.
 
-NSLogger viewer app on iPad  
-
-Derived from [Florent Pillet's NSLogger](https://github.com/fpillet/NSLogger), NSLogger iPad is an in-field logging tool to monitor your mobile application's behavior in unfabricated, real-world environments. NSLogger-iPad-Viewer makes use of Bluetooth connection to transmit an application's logging traces.
-
-This is extremely useful to monitor how your application behaves on cellular network, handles GPS data, and/or, treats frequent data exchange with backend outside of your office.
+This is extremely useful to monitor how your application behaves on cellular network, handles GPS data, and/or, treats frequent data exchange with backend.
 
 ##Minimum Requirements
-iOS 5.1 and upward<br/>
-iPad 2 or iPad mini<br/>
+iOS 5.1 and upward  
+iPad 2 / iPad mini or higher  
 <sup>*</sup>iCloud not supported.
 
 ##Documents, Example, and/or Wiki
-As soon as ver 1.0 comes out, iPad viewer will go to [the main repository](https://github.com/fpillet/NSLogger) with documents.<br/>
-All pull requests and issues will only be accepted through there.<br/>
-Stay tuned.
-
-####Meanwhile, if you're interested…
-1. [Caught at the scene
-](http://blog.colorfulglue.com/2012/12/caught-at-the-scene/)
-2. [NSLogger viewer architecture](http://blog.colorfulglue.com/2013/02/nslogger-viewer-architecture/)
+You will see them at [the main repository](https://github.com/fpillet/NSLogger). All pull requests and issues are only accepted from there.  
 
 ##Status
 As of today (May 9, 2013), I'll split two branches; release & development.   
-A release version (0.4 atm) would be highly limited in UI features. Its underlying logics are essentially the same as development version and you could capture logging traces.    
-
+A release version of 0.4 would be highly limited in terms of UI. Nontheless, its underlying logics are essentially the same as the development version and you could capture logging traces with WiFi/Bluetooth connection.    
 
 ###Questions
 Throw 'em at [@stkim1](http://twitter.com/stkim1)
 
-## Bluetooth Connection
-There are three Bluetooth frameworks and one API publicly opened in iOS  
-1. [CoreBluetooth](http://developer.apple.com/library/ios/#documentation/CoreBluetooth/Reference/CoreBluetooth_Framework/_index.html)  
-2. [External Accessary](http://developer.apple.com/library/ios/#documentation/ExternalAccessory/Reference/ExternalAccessoryFrameworkReference/_index.ht]ml)  
-3. [GameKit](http://developer.apple.com/library/ios/#documentation/GameKit/Reference/GameKit_Collection/_index.html)  
-4. [Bonjour over Bluetooth (DNS-SD)](http://developer.apple.com/library/ios/#qa/qa1753/_index.html#//apple_ref/doc/uid/DTS40011315)  
-
-The one that is most clutter-free and provides best possible use case is, so far in my opinion, the last one. It requires no additional framework, library, and does not ask user to choose bluetooth connection. It simply finds the nearest possible service on Bluetooth interface and makes use of it.  
-
-
-##Screen Shots 
-### How to run demo
+## How to run demo
 1. Run iPad Viewer with WiFi off and Bluetooth on.  
 2. Run iOS client with Bluetooth on. (It's up to use to leave WiFi or cellular on).      
 3. Start logging. Look at the Bluetooth mark on top right corner. :)  
 
+##Screen Shots 
 ### iPhone Client (13/04/27)
 <img width="320" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/iphone_13_04_27.png" />
 
