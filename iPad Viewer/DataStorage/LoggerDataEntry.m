@@ -120,8 +120,6 @@ _split_dir_only(char** p, const char *pf)
 
 -(void)dealloc
 {
-	MTLogError(@"%@ dealloc : [%p] %@",NSStringFromClass([self class]),self,_filepath);
-	
 	[_filepath release],_filepath = nil;
 
 	if(_dirOfFilepath != nil)

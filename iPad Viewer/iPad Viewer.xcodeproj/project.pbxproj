@@ -12,9 +12,6 @@
 		042DEB381716EA2B00088195 /* KGNoise.m in Sources */ = {isa = PBXBuildFile; fileRef = 042DEB301716EA2B00088195 /* KGNoise.m */; };
 		042DEB391716EA2B00088195 /* license.txt in Resources */ = {isa = PBXBuildFile; fileRef = 042DEB311716EA2B00088195 /* license.txt */; };
 		042DEB3A1716EA2B00088195 /* readme.md in Resources */ = {isa = PBXBuildFile; fileRef = 042DEB321716EA2B00088195 /* readme.md */; };
-		042DEB3B1716EA2B00088195 /* KLNoteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 042DEB351716EA2B00088195 /* KLNoteViewController.m */; };
-		042DEB3C1716EA2B00088195 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 042DEB361716EA2B00088195 /* LICENSE */; };
-		042DEB3D1716EA2B00088195 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 042DEB371716EA2B00088195 /* README.md */; };
 		042F180B170E7D3A007ECDA4 /* LoggerMessageFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 042F1803170E7D3A007ECDA4 /* LoggerMessageFormatter.m */; };
 		042F180C170E7D3A007ECDA4 /* LoggerClientSize.m in Sources */ = {isa = PBXBuildFile; fileRef = 042F1806170E7D3A007ECDA4 /* LoggerClientSize.m */; };
 		042F180D170E7D3A007ECDA4 /* LoggerMarkerSize.m in Sources */ = {isa = PBXBuildFile; fileRef = 042F1808170E7D3A007ECDA4 /* LoggerMarkerSize.m */; };
@@ -80,10 +77,6 @@
 		042DEB301716EA2B00088195 /* KGNoise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KGNoise.m; sourceTree = "<group>"; };
 		042DEB311716EA2B00088195 /* license.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = license.txt; sourceTree = "<group>"; };
 		042DEB321716EA2B00088195 /* readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = readme.md; sourceTree = "<group>"; };
-		042DEB341716EA2B00088195 /* KLNoteViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KLNoteViewController.h; sourceTree = "<group>"; };
-		042DEB351716EA2B00088195 /* KLNoteViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KLNoteViewController.m; sourceTree = "<group>"; };
-		042DEB361716EA2B00088195 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
-		042DEB371716EA2B00088195 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 		042F1802170E7D3A007ECDA4 /* LoggerMessageFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerMessageFormatter.h; sourceTree = "<group>"; };
 		042F1803170E7D3A007ECDA4 /* LoggerMessageFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerMessageFormatter.m; sourceTree = "<group>"; };
 		042F1805170E7D3A007ECDA4 /* LoggerClientSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerClientSize.h; sourceTree = "<group>"; };
@@ -237,7 +230,6 @@
 			isa = PBXGroup;
 			children = (
 				042DEB2E1716EA2B00088195 /* KGNoise */,
-				042DEB331716EA2B00088195 /* KLNoteViewController */,
 			);
 			path = Vendors;
 			sourceTree = "<group>";
@@ -251,17 +243,6 @@
 				042DEB321716EA2B00088195 /* readme.md */,
 			);
 			path = KGNoise;
-			sourceTree = "<group>";
-		};
-		042DEB331716EA2B00088195 /* KLNoteViewController */ = {
-			isa = PBXGroup;
-			children = (
-				042DEB341716EA2B00088195 /* KLNoteViewController.h */,
-				042DEB351716EA2B00088195 /* KLNoteViewController.m */,
-				042DEB361716EA2B00088195 /* LICENSE */,
-				042DEB371716EA2B00088195 /* README.md */,
-			);
-			path = KLNoteViewController;
 			sourceTree = "<group>";
 		};
 		042F1801170E7D3A007ECDA4 /* MessageFormatter */ = {
@@ -618,8 +599,6 @@
 				044FEFB916AC4B7A0067FA53 /* MainWindow.xib in Resources */,
 				042DEB391716EA2B00088195 /* license.txt in Resources */,
 				042DEB3A1716EA2B00088195 /* readme.md in Resources */,
-				042DEB3C1716EA2B00088195 /* LICENSE in Resources */,
-				042DEB3D1716EA2B00088195 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -670,7 +649,6 @@
 				042DEB2A1716E9CD00088195 /* BaseViewController.m in Sources */,
 				042DEB2B1716E9CD00088195 /* BaseViewKeyboardAddition.m in Sources */,
 				042DEB381716EA2B00088195 /* KGNoise.m in Sources */,
-				042DEB3B1716EA2B00088195 /* KLNoteViewController.m in Sources */,
 				04A4EEE41738001E00479F0E /* LoggerClientInfoCell.m in Sources */,
 				04A4EEE51738001E00479F0E /* LoggerMarkerCell.m in Sources */,
 				04A4EEE61738001E00479F0E /* LoggerMessageCell.m in Sources */,

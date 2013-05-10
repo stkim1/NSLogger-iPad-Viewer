@@ -83,11 +83,15 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 		{
 			NSError *error = nil;
 			LoggerCertManager *aCertManager = [[LoggerCertManager alloc] init];
+			_certManager = aCertManager;
 			
 			// we load server cert at this point to reduce any delay might happen later
 			// in transport object.
-			[aCertManager loadEncryptionCertificate:&error];
-			_certManager = aCertManager;
+			if(![aCertManager loadEncryptionCertificate:&error])
+			{
+				// @@@ TODO: do something when error is not nil;
+				NSLog(@"Certification loading error. SSL connection will not be available.\n\n %@",error);
+			}
 		}
 		
 		if(_transports == nil)

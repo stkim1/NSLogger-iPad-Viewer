@@ -61,10 +61,9 @@ NSString *StringWithTimeDelta(struct timeval *td)
 	return [NSString stringWithFormat:@"+%d.%03dms", td->tv_usec / 1000, td->tv_usec % 1000];
 }
 
-//#define RECREATE_COLOR_WITH_COLORSPACE
+
 CGColorRef CreateCGColorFromUIColor(UIColor * color)
 {
-#if RECREATE_COLOR_WITH_COLORSPACE
     CGFloat colorComponent[4] = {0.f, 0.f, 0.f, 0.f};
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     CGColorRef colorRef = NULL;
@@ -79,11 +78,8 @@ CGColorRef CreateCGColorFromUIColor(UIColor * color)
     CGColorSpaceRelease(colorSpace);
 
     return colorRef;
-#else
-    return [color CGColor];
-#endif
-
 }
+
 void MakeRoundedPath(CGContextRef ctx, CGRect r, CGFloat radius)
 {
 	CGContextBeginPath(ctx);

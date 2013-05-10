@@ -315,8 +315,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 		{
 			if([entry data] != nil)
 			{
-				MTLogVerify(@"[READ] Cache Found %@ success YES",aPath);
-				
 				NSData *cachedData = [entry data];
 				aResultHandler(cachedData);
 				
@@ -328,8 +326,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 				return;
 			}
 		}
-
-		//MTLogError(@"[READ] Cache NOT Found %@",aPath);
 
 		// cannot find an entry from cache. find it from file system
 		dispatch_async([self highPriorityOperationQueue], ^{
@@ -352,7 +348,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataStorage,sharedDataStorage
 
 -(void)_purgeDataEntryCache
 {
-	MTLogAssert(@"--- CACHE PURGING---");
 	dispatch_async([self lowPriorityOperationQueue], ^{
 		NSMutableArray *purgeList = \
 			[[NSMutableArray alloc] initWithCapacity:0];
@@ -450,8 +445,6 @@ unsigned int _write_dependency_count(NSArray *pool, LoggerDataWrite *operation)
 		}];
 
 	}
-
-	MTLogVerify(@"total write dependency count %u",dependencies);
 	
 	return dependencies;
 }
@@ -480,18 +473,7 @@ unsigned int _write_dependency_count(NSArray *pool, LoggerDataWrite *operation)
 		 dirPartOfFilepath:[dataEntry dirOfFilepath]
 		 callback_queue:[self highPriorityOperationQueue]
 		 callback:^(LoggerDataOperation *dataOperation, int error, NSData *data) {
-			 MTLogInfo(@"%@ success %@ error %d",[dataEntry filepath],(!error?@"YES":@"NO"),error);
 
-#ifdef HANDLE_WRITING_FAILURE
-			 // handle success
-			 if(error == 0)
-			 {
-			 }
-			 // handle error here
-			 else
-			 {
-			 }
-#endif
 			 [[dataEntry dataOperations] removeObject:dataOperation];
 
 			 // remove data type data entry from cache immediately after saved
@@ -562,8 +544,6 @@ unsigned int _read_dependency_count(NSArray *pool, LoggerDataRead *operation)
 		 }];
 		
 	}
-
-	MTLogVerify(@"total read dependency count %u",dependencies);
 	
 	return dependencies;
 }
@@ -589,7 +569,7 @@ unsigned int _read_dependency_count(NSArray *pool, LoggerDataRead *operation)
 		 dirOfFilepath:[dataEntry dirOfFilepath]
 		 callback_queue:[self highPriorityOperationQueue]
 		 callback:^(LoggerDataOperation *dataOperation, int error, NSData *data) {
-			MTLogInfo(@"[READ] File read %@ success %@ error %d",aFilepath,(!error?@"YES":@"NO"),error);
+			 
 			if(error == 0)
 			{
 				// retain accesed data
@@ -605,7 +585,6 @@ unsigned int _read_dependency_count(NSArray *pool, LoggerDataRead *operation)
 			else
 			{
 				// if read operation fails, remove datacache
-				MTLogError(@"read file error. remove data cache");
 				aResultHandler(nil);
 				[self _uncacheDataEntryForKey:aFilepath];
 			}
@@ -660,8 +639,6 @@ unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation
 			 }
 		 }];
 	}
-
-	MTLogVerify(@"total DELETE dependencies %d",dependencies);
 	
 	return dependencies;
 }
@@ -679,19 +656,6 @@ unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation
 		 dirOfFilepath:aDirPath
 		 callback_queue:[self highPriorityOperationQueue]
 		 callback:^(LoggerDataOperation *dataOperation, int error, NSData *data) {
-
-			 MTLogVerify(@"DataManager Delete %@ success %@ error %d"
-						,[dataOperation dirPartOfFilepath]
-						,(!error?@"YES":@"NO"),error);
-
-			 if(error == 0)
-			 {
-				 // handle success
-			 }
-			 else
-			 {
-				 // handle error here
-			 }
 			 
 			 [self _dequeueOperation:dataOperation];
  
@@ -755,8 +719,6 @@ unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation
 						unsigned int dependency = [dataOp dependencyCount];
 						dependency--;
 						[dataOp setDependencyCount:dependency];
-						
-						MTLogVerify(@"%@ dependency reduction %d",NSStringFromClass([dataOp class]),dependency);
 					}
 				}
 				else
@@ -766,8 +728,6 @@ unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation
 						unsigned int dependency = [dataOp dependencyCount];
 						dependency--;
 						[dataOp setDependencyCount:dependency];
-
-						MTLogVerify(@"%@ dependency reduction %d",NSStringFromClass([dataOp class]),dependency);
 					}
 				}
 			}
@@ -789,8 +749,6 @@ unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation
 
 	// now operation is done with its job. release it
 	[anOperation release];
-	
-	MTLogVerify(@"------------------ OPERATION POOL SIZE %u ------------------",[[self operationPool] count]);
 	
 	// if there is no dependency and read|write op slot is available,
 	// execute the next operation
@@ -817,9 +775,6 @@ unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation
 			[[self readOperationSlot] addObject:anOperation];
 			[anOperation setExecuting:YES];
 			[anOperation executeOnQueue:[self operationDispatcherQueue]];
-			MTLogInfo(@"[READ] en-slot<%d>\n(%@)"
-					  ,[[self readOperationSlot] count]
-					  ,[anOperation absTargetFilePath]);
 		}
 	}
 	else
@@ -829,9 +784,6 @@ unsigned int _delete_dependency_count(NSArray *pool, LoggerDataDelete *operation
 			[[self writeOperationSlot] addObject:anOperation];
 			[anOperation setExecuting:YES];
 			[anOperation executeOnQueue:[self operationDispatcherQueue]];
-			MTLogInfo(@"[WRITE] en-slot<%d>\n(%@)"
-					  ,[[self writeOperationSlot] count]
-					  ,[anOperation absTargetFilePath]);
 		}
 	}
 }

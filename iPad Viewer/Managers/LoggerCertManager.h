@@ -41,14 +41,8 @@
 
 #import <Foundation/Foundation.h>
 
-typedef enum {
-    kCredentialImportStatusCancelled,
-    kCredentialImportStatusFailed,
-    kCredentialImportStatusSucceeded
-} CredentialImportStatus;
-
 @interface LoggerCertManager : NSObject
-@property (nonatomic, readonly) CFArrayRef serverCerts;
-@property (nonatomic, readonly) BOOL serverCertsLoadAttempted;
-- (BOOL)loadEncryptionCertificate:(NSError **)outError;
+@property (nonatomic, readonly) __attribute__((NSObject)) CFArrayRef serverCerts;
+- (BOOL)loadEncryptionCertificate:(NSError **)aLoadingError;
+- (BOOL)isEncryptionCertificateAvailable;
 @end

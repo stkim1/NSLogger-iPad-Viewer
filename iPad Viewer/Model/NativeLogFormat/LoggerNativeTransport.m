@@ -177,8 +177,7 @@ ServiceRegisterCallback(DNSServiceRef,DNSServiceFlags,DNSServiceErrorType,const 
 	 and ready. If an error ever occured, it should have been reported.
 	 All we want atm is to know whether it's ok to go with SSL
 	 */
-	NSError *loadingError = nil;
-	return [self.certManager loadEncryptionCertificate:&loadingError];
+	return [self.certManager isEncryptionCertificateAvailable];
 }
 
 static void
@@ -222,7 +221,6 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
 
 - (BOOL)setup
 {
-	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
 	int yes = 1;
 	DNSServiceErrorType errorType	= kDNSServiceErr_NoError;
 
@@ -410,8 +408,6 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
 
 - (void)startListening
 {
-	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
-	
 	listenerThread = [NSThread currentThread];
 	[[listenerThread threadDictionary] setObject:[NSRunLoop currentRunLoop] forKey:@"runLoop"];
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -476,8 +472,6 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
 //------------------------------------------------------------------------------
 - (void)restart
 {
-	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
-
 	if (active)
 	{
 		// Check whether we need to actually restart the service if the settings have changed
@@ -519,7 +513,6 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
 
 - (void)startup
 {
-	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
 	if (!active)
 	{
 		active = YES;
@@ -543,7 +536,6 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
 
 - (void)completeRestart
 {
-	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
 	if (active)
 	{
 		// wait for the service to be completely shut down, then restart it
@@ -585,7 +577,6 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
 
 - (void)shutdown
 {
-	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
 	if (!active)
 		return;
 

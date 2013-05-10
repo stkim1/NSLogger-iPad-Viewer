@@ -506,8 +506,7 @@ didEstablishConnection:(LoggerConnection *)theConnection
 				lastRunCount = [[client connectionStatus] count];				
 				[theConnection setReconnectionCount:lastRunCount];
 
-				
-MTLog(@"transport:didEstablishConnection: (%lx)[%d]",theConnection.clientHash, theConnection.reconnectionCount);
+				MTLog(@"%s (%lx)[%d]",__PRETTY_FUNCTION__,theConnection.clientHash, theConnection.reconnectionCount);
 				
 				LoggerConnectionStatusData *status = \
 					[NSEntityDescription

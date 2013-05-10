@@ -42,6 +42,12 @@
 #import "LoggerCertManager.h"
 #import <Security/SecItem.h>
 
+typedef enum {
+    kCredentialImportStatusCancelled,
+    kCredentialImportStatusFailed,
+    kCredentialImportStatusSucceeded
+} CredentialImportStatus;
+
 @interface LoggerCertManager()
 @property (nonatomic, retain) NSError *errorLoadingCert;
 - (CFArrayRef)_loadIdentityFromKeyChain:(NSString*)inStrCertPath
@@ -52,11 +58,10 @@
 {
 	NSError			*_errorLoadingCert;
     CFArrayRef		_serverCerts;
-	BOOL			_serverCertsLoadAttempted;
+	BOOL			_certsLoadAttempted;
 }
 @synthesize errorLoadingCert = _errorLoadingCert;
 @synthesize serverCerts = _serverCerts;
-@synthesize serverCertsLoadAttempted = _serverCertsLoadAttempted;
 
 static const UInt8 kKeychainCertificateID[] = "NSLogger SSL\0";
 
@@ -65,8 +70,9 @@ static const UInt8 kKeychainCertificateID[] = "NSLogger SSL\0";
 	self = [super init];
 	if(self)
 	{
+		_errorLoadingCert = nil;
 		_serverCerts = NULL;
-		_serverCertsLoadAttempted = NO;
+		_certsLoadAttempted = NO;
 	}
 	
 	return self;
@@ -77,6 +83,7 @@ static const UInt8 kKeychainCertificateID[] = "NSLogger SSL\0";
 	if(_serverCerts != NULL)
 		CFRelease(_serverCerts);
 
+	self.errorLoadingCert = nil;
 	[super dealloc];
 }
 
@@ -104,8 +111,11 @@ static const UInt8 kKeychainCertificateID[] = "NSLogger SSL\0";
 	NSDictionary			*identityAddQuery	= nil;
 	OSStatus                identityError		= noErr;
 		
-	if (outError != NULL)
+	
+	if(outError != NULL)
+	{
 		*outError = nil;
+	}
 	
     identityLabel = \
 		CFStringCreateWithCString(NULL
@@ -214,9 +224,6 @@ static const UInt8 kKeychainCertificateID[] = "NSLogger SSL\0";
 				}
 			}
 		}
-		
-		// since you are not the owner, you cannot release it... my bad
-		//CFRelease(importedPkcs12);
 	}
 	
 	// release idendity label
@@ -242,41 +249,57 @@ static const UInt8 kKeychainCertificateID[] = "NSLogger SSL\0";
 		,NSLocalizedFailureReasonErrorKey:errMsg
 		,NSLocalizedRecoverySuggestionErrorKey:NSLocalizedString(@"Please contact the application developers", @"")};
 	
-	*outError = [NSError
-				 errorWithDomain:NSOSStatusErrorDomain
-				 code:status
-				 userInfo:dictUserInfo];
+	if (outError != NULL)
+	{
+		*outError = [NSError
+					 errorWithDomain:NSOSStatusErrorDomain
+					 code:status
+					 userInfo:dictUserInfo];
+	}
 
 	return NULL;
 }
 
-
-// loadEncryptionCertificate gets called mutiple times from LoggerTransport object
-// To handle them, we need to save the error and result and return whenver asked.
-- (BOOL)loadEncryptionCertificate:(NSError **)outError;
+-(BOOL)loadEncryptionCertificate:(NSError **)aLoadingError
 {
-	if(_serverCertsLoadAttempted)
-	{
-		// return the error from the previous attempt
-		*outError = _errorLoadingCert;
-		return (_serverCerts != NULL);
-	}
 
-	_serverCertsLoadAttempted = YES;
+	_certsLoadAttempted = YES;
 
 	NSError *loadingError = nil;
-	
 	_serverCerts =
 		[self
 		 _loadIdentityFromKeyChain:@"NSLoggerResource.bundle/Certificate/NSLoggerCert"
 		 error:&loadingError];
 
-	// retain the error and return it next time
-	self.errorLoadingCert = loadingError;
-	
-	*outError = loadingError;
+	if(loadingError != nil)
+	{
+		// retain the error and return it next time
+		self.errorLoadingCert = loadingError;
+		
+		if(aLoadingError != NULL)
+		{
+			*aLoadingError = loadingError;
+		}
+	}
 
-	return (_serverCerts != NULL);
+	return (loadingError == nil && _serverCerts != NULL);
+
+}
+
+// loadEncryptionCertificate gets called mutiple times from LoggerTransport object
+// To handle them, we need to save the error and result and return whenver asked.
+- (BOOL)isEncryptionCertificateAvailable
+{
+	if(_certsLoadAttempted)
+	{
+		// return the error from the previous attempt
+		return (_errorLoadingCert == nil && _serverCerts != NULL);
+	}
+
+	NSError *loadingError = nil;
+	[self loadEncryptionCertificate:&loadingError];
+
+	return (loadingError == nil && _serverCerts != NULL);
 }
 
 
