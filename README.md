@@ -17,7 +17,8 @@ As of today (May 9, 2013), I split the repo into two branches; release & develop
 
 A release version of 0.4 would be highly limited in terms of UI. Nontheless, its underlying logics are essentially the same as the development version and you could capture logging traces with WiFi/Bluetooth connection.    
 
-Ver 0.4 is tested for 17,160 logging traces with 1,946 images for an hour. I believe it is stable enough to deploy outside.  
+Ver 0.4 is tested on iPad 2 for receiving 17,160 logging traces with 1,946 images for an hour. I believe it is stable enough to deploy outside.  
+
 ###Questions
 Throw 'em at [@stkim1](http://twitter.com/stkim1)
 
