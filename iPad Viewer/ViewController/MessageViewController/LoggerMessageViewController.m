@@ -87,6 +87,11 @@
 	 name:kShowClientDisconnectedNotification
 	 object:nil];
 	
+	[[NSNotificationCenter defaultCenter]
+	 addObserver:self
+	 selector:@selector(stopTimer)
+	 name:UIApplicationWillResignActiveNotification
+	 object:nil];
 }
 
 - (void)viewDidLoad
@@ -117,6 +122,7 @@
 {
 	[super startViewDestruction];
 
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:kShowClientConnectedNotification object:nil];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:kShowClientDisconnectedNotification object:nil];
 	
@@ -160,7 +166,7 @@
 
 	self.runCountLabel.text = \
 		[NSString stringWithFormat:
-		 NSLocalizedString(@"Run %d of %d", nil),runCount,runCount];
+		 NSLocalizedString(@"Run %d of %d", nil),runCount+1,runCount+1];
 
 	assert([self.dataManager messageDisplayContext] != nil);
 	

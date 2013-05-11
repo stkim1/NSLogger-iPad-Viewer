@@ -14,8 +14,10 @@ You will see them at [the main repository](https://github.com/fpillet/NSLogger).
 
 ##Status
 As of today (May 9, 2013), I split the repo into two branches; release & development.   
+
 A release version of 0.4 would be highly limited in terms of UI. Nontheless, its underlying logics are essentially the same as the development version and you could capture logging traces with WiFi/Bluetooth connection.    
 
+Ver 0.4 is tested for 17,160 logging traces with 1,946 images for an hour. I believe it is stable enough to deploy outside.  
 ###Questions
 Throw 'em at [@stkim1](http://twitter.com/stkim1)
 
@@ -28,8 +30,8 @@ Throw 'em at [@stkim1](http://twitter.com/stkim1)
 ### iPhone Client (13/04/27)
 <img width="320" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/iphone_13_04_27.png" />
 
-###iPad Viwer (13/05/09)
-<img width="576" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ipad_13_05_09.png" />
+###iPad Viwer (13/05/11)
+<img width="576" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ipad_13_05_11.png" />
 
 
 ##License
