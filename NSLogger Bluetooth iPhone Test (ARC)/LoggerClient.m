@@ -1535,7 +1535,7 @@ static void LoggerTryConnectBluetooth(Logger *logger)
 }
 
 // -----------------------------------------------------------------------------
-#pragma mark - DNS-SD Browser over Bluetooth
+#pragma mark - DNS-SD Browser Service on Bluetooth
 // -----------------------------------------------------------------------------
 static BOOL LoggerStartDnsSdBrowserService(Logger *logger)
 {
@@ -1606,7 +1606,7 @@ static BOOL LoggerStartDnsSdBrowserService(Logger *logger)
 
 static void LoggerStopDnsSdBrowserService(Logger *logger)
 {
-	// check to stop resolvers first if any
+	// check to stop resolvers first if anyone exists
 	LoggerStopDnsSdResolverService(logger);
 
 	if(logger->dnssdBrowserRunLoop != NULL)
@@ -1686,7 +1686,7 @@ static void LoggerDnsSdBrowserSocketCallBack(CFSocketRef			socket,
 
 
 // -----------------------------------------------------------------------------
-#pragma mark - DNS-SD Resolve Service
+#pragma mark - DNS-SD Resolve Service on Bluetooth
 //------------------------------------------------------------------------------
 // Starts a resolve.  Starting a resolve on a service that is currently resolving is a no-op.
 static BOOL LoggerStartDnsSdResolverService(Logger		*logger,
