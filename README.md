@@ -23,8 +23,8 @@ Ver 0.4 is tested on iPad 2 for receiving 17,160 logging traces with 1,946 image
 Throw 'em at [@stkim1](http://twitter.com/stkim1)
 
 ## How to run demo
-1. Run iPad Viewer with WiFi off and Bluetooth on.  
-2. Run iOS client with Bluetooth on. (It's up to use to leave WiFi or cellular on).      
+1. Run NSLogger iPad Viewer with WiFi off and Bluetooth on from Setting.  
+2. Run iOS client with Bluetooth on. (It's up to you to leave WiFi or cellular on).        
 3. Start logging. Look at the Bluetooth mark on top right corner. :)  
 
 ##Screen Shots 
