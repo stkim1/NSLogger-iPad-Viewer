@@ -19,9 +19,8 @@ A release version of 0.4 would be highly limited in terms of UI. Nontheless, its
 
 Ver 0.4 is tested on iPad 2 for receiving 17,160 logging traces with 1,946 images for an hour. I believe it is stable enough to deploy outside.  
 
-### TODO
-1. UI (Preference/Multi-Window/Search) : Work-In-Progress  
-2. Android Bluetooth Client  
+### Work-In-Progress
+UI : Preference/Multi-Window/Search
 
 ###Questions
 Throw 'em at [@stkim1](http://twitter.com/stkim1)
