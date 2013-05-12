@@ -448,7 +448,6 @@ ServiceRegisterSocketCallBack(CFSocketRef			socket,
 	{
 		if ([self setup])
 		{
-			MTLog(@"commencing listener thread...");
 			while (![listenerThread isCancelled])
 			{
 				/*

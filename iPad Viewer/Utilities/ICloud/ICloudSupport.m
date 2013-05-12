@@ -72,7 +72,6 @@
 		}
 		else
 		{
-			MTLog(@"Excluded '%@' from backup",fileURL);
 			return YES;
 		}
 	}

@@ -150,7 +150,6 @@ static const UInt8 kKeychainCertificateID[] = "NSLogger SSL\0";
 			{
 				if(CFStringCompare(certSummary, identityLabel, 0) == kCFCompareEqualTo)
 				{
-					NSLog(@"cert found!");
 					status = kCredentialImportStatusSucceeded;
 				}
 

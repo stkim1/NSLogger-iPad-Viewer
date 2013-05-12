@@ -138,8 +138,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 		// very first save operation to initialize PSC
 		dispatch_sync(_messageProcessQueue, ^{
 
-			MTLog(@"message process MOC save");
-
 			__block NSError *error = nil;
 			__block BOOL	isSavedOk = NO;
 
@@ -152,7 +150,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 			else
 			{
 
-				MTLog(@"message display MOC save");
 				[[self messageDisplayContext]
 				 performBlockAndWait:^{
 					 
@@ -165,7 +162,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 					 else
 					 {
 						 // initialize PSC on disk
-						 MTLog(@"message write MOC save");
 						 [[self messageSaveContext]
 						  performBlockAndWait:^{
 							  isSavedOk = [[self messageSaveContext] save:&error];
