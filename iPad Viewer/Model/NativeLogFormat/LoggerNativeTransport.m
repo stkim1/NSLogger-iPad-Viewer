@@ -53,9 +53,12 @@
 static void
 AcceptSocketCallback(CFSocketRef, CFSocketCallBackType, CFDataRef, const void*, void*);
 
+
 @interface LoggerNativeTransport()
 static void
 ServiceRegisterCallback(DNSServiceRef,DNSServiceFlags,DNSServiceErrorType,const char*,const char*,const char*,void*);
+static void
+ServiceRegisterSocketCallBack(CFSocketRef,CFSocketCallBackType,CFDataRef,const void*,void*);
 -(void)startListening;
 -(void)destorySockets;
 - (void)didNotRegisterWithError:(DNSServiceErrorType)errorCode;
@@ -66,6 +69,8 @@ ServiceRegisterCallback(DNSServiceRef,DNSServiceFlags,DNSServiceErrorType,const 
 {
 	BOOL				_useBluetooth;
 	DNSServiceRef		_sdServiceRef;
+	CFSocketRef			_sdServiceSocket;	// browser service socket to tie in the current runloop
+	CFRunLoopSourceRef	_sdServiceRunLoop;	// browser service callback runloop
 }
 @synthesize listenerPort, listenerSocket_ipv4, listenerSocket_ipv6;
 @synthesize publishBonjourService;
@@ -171,10 +176,10 @@ ServiceRegisterCallback(DNSServiceRef,DNSServiceFlags,DNSServiceErrorType,const 
 - (BOOL)canDoSSL
 {
 	/*
-	 * stkim1_dec.11,2012
-	 * by the time transport object reaches this point encryption certificate 
-	 * must have been loaded and ready. If an error ever occured, it should 
-	 * have been reported. All we want is to know if it's ok to go with SSL
+	 stkim1_dec.11,2012
+	 by the time transport object reaches this point server cert must be loaded
+	 and ready. If an error ever occured, it should have been reported.
+	 All we want atm is to know whether it's ok to go with SSL
 	 */
 	return [self.certManager isEncryptionCertificateAvailable];
 }
@@ -189,8 +194,6 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
 						void					*context)
 
 {
-	MTLog(@"%s %s %s %s",__PRETTY_FUNCTION__,name,regtype, domain);
-	
 	LoggerNativeTransport *callbackSelf = (LoggerNativeTransport *) context;
     assert([callbackSelf isKindOfClass:[LoggerNativeTransport class]]);
     assert(sdRef == callbackSelf->_sdServiceRef);
@@ -198,9 +201,6 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
 	
     if (errorCode == kDNSServiceErr_NoError)
 	{
-		NSLog(@"errorCode : kDNSServiceErr_NoError");
-		NSLog(@"service is now assigned");
-		
 		// We're assuming SRV records over unicast DNS here, so the first result packet we get
         // will contain all the information we're going to get.  In a more dynamic situation
         // (for example, multicast DNS or long-lived queries in Back to My Mac) we'd would want
@@ -213,7 +213,29 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
         }
 		
     } else {
-		NSLog(@"errorCode is NOT kDNSServiceErr_NoError");
+        [callbackSelf didNotRegisterWithError:errorCode];
+    }
+}
+
+
+// A CFSocket callback for Browsing. This runs when we get messages from mDNSResponder
+// regarding our DNSServiceRef.  We just turn around and call DNSServiceProcessResult,
+// which does all of the heavy lifting (and would typically call BrowserServiceReply).
+static void
+ServiceRegisterSocketCallBack(CFSocketRef			socket,
+							  CFSocketCallBackType	type,
+							  CFDataRef				address,
+							  const void			*data,
+							  void					*info)
+{
+	DNSServiceErrorType errorCode = kDNSServiceErr_NoError;
+
+	LoggerNativeTransport *callbackSelf = (LoggerNativeTransport *)info;
+	assert(callbackSelf != NULL);
+
+	errorCode = DNSServiceProcessResult(callbackSelf->_sdServiceRef);
+    if (errorCode != kDNSServiceErr_NoError)
+	{
         [callbackSelf didNotRegisterWithError:errorCode];
     }
 }
@@ -222,11 +244,12 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
 {
 	int yes = 1;
 	DNSServiceErrorType errorType	= kDNSServiceErr_NoError;
+	int fd = 0;
+	CFSocketContext context = { 0, (void *)self, NULL, NULL, NULL };
+	CFOptionFlags socketFlag = 0;
 
 	@try
 	{
-		CFSocketContext context = {0, self, NULL, NULL, NULL};
-		
 		// create sockets
 		listenerSocket_ipv4 = CFSocketCreate(kCFAllocatorDefault,
 											 PF_INET,
@@ -312,6 +335,8 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
 		// register Bonjour service
 		if (publishBonjourService)
 		{
+			BOOL publishingResult = NO;
+			
 			// The service type is nslogger-ssl (now the default), or nslogger for backwards
 			// compatibility with pre-1.0.
 			NSString *serviceType = (NSString *)(secure ? LOGGER_SERVICE_TYPE_SSL : LOGGER_SERVICE_TYPE);
@@ -345,42 +370,47 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
 								   (void *)(self)				// context
 								   );
 
-			//unfortunately, DNSServiceRegister never calls its callback,ServiceRegisterCallback
-			if (errorType != kDNSServiceErr_NoError)
+			if (errorType == kDNSServiceErr_NoError)
 			{
-				NSString *failReason = nil;
-				
-				switch (errorType)
+				fd = DNSServiceRefSockFD(self->_sdServiceRef);
+				if(0 <= fd)
 				{
-					case kDNSServiceErr_NameConflict:{
-						failReason = NSLocalizedString(@"Duplicate Bonjour service name on your network", @"");
-						break;
-					}
-					case kDNSServiceErr_BadParam:{
-						failReason = NSLocalizedString(@"Bonjour bad argument - please report bug.", @"");
-						break;
-					}
-					case kDNSServiceErr_Invalid:{
-						failReason = NSLocalizedString(@"Bonjour invalid configuration - please report bug.", @"");
-						break;
-					}
-					default:{
-						failReason = [NSString stringWithFormat:NSLocalizedString(@"Bonjour error %d", @""), errorType];
-						break;
+					self->_sdServiceSocket =
+						CFSocketCreateWithNative(NULL,
+												 fd,
+												 kCFSocketReadCallBack,
+												 ServiceRegisterSocketCallBack,
+												 &context);
+					if(self->_sdServiceSocket != NULL)
+					{
+						socketFlag = CFSocketGetSocketFlags(self->_sdServiceSocket);
+						socketFlag = socketFlag &~ (CFOptionFlags)kCFSocketCloseOnInvalidate;
+						CFSocketSetSocketFlags(self->_sdServiceSocket,socketFlag);
+
+						self->_sdServiceRunLoop = CFSocketCreateRunLoopSource(NULL,self->_sdServiceSocket, 0);
+						CFRunLoopAddSource(CFRunLoopGetCurrent(), self->_sdServiceRunLoop, kCFRunLoopCommonModes);
+
+						publishingResult = YES;
 					}
 				}
-				
+			}
+
+			if(!publishingResult)
+			{
 				@throw
 					[NSException
-					 exceptionWithName:@"Bonjour Service"
-					 reason:[NSString stringWithFormat:@"%@\n\n%@",NSLocalizedString(@"Failed announce Bonjour service (DNSServiceRegister failed)", nil),failReason]
+					 exceptionWithName:@"DNSServiceRegister"
+					 reason:[NSString
+							 stringWithFormat:@"%@\n\n%@"
+							 ,NSLocalizedString(@"Failed announce Bonjour service (DNSServiceRegister failed)", nil)
+							 ,@"Transport failed opening - unknown reason"]
 					 userInfo:nil];
 			}
-			
 		}
-
-		ready = YES;
-
+		else
+		{
+			ready = YES;
+		}
 	}
 	@catch (NSException * e)
 	{
@@ -552,6 +582,20 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
 
 -(void)destorySockets
 {
+	if(self->_sdServiceRunLoop != NULL)
+	{
+		CFRunLoopSourceInvalidate(self->_sdServiceRunLoop);
+		CFRelease(self->_sdServiceRunLoop);
+		self->_sdServiceRunLoop = NULL;
+	}
+	
+	if (self->_sdServiceSocket != NULL)
+	{
+        CFSocketInvalidate(self->_sdServiceSocket);
+        CFRelease(self->_sdServiceSocket);
+        self->_sdServiceSocket = NULL;
+    }
+	
 	// stop DNS-SD service, stop Bonjour service
 	if (self->_sdServiceRef != NULL)
 	{
