@@ -79,16 +79,11 @@
 {
 	if ([connections containsObject:aConnection])
 	{
-		if(LoggerCheckDelegate(transManager
-							   ,@protocol(LoggerTransportDelegate)
-							   ,@selector(transport:removeConnection:)))
-		{
-			[transManager
-			 transport:self
-			 removeConnection:aConnection];
-		}
+		[self.transManager transport:self removeConnection:aConnection];
+		
 		[aConnection shutdown];
-		[connections removeObject:aConnection];
+
+		[self.connections removeObject:aConnection];
 	}
 }
 
@@ -140,15 +135,10 @@
 - (void)connection:(LoggerConnection *)theConnection
 didEstablishWithMessage:(LoggerMessage *)theMessage
 {
-	if(LoggerCheckDelegate(transManager
-						   ,@protocol(LoggerTransportDelegate)
-						   ,@selector(transport:didEstablishConnection:clientInfo:)))
-	{
-		[transManager
-		 transport:self
-		 didEstablishConnection:theConnection
-		 clientInfo:theMessage];
-	}
+	[self.transManager
+	 transport:self
+	 didEstablishConnection:theConnection
+	 clientInfo:theMessage];
 }
 
 // method that may not be called on main thread
@@ -156,29 +146,19 @@ didEstablishWithMessage:(LoggerMessage *)theMessage
 didReceiveMessages:(NSArray *)theMessages
 			 range:(NSRange)rangeInMessagesList
 {
-	if(LoggerCheckDelegate(transManager
-						   ,@protocol(LoggerTransportDelegate)
-						   ,@selector(transport:connection:didReceiveMessages:range:)))
-	{
-		[transManager
-		 transport:self
-		 connection:theConnection
-		 didReceiveMessages:theMessages
-		 range:rangeInMessagesList];
-	}
+	[self.transManager
+	 transport:self
+	 connection:theConnection
+	 didReceiveMessages:theMessages
+	 range:rangeInMessagesList];
 }
 
 -(void)connection:(LoggerConnection *)theConnection
 didDisconnectWithMessage:(LoggerMessage *)theMessage
 {
-	if(LoggerCheckDelegate(transManager
-						   ,@protocol(LoggerTransportDelegate)
-						   ,@selector(transport:didDisconnectRemote:lastMessage:)))
-	{
-		[transManager
-		 transport:self
-		 didDisconnectRemote:theConnection
-		 lastMessage:theMessage];
-	}
+	[self.transManager
+	 transport:self
+	 didDisconnectRemote:theConnection
+	 lastMessage:theMessage];
 }
 @end

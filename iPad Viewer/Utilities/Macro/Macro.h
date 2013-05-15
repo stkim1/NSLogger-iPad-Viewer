@@ -49,8 +49,3 @@
 	#define MTAssert(cond,desc...)	assert(cond)
 	#define MTDealloc(__POINTER)	do { [super dealloc]; } while(0)
 #endif
-
-#define LoggerCheckDelegate(__POINTER,__PROTOCOL,__SELECTOR) \
-		((__POINTER != nil) &&\
-		[(id)__POINTER conformsToProtocol:__PROTOCOL] &&\
-		[(id)__POINTER respondsToSelector:__SELECTOR])

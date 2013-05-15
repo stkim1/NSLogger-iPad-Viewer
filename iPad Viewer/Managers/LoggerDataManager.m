@@ -430,8 +430,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 					  
 					  if(flushDisplayContext || DEFAULT_SAVING_BLOCK_SIZE <= _messageSaveSizeCount)
 					  {
-						  MTLog(@"accumulated data size to be saved is %ld",_messageSaveSizeCount);
-
 						  BOOL	isSaveMocSavedOk = NO;
 						  NSError *saveMocSaveError = nil;
 						  

@@ -163,12 +163,7 @@ char sConnectionAssociatedObjectKey = 1;
 		// format message string for client info
 		[message formatMessage];
 		
-		if(LoggerCheckDelegate(delegate
-							   ,@protocol(LoggerConnectionDelegate)
-							   ,@selector(connection:didEstablishWithMessage:)))
-		{
-			[self.delegate connection:self didEstablishWithMessage:message];
-		}
+		[self.delegate connection:self didEstablishWithMessage:message];
 	});
 }
 
@@ -221,24 +216,17 @@ char sConnectionAssociatedObjectKey = 1;
 		 * I find that this is a perfect place to pre-calculate data to cache
 		 * such as cell height, image size, text representation
 		 */
-
 		[msgs makeObjectsPerformSelector:@selector(formatMessage)];
 
-		if(LoggerCheckDelegate(delegate
-							   ,@protocol(LoggerConnectionDelegate)
-							   ,@selector(connection:didReceiveMessages:range:)))
-		{
-			/*
-			 * stkim1_jan.15,2013
-			 * range is not really necessary since I got rid of 'message' array
-			 * which stores LoggerMessages. Nonetheless, it will be here for
-			 * a while due to 'parentIndexesStack' above.
-			 */
-
-			NSRange range;
-			range = NSMakeRange(0, [msgs count]);
-			[self.delegate connection:self didReceiveMessages:msgs range:range];
-		}
+		/*
+		 * stkim1_jan.15,2013
+		 * range is not really necessary since I got rid of 'message' array
+		 * which stores LoggerMessages. Nonetheless, it will be here for
+		 * a while due to 'parentIndexesStack' above.
+		 */
+		NSRange range;
+		range = NSMakeRange(0, [msgs count]);
+		[self.delegate connection:self didReceiveMessages:msgs range:range];
 	});
 }
 
@@ -250,15 +238,9 @@ char sConnectionAssociatedObjectKey = 1;
 
 		// format message string for client info
 		[message formatMessage];
-		
-		if(LoggerCheckDelegate(delegate
-							   ,@protocol(LoggerConnectionDelegate)
-							   ,@selector(connection:didDisconnectWithMessage:)))
-		{
-			[delegate
-			 connection:self
-			 didDisconnectWithMessage:message];
-		}
+
+		[self.delegate connection:self didDisconnectWithMessage:message];
+
 	});
 }
 
