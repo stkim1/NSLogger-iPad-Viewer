@@ -59,6 +59,7 @@ extern UIFont *displayMonospacedFont;
 - (void)drawMessageView:(CGRect)cellFrame
 {
 	CGContextRef context = UIGraphicsGetCurrentContext();
+	CGContextSaveGState(context);
 
 	BOOL highlighted = NO;
 	
@@ -110,7 +111,7 @@ extern UIFont *displayMonospacedFont;
 	 withFont:displayMonospacedFont
 	 lineBreakMode:NSLineBreakByWordWrapping
 	 alignment:NSTextAlignmentCenter];
-	
+
 	CGContextRestoreGState(context);
 }
 

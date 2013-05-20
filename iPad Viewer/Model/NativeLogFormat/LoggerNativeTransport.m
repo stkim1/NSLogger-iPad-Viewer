@@ -194,6 +194,8 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
 						void					*context)
 
 {
+	MTLog(@"%s %s %s %s",__PRETTY_FUNCTION__,name,regtype, domain);
+	
 	LoggerNativeTransport *callbackSelf = (LoggerNativeTransport *) context;
     assert([callbackSelf isKindOfClass:[LoggerNativeTransport class]]);
     assert(sdRef == callbackSelf->_sdServiceRef);
@@ -201,6 +203,8 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
 	
     if (errorCode == kDNSServiceErr_NoError)
 	{
+		MTLogInfo(@"service is now assigned : errorCode[kDNSServiceErr_NoError]");
+
 		// We're assuming SRV records over unicast DNS here, so the first result packet we get
         // will contain all the information we're going to get.  In a more dynamic situation
         // (for example, multicast DNS or long-lived queries in Back to My Mac) we'd would want
@@ -213,6 +217,7 @@ ServiceRegisterCallback(DNSServiceRef			sdRef,
         }
 		
     } else {
+		MTLogError(@"errorCode is NOT kDNSServiceErr_NoError");
         [callbackSelf didNotRegisterWithError:errorCode];
     }
 }
@@ -228,6 +233,7 @@ ServiceRegisterSocketCallBack(CFSocketRef			socket,
 							  const void			*data,
 							  void					*info)
 {
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
 	DNSServiceErrorType errorCode = kDNSServiceErr_NoError;
 
 	LoggerNativeTransport *callbackSelf = (LoggerNativeTransport *)info;
@@ -236,12 +242,14 @@ ServiceRegisterSocketCallBack(CFSocketRef			socket,
 	errorCode = DNSServiceProcessResult(callbackSelf->_sdServiceRef);
     if (errorCode != kDNSServiceErr_NoError)
 	{
+		MTLogError(@"errorCode is NOT kDNSServiceErr_NoError");
         [callbackSelf didNotRegisterWithError:errorCode];
     }
 }
 
 - (BOOL)setup
 {
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
 	int yes = 1;
 	DNSServiceErrorType errorType	= kDNSServiceErr_NoError;
 	int fd = 0;
@@ -372,9 +380,13 @@ ServiceRegisterSocketCallBack(CFSocketRef			socket,
 
 			if (errorType == kDNSServiceErr_NoError)
 			{
+				MTLogInfo(@"DNSServiceRegister kDNSServiceErr_NoError");
+				
 				fd = DNSServiceRefSockFD(self->_sdServiceRef);
 				if(0 <= fd)
 				{
+					MTLogInfo(@"DNSServiceRefSockFD 0 <= fd");
+					
 					self->_sdServiceSocket =
 						CFSocketCreateWithNative(NULL,
 												 fd,
@@ -383,6 +395,7 @@ ServiceRegisterSocketCallBack(CFSocketRef			socket,
 												 &context);
 					if(self->_sdServiceSocket != NULL)
 					{
+						MTLogInfo(@"self->_sdServiceSocket != NULL");
 						socketFlag = CFSocketGetSocketFlags(self->_sdServiceSocket);
 						socketFlag = socketFlag &~ (CFOptionFlags)kCFSocketCloseOnInvalidate;
 						CFSocketSetSocketFlags(self->_sdServiceSocket,socketFlag);
@@ -437,6 +450,8 @@ ServiceRegisterSocketCallBack(CFSocketRef			socket,
 
 - (void)startListening
 {
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
+	
 	listenerThread = [NSThread currentThread];
 	[[listenerThread threadDictionary] setObject:[NSRunLoop currentRunLoop] forKey:@"runLoop"];
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -448,6 +463,7 @@ ServiceRegisterSocketCallBack(CFSocketRef			socket,
 	{
 		if ([self setup])
 		{
+			MTLog(@"commencing listener thread...");
 			while (![listenerThread isCancelled])
 			{
 				/*
@@ -467,13 +483,13 @@ ServiceRegisterSocketCallBack(CFSocketRef			socket,
 	@catch (NSException * e)
 	{
 #ifdef DEBUG
-		MTLog(@"listenerThread catched exception %@", e);
+		MTLogAssert(@"listenerThread catched exception %@", e);
 #endif
 	}
 	@finally
 	{
 #ifdef DEBUG
-		MTLog(@"Exiting listenerThread for transport %@", description);
+		MTLogInfo(@"Exiting listenerThread for transport %@", description);
 #endif
 		[pool release];
 		listenerThread = nil;
@@ -500,6 +516,8 @@ ServiceRegisterSocketCallBack(CFSocketRef			socket,
 //------------------------------------------------------------------------------
 - (void)restart
 {
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
+
 	if (active)
 	{
 		// Check whether we need to actually restart the service if the settings have changed
@@ -541,6 +559,7 @@ ServiceRegisterSocketCallBack(CFSocketRef			socket,
 
 - (void)startup
 {
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
 	if (!active)
 	{
 		active = YES;
@@ -564,6 +583,7 @@ ServiceRegisterSocketCallBack(CFSocketRef			socket,
 
 - (void)completeRestart
 {
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
 	if (active)
 	{
 		// wait for the service to be completely shut down, then restart it
@@ -619,6 +639,7 @@ ServiceRegisterSocketCallBack(CFSocketRef			socket,
 
 - (void)shutdown
 {
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
 	if (!active)
 		return;
 
@@ -873,7 +894,7 @@ ServiceRegisterSocketCallBack(CFSocketRef			socket,
 	}
 	@catch (NSException * e)
 	{
-		MTLog(@"error happens : %@",[e reason]);
+		MTLogAssert(@"error happens : %@",[e reason]);
 	}
 	@finally
 	{
@@ -1005,7 +1026,7 @@ AcceptSocketCallback(CFSocketRef sock, CFSocketCallBackType type, CFDataRef addr
 	@catch (NSException * e)
 	{
 #ifdef DEBUG
-		MTLog(@"LoggerNativeTransport %p: exception catched in AcceptSocketCallback: %@", info, e);
+		MTLogAssert(@"LoggerNativeTransport %p: exception catched in AcceptSocketCallback: %@", info, e);
 #endif
 	}
 	@finally

@@ -96,9 +96,83 @@ char sConnectionAssociatedObjectKey = 1;
 	connected = NO;
 }
 
+
 //------------------------------------------------------------------------------
 #pragma mark - Message Handling
 //------------------------------------------------------------------------------
+#ifdef CHECK_DUPLICATED_CONNECTION
+- (BOOL)isNewRunOfClient:(LoggerConnection *)aConnection
+{
+	// Try to detect if a connection is a new run of an older, disconnected session
+	// (goal is to detect restarts, so as to replace logs in the same window)
+
+	// as well as still-up connections
+	if (aConnection.connected)
+		return NO;
+
+	// check whether client info is the same
+	BOOL (^isSame)(NSString *, NSString *) = ^(NSString *s1, NSString *s2)
+	{
+		if ((s1 == nil) != (s2 == nil))
+			return NO;
+		if (s1 != nil && ![s2 isEqualToString:s1])
+			return NO;
+		return YES;	// s1 and d2 either nil or same
+	};
+
+	if (!isSame(clientName, aConnection.clientName) ||
+		!isSame(clientVersion, aConnection.clientVersion) ||
+		!isSame(clientOSName, aConnection.clientOSName) ||
+		!isSame(clientOSVersion, aConnection.clientOSVersion) ||
+		!isSame(clientDevice, aConnection.clientDevice))
+	{
+		return NO;
+	}
+	
+	// check whether address is the same, OR hardware ID (if present) is the same.
+	// hardware ID wins (on desktop, iOS simulator can connect have different
+	// addresses from run to run if the computer has multiple network interfaces / VMs installed
+	if (clientUDID != nil && isSame(clientUDID, aConnection.clientUDID))
+		return YES;
+	
+	if ((clientAddress != nil) != (aConnection.clientAddress != nil))
+		return NO;
+
+	if (clientAddress != nil)
+	{
+		// compare address blocks sizes (ipv4 vs. ipv6)
+		NSUInteger addrSize = [clientAddress length];
+		if (addrSize != [aConnection.clientAddress length])
+			return NO;
+		
+		// compare ipv4 or ipv6 address. We don't want to compare the source port,
+		// because it will change with each connection
+		if (addrSize == sizeof(struct sockaddr_in))
+		{
+			struct sockaddr_in addra, addrb;
+			[clientAddress getBytes:&addra];
+			[aConnection.clientAddress getBytes:&addrb];
+			if (memcmp(&addra.sin_addr, &addrb.sin_addr, sizeof(addra.sin_addr)))
+				return NO;
+		}
+		else if (addrSize == sizeof(struct sockaddr_in6))
+		{
+			struct sockaddr_in6 addr6a, addr6b;
+			[clientAddress getBytes:&addr6a];
+			[aConnection.clientAddress getBytes:&addr6b];
+			if (memcmp(&addr6a.sin6_addr, &addr6b.sin6_addr, sizeof(addr6a.sin6_addr)))
+				return NO;
+		}
+		else if (![clientAddress isEqualToData:aConnection.clientAddress])
+			return NO;		// we only support ipv4 and ipv6, so this should not happen
+	}
+	
+	return YES;
+}
+#endif
+
+
+
 - (void)clientInfoReceived:(LoggerMessage *)message
 {
 	
@@ -212,18 +286,20 @@ char sConnectionAssociatedObjectKey = 1;
 		 */
 
 		/*
-		 * stkim1_jan.19,2013
-		 * I find that this is a perfect place to pre-calculate data to cache
-		 * such as cell height, image size, text representation
+		 stkim1_jan.19,2013
+		 I find this is a perfect spot to pre-calculate data to cache
+		 such as cell height, image size, text representation
 		 */
+
 		[msgs makeObjectsPerformSelector:@selector(formatMessage)];
 
 		/*
-		 * stkim1_jan.15,2013
-		 * range is not really necessary since I got rid of 'message' array
-		 * which stores LoggerMessages. Nonetheless, it will be here for
-		 * a while due to 'parentIndexesStack' above.
+		 stkim1_jan.15,2013
+		 range is not really necessary since I got rid of 'message' array
+		 which stores LoggerMessages. Nonetheless, it will be here for
+		 a while due to 'parentIndexesStack' above.
 		 */
+		
 		NSRange range;
 		range = NSMakeRange(0, [msgs count]);
 		[self.delegate connection:self didReceiveMessages:msgs range:range];
@@ -238,9 +314,8 @@ char sConnectionAssociatedObjectKey = 1;
 
 		// format message string for client info
 		[message formatMessage];
-
+		
 		[self.delegate connection:self didDisconnectWithMessage:message];
-
 	});
 }
 
@@ -283,4 +358,27 @@ char sConnectionAssociatedObjectKey = 1;
 	//assert([NSThread isMainThread]);
 	return [NSString stringWithFormat:@"%@ @ %@", [self clientAppDescription], [self clientAddressDescription]];
 }
+
+#if 0
+- (NSString *)status
+{
+	// status is being observed by LoggerStatusWindowController and changes once
+	// when the connection gets disconnected
+	NSString *format;
+	if (connected)
+		format = NSLocalizedString(@"%@ connected", @"");
+	else
+		format = NSLocalizedString(@"%@ disconnected", @"");
+	if ([NSThread isMainThread])
+		return [NSString stringWithFormat:format, [self clientDescription]];
+
+	__block NSString *status;
+	
+#warning need to change this queue to transport manage queue
+	dispatch_sync(dispatch_get_main_queue(), ^{
+		status = [[NSString stringWithFormat:format, [self clientDescription]] retain];
+	});
+	return [status autorelease];
+}
+#endif
 @end

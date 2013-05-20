@@ -138,6 +138,8 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 		// very first save operation to initialize PSC
 		dispatch_sync(_messageProcessQueue, ^{
 
+			MTLog(@"message process MOC save");
+
 			__block NSError *error = nil;
 			__block BOOL	isSavedOk = NO;
 
@@ -150,6 +152,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 			else
 			{
 
+				MTLog(@"message display MOC save");
 				[[self messageDisplayContext]
 				 performBlockAndWait:^{
 					 
@@ -162,6 +165,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 					 else
 					 {
 						 // initialize PSC on disk
+						 MTLog(@"message write MOC save");
 						 [[self messageSaveContext]
 						  performBlockAndWait:^{
 							  isSavedOk = [[self messageSaveContext] save:&error];
@@ -430,6 +434,8 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerDataManager,sharedDataManager
 					  
 					  if(flushDisplayContext || DEFAULT_SAVING_BLOCK_SIZE <= _messageSaveSizeCount)
 					  {
+						  MTLog(@"accumulated data size to be saved is %ld",_messageSaveSizeCount);
+
 						  BOOL	isSaveMocSavedOk = NO;
 						  NSError *saveMocSaveError = nil;
 						  
@@ -499,10 +505,11 @@ didEstablishConnection:(LoggerConnection *)theConnection
 				// runcount is 0-based 
 				lastRunCount = [[client connectionStatus] count];
 				
-				// @@@ TODO: we should avoid set a client's run count in a connection 
+#warning make sure you encounter no race condition. this is an unprotected value
 				[theConnection setReconnectionCount:lastRunCount];
 
-				MTLog(@"%s (%lx)[%d]",__PRETTY_FUNCTION__,theConnection.clientHash, theConnection.reconnectionCount);
+				
+MTLog(@"transport:didEstablishConnection: (%lx)[%d]",theConnection.clientHash, theConnection.reconnectionCount);
 				
 				LoggerConnectionStatusData *status = \
 					[NSEntityDescription
@@ -609,8 +616,6 @@ didReceiveMessages:(NSArray *)theMessages
 
 					//run count of the connection
 					[messageData setClientHash:		[NSNumber numberWithUnsignedLong:[theConnection clientHash]]];
-
-					// @@@ TODO: find a way to retrieve client run count from LoggerClientData
 					[messageData setRunCount:		[NSNumber numberWithInt:[theConnection reconnectionCount]]];
 
 					[messageData setTimestamp:		[NSNumber numberWithUnsignedLongLong:tm64]];

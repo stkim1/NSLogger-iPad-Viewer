@@ -88,6 +88,8 @@ _split_dir_only(char** p, const char *pf)
 		// split diretory part from file path
 		_fpath_dir_part = NULL;
 		_split_dir_only(&_fpath_dir_part,[aFilepath UTF8String]);
+
+		//MTLogInfo(@"fpath_path %s(%p)[%zd]",_fpath_dir_part,_fpath_dir_part,strlen(_fpath_dir_part));
 		
 		// this is an error. should never happpen
 		assert(_fpath_dir_part != NULL);
@@ -118,6 +120,8 @@ _split_dir_only(char** p, const char *pf)
 
 -(void)dealloc
 {
+	MTLogError(@"%@ dealloc : [%p] %@",NSStringFromClass([self class]),self,_filepath);
+	
 	[_filepath release],_filepath = nil;
 
 	if(_dirOfFilepath != nil)

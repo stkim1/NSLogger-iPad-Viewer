@@ -112,9 +112,9 @@
 @property (nonatomic, readonly) CGSize				landscapeMessageSize;
 @property (nonatomic, readonly) CGSize				landscapeHintSize;
 
-
+- (void)computeTimeDelta:(struct timeval *)td since:(LoggerMessage *)previousMessage;
 - (void)formatMessage;
+
 - (void)makeTerminalMessage;
 
-- (void)computeTimeDelta:(struct timeval *)td since:(LoggerMessage *)previousMessage;
 @end

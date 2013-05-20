@@ -124,6 +124,7 @@
 {
 	if(_targetCell != nil && !_isReadImageTriggered)
 	{
+		MTLogError(@"%s this really shouldn't happen",__PRETTY_FUNCTION__);
 		[_targetCell release],_targetCell = nil;
 	}
 
@@ -134,6 +135,7 @@
 {
 	if(_targetCell != nil && !_isReadImageTriggered)
 	{
+		MTLogError(@"%s this really shouldn't happen",__PRETTY_FUNCTION__);
 		[_targetCell release],_targetCell = nil;
 	}
 	
@@ -156,6 +158,8 @@
 	//now store datas
 	if(type != kMessageImage)
 		return;
+
+	//MTLogVerify(@"%s %p %@",__PRETTY_FUNCTION__,aCell,[self dataFilepath]);
 	
 	[self setMessageCell:aCell];
 	
@@ -168,7 +172,7 @@
 		 forType:type
 		 withResult:^(NSData *aData) {
 			dispatch_async(dispatch_get_main_queue(), ^{
-
+				//MTLogAssert(@"%s read done # of cells : %p, image : %@",__PRETTY_FUNCTION__, [self messageCell], [self dataFilepath]);
 				if(aData != nil && [aData length])
 				{
 					[[self messageCell] setImagedata:aData forRect:CGRectZero];
@@ -188,6 +192,8 @@
 	//now store datas
 	if(type != kMessageImage)
 		return;
+
+	//MTLogError(@"%s %p",__PRETTY_FUNCTION__,aCell);
 	
 	[self setMessageCell:nil];
 }

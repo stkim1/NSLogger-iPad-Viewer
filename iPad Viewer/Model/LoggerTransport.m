@@ -80,9 +80,7 @@
 	if ([connections containsObject:aConnection])
 	{
 		[self.transManager transport:self removeConnection:aConnection];
-		
 		[aConnection shutdown];
-
 		[self.connections removeObject:aConnection];
 	}
 }
@@ -160,5 +158,6 @@ didDisconnectWithMessage:(LoggerMessage *)theMessage
 	 transport:self
 	 didDisconnectRemote:theConnection
 	 lastMessage:theMessage];
+
 }
 @end

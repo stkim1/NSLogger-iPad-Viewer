@@ -41,8 +41,8 @@
 
 #import <Foundation/Foundation.h>
 
+/*-----                     Logger Message Cell Constants               ------*/
 
-// Logger Message Cell Constants
 #define MAX_DATA_LINES					16		// max number of data lines to show
 
 #define MINIMUM_CELL_HEIGHT				30.0f

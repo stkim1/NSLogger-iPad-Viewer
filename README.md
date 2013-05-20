@@ -1,41 +1,89 @@
 #NSLogger-iPad-Viewer
 
-Derived from [Florent Pillet's NSLogger](https://github.com/fpillet/NSLogger), NSLogger iPad Viewer is an in-field logging tool to monitor your mobile application's behavior in unfabricated, real-world environments. NSLogger iPad Viewer makes use of Bluetooth connection to transmit an application's logging traces.
 
-This is extremely useful to monitor how your application behaves on cellular network, handles GPS data, and/or, treats frequent data exchange with backend.
+NSLogger viewer app on iPad  
+
+Derived from [Florent Pillet's NSLogger](https://github.com/fpillet/NSLogger), NSLogger iPad is an in-field logging tool to monitor your mobile application's behavior in unfabricated, real-world environments. NSLogger-iPad-Viewer makes use of Bluetooth connection to transmit an application's logging traces.
+
+This is extremely useful to monitor how your application behaves on cellular network, handles GPS data, and/or, treats frequent data exchange with backend outside of your office.
 
 ##Minimum Requirements
-iOS 5.1 and upward  
-iPad 2 / iPad mini or higher  
+iOS 5.1 and upward<br/>
+iPad 2 or iPad mini<br/>
 <sup>*</sup>iCloud not supported.
 
 ##Documents, Example, and/or Wiki
-You will see them at [the main repository](https://github.com/fpillet/NSLogger). All pull requests and issues are only accepted from there.  
+As soon as ver 1.0 comes out, iPad viewer will go to [the main repository](https://github.com/fpillet/NSLogger) with documents.<br/>
+All pull requests and issues will only be accepted through there.<br/>
+Stay tuned.
+
+####Meanwhile, if you're interested…
+1. [Caught at the scene
+](http://blog.colorfulglue.com/2012/12/caught-at-the-scene/)
+2. [NSLogger viewer architecture](http://blog.colorfulglue.com/2013/02/nslogger-viewer-architecture/)
 
 ##Status
-As of today (May 9, 2013), I split the repo into two branches; release & development.   
+UI : Preference (Work in progress)
 
-A release version of 0.4 would be highly limited in terms of UI. Nontheless, its underlying logics are essentially the same as the development version and you could capture logging traces with WiFi/Bluetooth connection.    
+##TODO
+###Search
+Search is what makes NSLogger stand out, and my wish is to make the search feature as powerful as Desktop version.  
 
-Ver 0.4 is tested on iPad 2 for receiving 17,160 logging traces with 1,946 images for an hour. I believe it is stable enough to deploy outside.  
+Unlike OSX environment, iOS does not provide something similar to BWToolKit so we have to come up with something new but easy to use.  
 
-### Work-In-Progress
-UI : Preference/Multi-Window/Search
+A proposal is made here that we are to drag and drop a searchable element into a basket of combinator, and to come up with a preset. Open up "Dragger" example. It's crude but I hope it explains the idea.  
+
+
+###UI 
+1. Preference : Transport On/Off, Network Setting, Export log data  
+2. Multiple views to show connections to viewer  
+3. Search for thread, Tag, and/or etc.  
+4. Function name  
+5. Time delta between logs  
+6. Click to see detail  
+
+### CoreData model
+1. Split log entity for performance : data for format such as height vs. actual  data
+2. New entry for tag, function name
+3. Move reconnection count variable from LoggerConnection to LoggerClient entity
+4. Handle App lifecycle (active/inactive/background/terminate)
+
+### DataStorage (File Cache)
+1. Code clean up
+
+### Transport
+1. Clean up error handling
+
+
+## Future Plan
+1. Android Bluetooth client
+2. Crash report integration
 
 ###Questions
 Throw 'em at [@stkim1](http://twitter.com/stkim1)
 
-## How to run demo
-1. Run NSLogger iPad Viewer with WiFi off and Bluetooth on from Setting.  
-2. Run iOS client with Bluetooth on. (It's up to you to leave WiFi or cellular on).        
+## Bluetooth Connection
+There are three Bluetooth frameworks and one API publicly opened in iOS  
+1. [CoreBluetooth](http://developer.apple.com/library/ios/#documentation/CoreBluetooth/Reference/CoreBluetooth_Framework/_index.html)  
+2. [External Accessary](http://developer.apple.com/library/ios/#documentation/ExternalAccessory/Reference/ExternalAccessoryFrameworkReference/_index.ht]ml)  
+3. [GameKit](http://developer.apple.com/library/ios/#documentation/GameKit/Reference/GameKit_Collection/_index.html)  
+4. [Bonjour over Bluetooth (DNS-SD)](http://developer.apple.com/library/ios/#qa/qa1753/_index.html#//apple_ref/doc/uid/DTS40011315)  
+
+The one that is most clutter-free and provides best possible use case is, so far in my opinion, the last one. It requires no additional framework, library, and does not ask user to choose bluetooth connection. It simply finds the nearest possible service on Bluetooth interface and makes use of it.  
+
+
+##Screen Shots
+### How to run demo
+1. Run iPad Viewer with WiFi off and Bluetooth on.  
+2. Run iOS client with Bluetooth on. (It's up to use to leave WiFi or cellular on).      
 3. Start logging. Look at the Bluetooth mark on top right corner. :)  
 
-##Screen Shots 
-### iPhone Client (13/04/27)
-<img width="320" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/iphone_13_04_27.png" />
 
-###iPad Viwer (13/05/11)
-<img width="576" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ipad_13_05_11.png" />
+### iPhone Client (13/04/27)
+<img width="320" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/development/ScreenShots/iphone_13_04_27.png" />
+
+###iPad Viwer (13/05/10)
+<img width="576" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/development/ScreenShots/ios_13_05_10.png" />
 
 
 ##License
@@ -84,5 +132,5 @@ Lucida Grande, Lucida Grande Copyright (c) 1997, 2000, Bigelow & Holmes Inc. U.S
 <a href="http://www.levien.com/type/myfonts/inconsolata.html">Inconsolata</a> Copyright 2006 Raph Levien. Released under the Apache 2 license.
 <a href="http://www.styleseven.com">Digital-7</a> Copyright (c) 2008, Sizenko Alexander, Style-7 All rights reserved.</pre>
 
-_VER. 0.4.0_<br/>
-_Updated : May 9, 2013_
+_VER. 0.4.1_<br/>
+_Updated : May 13, 2013_

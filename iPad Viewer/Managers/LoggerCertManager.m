@@ -150,6 +150,7 @@ static const UInt8 kKeychainCertificateID[] = "NSLogger SSL\0";
 			{
 				if(CFStringCompare(certSummary, identityLabel, 0) == kCFCompareEqualTo)
 				{
+					NSLog(@"cert found!");
 					status = kCredentialImportStatusSucceeded;
 				}
 
@@ -286,7 +287,7 @@ static const UInt8 kKeychainCertificateID[] = "NSLogger SSL\0";
 }
 
 // loadEncryptionCertificate gets called mutiple times from LoggerTransport object
-// To handle them, we need to save the error and return it whenever asked.
+// To handle them, we need to save the error and result and return whenver asked.
 - (BOOL)isEncryptionCertificateAvailable
 {
 	if(_certsLoadAttempted)

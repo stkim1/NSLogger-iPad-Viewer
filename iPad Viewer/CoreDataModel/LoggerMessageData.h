@@ -72,6 +72,7 @@
 @property (nonatomic, retain) NSNumber * truncated;
 @property (nonatomic, retain) NSNumber * type;
 
+#warning fix this naming
 -(LoggerMessageType)dataType;
 -(void)imageForCell:(LoggerMessageCell *)aCell;
 -(void)cancelImageForCell:(LoggerMessageCell *)aCell;

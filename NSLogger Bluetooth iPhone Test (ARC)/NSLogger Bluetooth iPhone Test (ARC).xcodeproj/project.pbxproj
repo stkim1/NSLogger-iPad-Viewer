@@ -31,7 +31,7 @@
 		0424F1301728B549007D33C9 /* LoggerTestAppViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LoggerTestAppViewController.xib; sourceTree = "<group>"; };
 		0437E5561726C5C300AE380A /* LoggerClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerClient.h; sourceTree = "<group>"; };
 		0437E5571726C5C300AE380A /* LoggerClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerClient.m; sourceTree = "<group>"; };
-		0437E5581726C5C300AE380A /* LoggerCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerCommon.h; sourceTree = "<group>"; };
+		04749F50174A679700C11835 /* LoggerCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LoggerCommon.h; path = "../iPad Viewer/LoggerCommon.h"; sourceTree = "<group>"; };
 		047EB4AC1723B9A8006B0A25 /* NSLogger Bluetooth iPhone Test (ARC).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "NSLogger Bluetooth iPhone Test (ARC).app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		047EB4AF1723B9A8006B0A25 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		047EB4B11723B9A8006B0A25 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -66,9 +66,9 @@
 		0437E5551726C5B000AE380A /* NSLoggerClient */ = {
 			isa = PBXGroup;
 			children = (
+				04749F50174A679700C11835 /* LoggerCommon.h */,
 				0437E5561726C5C300AE380A /* LoggerClient.h */,
 				0437E5571726C5C300AE380A /* LoggerClient.m */,
-				0437E5581726C5C300AE380A /* LoggerCommon.h */,
 			);
 			name = NSLoggerClient;
 			sourceTree = "<group>";

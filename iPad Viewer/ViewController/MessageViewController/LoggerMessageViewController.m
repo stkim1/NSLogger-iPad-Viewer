@@ -52,46 +52,48 @@
 @interface LoggerMessageViewController ()
 @property (nonatomic, retain) NSFetchedResultsController	*messageFetchResultController;
 @property (nonatomic, retain) NSDictionary					*clientInfo;
--(void)readMessages:(NSNotification *)aNotification;
--(void)insertTableViewSection;
--(void)deleteTableViewSection;
--(void)startTimer;
--(void)stopTimer;
--(void)timerTick:(NSTimer *)timer;
 @end
 
-@implementation LoggerMessageViewController{
-	NSTimer				*_runTimeCounter;
-	CFTimeInterval		_runTimeTicks;
-}
-
+@implementation LoggerMessageViewController
 //------------------------------------------------------------------------------
 #pragma mark - Inherited Methods
 //------------------------------------------------------------------------------
--(void)finishViewConstruction
+-(id)initWithHashCode:(uLong)aClientHash dataManager:(LoggerDataManager *)aDataManager
 {
-	[super finishViewConstruction];
+	self = [super initWithNibName:@"LoggerMessageViewController" bundle:[NSBundle mainBundle]];
+	if(self)
+	{
+		_clientHash = aClientHash;
+		_dataManager = aDataManager;
+	}
+	return self;
+}
 
-	[self.navigationController.navigationBar setFrame:(CGRect){{0.f,20.f},{self.view.frame.size.width,VIEWCONTROLLER_TITLE_HEIGHT}}];
-	[self.navigationController.navigationBar addSubview:self.titleBar];
-	
-	[[NSNotificationCenter defaultCenter]
+-(void)completeInstanceCreation
+{
+	[super completeInstanceCreation];
+	/*
+	 
+	 [[NSNotificationCenter defaultCenter]
 	 addObserver:self
 	 selector:@selector(readMessages:)
 	 name:kShowClientConnectedNotification
 	 object:nil];
 
-	[[NSNotificationCenter defaultCenter]
+	 [[NSNotificationCenter defaultCenter]
 	 addObserver:self
-	 selector:@selector(stopTimer)
+	 selector:nil//@selector(deleteMessages:)
 	 name:kShowClientDisconnectedNotification
 	 object:nil];
+	 */
+}
+
+-(void)finishViewConstruction
+{
+	[super finishViewConstruction];
 	
-	[[NSNotificationCenter defaultCenter]
-	 addObserver:self
-	 selector:@selector(stopTimer)
-	 name:UIApplicationWillResignActiveNotification
-	 object:nil];
+	[self.navigationController.navigationBar setFrame:(CGRect){CGPointZero,{self.view.frame.size.width,VIEWCONTROLLER_TITLE_HEIGHT}}];
+	[self.navigationController.navigationBar addSubview:self.titleBar];
 }
 
 - (void)viewDidLoad
@@ -110,7 +112,10 @@
         }
     }
 	
+	self.titleLabel.text = @"NSLogger Client (iPhone 5.2)";
+	
 	[self.timeLabel setFont:[UIFont fontWithName:@"Digital-7" size:_timeLabel.font.pointSize]];
+	//[self.runCountLabel setFont:[UIFont fontWithName:@"ArialRoundedMTBold" size:_runCountLabel.font.pointSize]];
     
 	self.toolBar.backgroundColor = [UIColor colorWithRed:0.73 green:0.73 blue:0.73 alpha:1.000];
     self.toolBar.alternateBackgroundColor = [UIColor colorWithRed:0.94 green:0.94 blue:0.94 alpha:1.000];
@@ -118,16 +123,72 @@
     self.toolBar.noiseOpacity = 0.1;
 }
 
+
+#if 0
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+
+
+	assert([self.dataManager messageDisplayContext] != nil);
+	
+	NSFetchRequest *request =\
+		[[NSFetchRequest alloc] init];
+	
+	NSEntityDescription *entity =\
+		[NSEntityDescription
+		 entityForName:@"LoggerMessageData"
+		 inManagedObjectContext:
+		 [[self dataManager] messageDisplayContext]];
+	
+	[request setShouldRefreshRefetchedObjects:YES];
+	[request setEntity:entity];
+	[request setFetchBatchSize:20];
+	//[request setFetchLimit:40];
+	//[request setFetchOffset:0];
+	
+	//[request setPredicate:[NSPredicate predicateWithFormat:@"uniqueID <= 50"]];
+	
+	NSSortDescriptor *sortByTimestamp = \
+		[[NSSortDescriptor alloc]
+		 initWithKey:@"timestamp"
+		 ascending:YES];
+
+	NSSortDescriptor *sortBySequence = \
+		[[NSSortDescriptor alloc]
+		 initWithKey:@"sequence"
+		 ascending:YES];
+	
+	[request setSortDescriptors:@[sortBySequence,sortByTimestamp]];
+	
+	[NSFetchedResultsController deleteCacheWithName:@"mock-cache"];
+	
+	NSFetchedResultsController *frc = \
+		[[NSFetchedResultsController alloc]
+		 initWithFetchRequest:request
+		 managedObjectContext:[[self dataManager] messageDisplayContext]
+		 sectionNameKeyPath:nil//@"uniqueID"
+		 cacheName:@"mock-cache"];
+
+	[frc setDelegate:self];
+	[self setMessageFetchResultController:frc];
+	
+	NSError *error = nil;
+	[frc performFetch:&error];
+	
+	[frc release],frc = nil;
+	[sortBySequence release],sortBySequence = nil;
+	[sortByTimestamp release],sortByTimestamp = nil;
+	[entity release],entity = nil;
+	[request release],request = nil;
+
+}
+#endif
+
 -(void)startViewDestruction
 {
 	[super startViewDestruction];
 
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:kShowClientConnectedNotification object:nil];
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:kShowClientDisconnectedNotification object:nil];
-	
-	[self stopTimer];
-	
 	if(_messageFetchResultController != nil)
 	{
 		self.messageFetchResultController.delegate = nil;
@@ -150,23 +211,28 @@
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - LoggerMessageViewController Methods
+#pragma mark - TableView + NSFetchedResultController Control
 //------------------------------------------------------------------------------
--(void)readMessages:(NSNotification *)aNotification
+-(IBAction)deletePath:(id)sender
 {
-	NSDictionary *userInfo = [aNotification userInfo];
+	if(_clientInfo == nil)
+		return;
 	
-	MTLog(@"userInfo %@",userInfo);
+	uLong clientHash = [[self.clientInfo objectForKey:kClientHash] integerValue];
+	int32_t runCount = [[self.clientInfo objectForKey:kClientRunCount] integerValue];
 	
-	uLong clientHash = [[userInfo objectForKey:kClientHash] integerValue];
-	int32_t runCount = [[userInfo objectForKey:kClientRunCount] integerValue];
-	
-	self.clientInfo = nil;
-	self.clientInfo = userInfo;
+	NSString *targetDir = [[NSString alloc] initWithFormat:@"%lx/%d/",clientHash,runCount];
+	[[LoggerDataStorage sharedDataStorage]
+	 deleteWholePath:targetDir];
+	[targetDir release],targetDir = nil;
+}
 
-	self.runCountLabel.text = \
-		[NSString stringWithFormat:
-		 NSLocalizedString(@"Run %d of %d", nil),runCount+1,runCount+1];
+
+-(void)startMonitoringRun:(int32_t)aLatestRun
+{	
+	uLong clientHash = _clientHash;
+	int32_t runCount = aLatestRun;
+	_runCount = aLatestRun;
 
 	assert([self.dataManager messageDisplayContext] != nil);
 	
@@ -176,17 +242,14 @@
 		self.messageFetchResultController = nil;
 		[self deleteTableViewSection];
 	}
-
-	// start timer
-	[self startTimer];
 	
-	// start fetching
 	NSFetchRequest *request = [[NSFetchRequest alloc] init];
 	
 	NSEntityDescription *entity =\
 		[NSEntityDescription
 		 entityForName:@"LoggerMessageData"
 		 inManagedObjectContext:[[self dataManager] messageDisplayContext]];
+#warning possible bug introduction. watchout
 	[request setShouldRefreshRefetchedObjects:NO];
 	[request setEntity:entity];
 	[request setFetchBatchSize:20];
@@ -215,6 +278,7 @@
 	NSString *cacheName = [NSString stringWithFormat:@"Cache-%lx",clientHash];
 	
 	[NSFetchedResultsController deleteCacheWithName:cacheName];
+	//[NSFetchedResultsController deleteCacheWithName:nil];
 	
 	NSFetchedResultsController *frc = \
 		[[NSFetchedResultsController alloc]
@@ -223,6 +287,7 @@
 		 sectionNameKeyPath:nil//@"uniqueID"
 		 cacheName:cacheName];
 	
+	NSLog(@"performFetch");
 	NSError *error = nil;
 	[frc performFetch:&error];
 	
@@ -243,6 +308,11 @@
 	[request release],request = nil;
 }
 
+-(void)deleteMessages:(NSNotification *)aNotification
+{
+}
+
+
 -(void)insertTableViewSection
 {
 	NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:0];
@@ -261,36 +331,7 @@
 	 deleteSections:indexSet
 	 withRowAnimation:UITableViewRowAnimationAutomatic];
 }
-//------------------------------------------------------------------------------
-#pragma mark Timer Control
-//------------------------------------------------------------------------------
-- (void)startTimer
-{
-    if (_runTimeCounter == nil) {
-        _runTimeCounter =
-			[NSTimer
-			 scheduledTimerWithTimeInterval:0.1
-			 target:self
-			 selector:@selector(timerTick:)
-			 userInfo:nil
-			 repeats:YES];
-    }
-}
 
-- (void)stopTimer
-{
-    [_runTimeCounter invalidate];
-    _runTimeCounter = nil;
-}
-
-- (void)timerTick:(NSTimer *)timer
-{
-    _runTimeTicks += 0.1;
-    double seconds = fmod(_runTimeTicks, 60.0);
-    double minutes = fmod(trunc(_runTimeTicks / 60.0), 60.0);
-    double hours = trunc(_runTimeTicks / 3600.0);
-    self.timeLabel.text = [NSString stringWithFormat:@"%02.0f:%02.0f:%04.1f", hours, minutes, seconds];
-}
 
 //------------------------------------------------------------------------------
 #pragma mark - UITableViewDataSource Delegate Methods
@@ -420,6 +461,8 @@ heightForFooterInSection:(NSInteger)section
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller;
 {
+	MTLog(@"%s",__PRETTY_FUNCTION__);
+	
 	[self.tableView beginUpdates];
 }
 

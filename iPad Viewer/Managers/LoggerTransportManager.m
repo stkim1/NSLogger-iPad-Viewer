@@ -119,7 +119,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 	t.tag = 0;
 	[self.transports addObject:t];
 	[t release];
-	
+
 	// non-SSL bonjour Service
 	t = [[LoggerNativeTransport alloc] init];
 	t.transManager = self;
@@ -146,12 +146,13 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 
 -(void)destoryTransports
 {
-	[self stopTransports];
-	[self.transports removeAllObjects];
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);	
 }
 
 -(void)startTransports
 {
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
+	
 	// Start and stop transports as needed
 	for (LoggerNativeTransport *transport in self.transports)
 	{
@@ -163,7 +164,9 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTransportManager,sharedTransp
 }
 
 -(void)stopTransports
-{	
+{
+	MTLogInfo(@"%s",__PRETTY_FUNCTION__);
+	
 	// Start and stop transports as needed
 	for (LoggerNativeTransport *transport in self.transports)
 	{
