@@ -80,7 +80,6 @@ The one that is most clutter-free and provides best possible use case is, so far
 2. Run iOS client with Bluetooth on. (It's up to use to leave WiFi or cellular on).      
 3. Start logging. Look at the Bluetooth mark on top right corner. :)  
 
-
 ### iPhone Client (13/04/27)
 <img width="320" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/iphone_13_04_27.png" />
 
