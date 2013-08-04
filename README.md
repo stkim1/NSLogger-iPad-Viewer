@@ -1,5 +1,7 @@
 #NSLogger-iPad-Viewer
 
+## Ver 0.4.1 is available on the main repo. (Aug.3. 13) 
+
 
 NSLogger viewer app on iPad  
 
@@ -12,12 +14,6 @@ iOS 5.1 and upward<br/>
 iPad 2 or iPad mini<br/>
 <sup>*</sup>iCloud not supported.
 
-##Documents, Example, and/or Wiki
-As soon as ver 1.0 comes out, iPad viewer will go to [the main repository](https://github.com/fpillet/NSLogger) with documents.<br/>  
-All pull requests and issues will only be accepted through there.<br/>
-Stay tuned.
-
-Ver 0.4 of iPad Viewer with Bluetooth client is pushed to the main repo. (May 18, 2013)  
 
 ####Meanwhile, if you're interested…
 1. [Caught at the scene
@@ -83,7 +79,7 @@ The one that is most clutter-free and provides best possible use case is, so far
 ### iPhone Client (13/04/27)
 <img width="320" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/iphone_13_04_27.png" />
 
-###iPad Viwer (13/05/10)
+###iPad Viewer (13/05/10)
 <img width="576" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ios_13_05_10.png" />
 
 
