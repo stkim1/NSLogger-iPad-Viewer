@@ -58,6 +58,7 @@ NSString *defaultDataHint = nil;
 
 //#define USE_UIKIT_FOR_DRAWING
 //#define DEBUG_CT_STR_RANGE
+//#define DEBUG_DRAW_AREA
 
 @interface LoggerMessageView : UIView
 @end
@@ -339,10 +340,10 @@ NSString *defaultDataHint = nil;
 		CFRelease(framesetter);
 		
 		CGRect cellFrame = self.bounds;
-		
-		
+
+#ifdef DEBUG_DRAW_AREA
 		MTLog(@"cellFrame %@",NSStringFromCGRect(cellFrame));
-		
+#endif
 		
 		//timestamp and delta
 		CGRect drawRect = [self timestampAndDeltaFrame:cellFrame];
@@ -953,14 +954,32 @@ NSString *defaultDataHint = nil;
 	// Draw timestamp and time delta column
 	CGRect drawRect = [self timestampAndDeltaFrame:cellFrame];
 	[self drawTimestampAndDeltaInRect:drawRect highlightedTextColor:nil];
+
+#ifdef DEBUG_DRAW_AREA
+	CGContextSetFillColorWithColor(context, [UIColor redColor].CGColor);
+	CGContextFillRect(context, drawRect);
+#endif
 	
 	// Draw thread ID and tag
 	drawRect = [self threadIDAndTagTextInRect:cellFrame];
 	[self drawThreadIDAndTagInRect:drawRect highlightedTextColor:nil];
-	
+
+#ifdef DEBUG_DRAW_AREA
+	CGContextSetFillColorWithColor(context, [UIColor blueColor].CGColor);
+	CGContextFillRect(context, drawRect);
+#endif
+
+	//@@TODO:: draw file && func area
+
 	// Draw message
 	drawRect = [self messageTextInRect:cellFrame];
 	[self drawMessageInRect:drawRect highlightedTextColor:nil];
+
+#ifdef DEBUG_DRAW_AREA
+	CGContextSetFillColorWithColor(context, [UIColor yellowColor].CGColor);
+	CGContextFillRect(context, drawRect);
+#endif
+	
 
 #if 1
 	CGContextSaveGState(context);
