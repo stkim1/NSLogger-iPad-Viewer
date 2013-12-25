@@ -12,10 +12,12 @@ Derived from [Florent Pillet's NSLogger](https://github.com/fpillet/NSLogger), N
 
 You can utilize this project to monitor how your application behaves on cellular network, handles GPS data, and/or, treats frequent data exchange with backend outside of your office.
 
+
 ##Minimum Requirements
 iOS 6.1 and upward<br/>
 iPad 2 or iPad mini gen 1<br/>
 <sup>*</sup>iCloud not supported.
+
 
 ## How to run demo
 1. Run iPad Viewer on an iPad with WiFi off and Bluetooth on.  
@@ -38,11 +40,13 @@ A proposal is made here that we are to drag and drop a searchable element into a
 5. Time delta between logs  
 6. Click to see detail  
 
+
 ### CoreData model
 1. Split log entity for performance : data for format such as height vs. actual  data
 2. New entry for tag, function name
 3. Move reconnection count variable from LoggerConnection to LoggerClient entity
 4. Handle App lifecycle (active/inactive/background/terminate)
+
 
 ###Questions
 Throw 'em at [@stkim1](http://twitter.com/stkim1)
