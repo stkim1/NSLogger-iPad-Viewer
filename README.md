@@ -1,27 +1,26 @@
-#NSLogger-iPad-Viewer
+#NSLogger iPad Viewer
 
-## Ver 0.4.1 is available on [the main repo](https://github.com/fpillet/NSLogger). (Aug. 3, 13) 
+### iPhone Client (13/04/27)
+<img width="320" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/iphone_13_04_27.png" />
 
+###iPad Viewer (13/05/10)
+<img width="576" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ipad_13_05_09.png" />
 
-NSLogger viewer app on iPad  
+## * Ver 0.4.1 is available on [the main repo](https://github.com/fpillet/NSLogger). (Aug. 3, 13) 
 
-Derived from [Florent Pillet's NSLogger](https://github.com/fpillet/NSLogger), NSLogger iPad is an in-field logging tool to monitor your mobile application's behavior in unfabricated, real-world environments. NSLogger-iPad-Viewer makes use of Bluetooth connection to transmit an application's logging traces.
+Derived from [Florent Pillet's NSLogger](https://github.com/fpillet/NSLogger), NSLogger iPad is an in-field logging tool to monitor your mobile application's behavior in unfabricated, real-world environments.
 
-This is extremely useful to monitor how your application behaves on cellular network, handles GPS data, and/or, treats frequent data exchange with backend outside of your office.
+You can utilize this project to monitor how your application behaves on cellular network, handles GPS data, and/or, treats frequent data exchange with backend outside of your office.
 
 ##Minimum Requirements
-iOS 5.1 and upward<br/>
-iPad 2 or iPad mini<br/>
+iOS 6.1 and upward<br/>
+iPad 2 or iPad mini gen 1<br/>
 <sup>*</sup>iCloud not supported.
 
-
-####Meanwhile, if you're interested…
-1. [Caught at the scene
-](http://blog.colorfulglue.com/2012/12/caught-at-the-scene/)
-2. [NSLogger viewer architecture](http://blog.colorfulglue.com/2013/02/nslogger-viewer-architecture/)
-
-##Status
-UI : Preference (Work in progress)
+## How to run demo
+1. Run iPad Viewer on an iPad with WiFi off and Bluetooth on.  
+2. Run iOS client with Bluetooth on. (It's up to you to leave WiFi or cellular on).      
+3. Start logging. Look at the Bluetooth mark on top right corner. :)  
 
 ##TODO
 ###Search
@@ -30,7 +29,6 @@ Search is what makes NSLogger stand out, and my wish is to make the search featu
 Unlike OSX environment, iOS does not provide something similar to BWToolKit so we have to come up with something new but easy to use.  
 
 A proposal is made here that we are to drag and drop a searchable element into a basket of combinator, and to come up with a preset. Open up "Dragger" example. It's crude but I hope it explains the idea.  
-
 
 ###UI 
 1. Preference : Transport On/Off, Network Setting, Export log data  
@@ -46,19 +44,13 @@ A proposal is made here that we are to drag and drop a searchable element into a
 3. Move reconnection count variable from LoggerConnection to LoggerClient entity
 4. Handle App lifecycle (active/inactive/background/terminate)
 
-### DataStorage (File Cache)
-1. Code clean up
-
-### Transport
-1. Clean up error handling
-
-
-## Future Plan
-1. Android Bluetooth client
-2. Crash report integration
-
 ###Questions
 Throw 'em at [@stkim1](http://twitter.com/stkim1)
+
+####Meanwhile, if you're interested…
+1. [Caught at the scene
+](http://blog.colorfulglue.com/2012/12/caught-at-the-scene/)
+2. [NSLogger viewer architecture](http://blog.colorfulglue.com/2013/02/nslogger-viewer-architecture/)
 
 ## Bluetooth Connection
 There are three Bluetooth frameworks and one API publicly opened in iOS  
@@ -68,20 +60,6 @@ There are three Bluetooth frameworks and one API publicly opened in iOS
 4. [Bonjour over Bluetooth (DNS-SD)](http://developer.apple.com/library/ios/#qa/qa1753/_index.html#//apple_ref/doc/uid/DTS40011315)  
 
 The one that is most clutter-free and provides best possible use case is, so far in my opinion, the last one. It requires no additional framework, library, and does not ask user to choose bluetooth connection. It simply finds the nearest possible service on Bluetooth interface and makes use of it.  
-
-
-##Screen Shots
-### How to run demo
-1. Run iPad Viewer with WiFi off and Bluetooth on.  
-2. Run iOS client with Bluetooth on. (It's up to use to leave WiFi or cellular on).      
-3. Start logging. Look at the Bluetooth mark on top right corner. :)  
-
-### iPhone Client (13/04/27)
-<img width="320" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/iphone_13_04_27.png" />
-
-###iPad Viewer (13/05/10)
-<img width="576" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ipad_13_05_09.png" />
-
 
 ##License
 <pre>Modified BSD license.
@@ -120,7 +98,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ************************** THE CODE IS BASED ON ******************************
 
-<a href="https://github.com/fpillet/NSLogger">NSLogger</a> Copyright (c) 2010-2012, Florent Pillet All rights reserved. 
+<a href="https://github.com/fpillet/NSLogger">NSLogger</a> Copyright (c) 2010-2013, Florent Pillet All rights reserved. 
 <a href="https://github.com/KieranLafferty/KLNoteViewController">KLNoteViewController</a> Copyright (c) 2012 Kieran Lafferty All rights reserved. 
 <a href="https://github.com/kgn/KGNoise">KGNoise</a> Copyright (c) 2012 David Keegan (http://davidkeegan.com) All rights reserved
 <a href="http://www.cocoawithlove.com/">Cocoa With Love</a> Copyright (c) 2007, 2008, 2010 Matt Gallagher. All rights reserved 
