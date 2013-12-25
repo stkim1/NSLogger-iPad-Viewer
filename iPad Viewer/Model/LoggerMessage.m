@@ -42,21 +42,16 @@
 #import <objc/runtime.h>
 #include <sys/time.h>
 #import "LoggerMessage.h"
-#import "LoggerCommon.h"
 #import "LoggerConnection.h"
 #import "NullStringCheck.h"
-
-/*
-#import "LoggerMessageHeight.h"
-#import "LoggerClientHeight.h"
-#import "LoggerMarkerHeight.h"
-*/
 
 #import "LoggerMessageFormatter.h"
 
 #import "LoggerMessageSize.h"
 #import "LoggerClientSize.h"
 #import "LoggerMarkerSize.h"
+
+#include "NullStringCheck.h"
 
 @implementation LoggerMessage
 @synthesize tag, message, threadID;
@@ -65,10 +60,10 @@
 @synthesize image, imageSize;
 @synthesize sequence;
 @synthesize timestampString = _timestampString;
+@synthesize fileFuncString = _fileFuncString;
 @synthesize filename, functionName, lineNumber;
 @synthesize textRepresentation = _textRepresentation;
 @synthesize truncated = _truncated;
-
 
 @dynamic messageText;
 @dynamic messageType;
@@ -103,6 +98,7 @@
 	[image release];
 	[threadID release];
 	[_timestampString release];
+	[_fileFuncString release];
 	[_textRepresentation release];
 	[super dealloc];
 }
@@ -123,122 +119,6 @@
 	return imageSize;
 }
 
-#if 0
-- (NSString *)textRepresentation
-{
-	if(!IS_NULL_STRING(_textRepresentation))
-		return _textRepresentation;
-	
-	// Prepare a text representation of the message, suitable for export of text field display
-	time_t sec = timestamp.tv_sec;
-	struct tm *t = localtime(&sec);
-
-	if (contentsType == kMessageString)
-	{
-		if (type == LOGMSG_TYPE_MARK)
-		{
-			_textRepresentation = [[NSString stringWithFormat:@"%@\n", message] retain];
-			return _textRepresentation;
-		}
-
-		/* commmon case */
-		
-		// if message is empty, use the function name (typical case of using a log to record
-		// a "waypoint" in the code flow)
-		NSString *s = message;
-		if (![s length] && [functionName length])
-			s = functionName;
-
-		_textRepresentation = \
-			[[NSString
-			  stringWithFormat:@"[%-8u] %02d:%02d:%02d.%03d | %@ | %@ | %@\n"
-			  ,sequence
-			  ,t->tm_hour
-			  ,t->tm_min
-			  ,t->tm_sec
-			  ,timestamp.tv_usec / 1000
-			  ,(tag == NULL) ? @"-" : tag
-			  ,threadID
-#warning shouldn't this be functionName?
-			  //,message] retain];
-			  ,s] retain];
-
-		return _textRepresentation;
-	}
-
-	NSString *header = [NSString
-						stringWithFormat:@"[%-8u] %02d:%02d:%02d.%03d | %@ | %@ | "
-						,sequence
-						,t->tm_hour
-						,t->tm_min
-						,t->tm_sec
-						,timestamp.tv_usec / 1000
-						,(tag == NULL) ? @"-" : tag
-						,threadID];
-
-	if (contentsType == kMessageImage){
-		_textRepresentation = \
-			[[NSString
-			  stringWithFormat:@"%@IMAGE size=%dx%d px\n"
-			  ,header
-			  ,(int)self.imageSize.width
-			  ,(int)self.imageSize.height]
-			 retain];
-
-		return _textRepresentation;
-	}
-
-	assert([message isKindOfClass:[NSData class]]);
-	NSMutableString *s = [[NSMutableString alloc] init];
-	[s appendString:header];
-	NSUInteger offset = 0, dataLen = [message length];
-	NSString *str;
-	char buffer[1+6+16*3+1+16+1+1+1];
-	buffer[0] = '\0';
-	const unsigned char *q = [message bytes];
-	if (dataLen == 1)
-		[s appendString:NSLocalizedString(@"Raw data, 1 byte:\n", @"")];
-	else
-		[s appendFormat:NSLocalizedString(@"Raw data, %u bytes:\n", @""), dataLen];
-	while (dataLen)
-	{
-		int i, b = sprintf(buffer," %04x: ", offset);
-		for (i=0; i < 16 && i < dataLen; i++)
-			sprintf(&buffer[b+3*i], "%02x ", (int)q[i]);
-		for (int j=i; j < 16; j++)
-			strcat(buffer, "   ");
-		
-		b = strlen(buffer);
-		buffer[b++] = '\'';
-		for (i=0; i < 16 && i < dataLen; i++)
-		{
-			if (q[i] >= 32 && q[i] < 128)
-				buffer[b++] = q[i];
-			else
-				buffer[b++] = ' ';
-		}
-		for (int j=i; j < 16; j++)
-			buffer[b++] = ' ';
-		buffer[b++] = '\'';
-		buffer[b++] = '\n';
-		buffer[b] = 0;
-		
-		str = [[NSString alloc] initWithBytes:buffer length:strlen(buffer) encoding:NSISOLatin1StringEncoding];
-		[s appendString:str];
-		[str release];
-		
-		dataLen -= i;
-		offset += i;
-		q += i;
-	}
-
-	_textRepresentation = s;
-	return _textRepresentation;
-}
-#endif
-
-
-
 // -----------------------------------------------------------------------------
 #pragma mark - Message Format
 // -----------------------------------------------------------------------------
@@ -258,8 +138,9 @@
 			threadID = nil;
 			_truncated = NO;
 
-			CGSize size __attribute__((unused)) = [self portraitMessageSize];
-			size = [self landscapeMessageSize];
+			// initially compute sizes before storage in CoreData
+			[self portraitMessageSize];
+			[self landscapeMessageSize];
 			break;
 		}
 
@@ -277,8 +158,9 @@
 			threadID = nil;
 			_truncated = NO;
 			
-			CGSize size __attribute__((unused)) = [self portraitMessageSize];
-			size = [self landscapeMessageSize];
+			// initially compute sizes before storage in CoreData
+			[self portraitMessageSize];
+			[self landscapeMessageSize];
 			break;
 		}
 			
@@ -294,18 +176,28 @@
 			[_textRepresentation release],_textRepresentation = nil;
 			_textRepresentation = formattedMessage;
 			
+			// set file func line
+			// set file func string
+			NSString *ffs = [LoggerMessageFormatter formatFileFuncLine:self];
+			if(!IS_NULL_STRING(ffs)){
+				[ffs retain];
+				[_fileFuncString release],_fileFuncString = nil;
+				_fileFuncString = ffs;
+			}
+			
 			// in case image message, preload image
 			if(contentsType == kMessageImage){
-				UIImage *formattedImage __attribute__((unused)) = [self image];
+				[self image];
 			}
 
-			CGSize size __attribute__((unused)) = [self portraitMessageSize];
-			size = [self landscapeMessageSize];
+			// initially compute sizes before storage in CoreData
+			[self portraitMessageSize];
+			[self landscapeMessageSize];
 
 			if(_truncated)
 			{
-				size = [self portraitHintSize];
-				size = [self landscapeHintSize];
+				[self portraitHintSize];
+				[self landscapeHintSize];
 			}
 			
 			break;
@@ -375,28 +267,31 @@
 		{
 			case LOGMSG_TYPE_LOG:
 			case LOGMSG_TYPE_BLOCKSTART:
-			case LOGMSG_TYPE_BLOCKEND:{
+			case LOGMSG_TYPE_BLOCKEND:
 				size = [LoggerMessageSize
 						sizeOfMessage:self
 						maxWidth:maxWidth
 						maxHeight:maxHeight];
 				break;
-			}
+
 			case LOGMSG_TYPE_CLIENTINFO:
-			case LOGMSG_TYPE_DISCONNECT:{
+			case LOGMSG_TYPE_DISCONNECT:
 				size = [LoggerClientSize
 						sizeOfMessage:self
 						maxWidth:maxWidth
 						maxHeight:maxHeight];
 				break;
-			}
-			case LOGMSG_TYPE_MARK:{
+
+			case LOGMSG_TYPE_MARK:
 				size = [LoggerMarkerSize
 						sizeOfMessage:self
 						maxWidth:maxWidth
 						maxHeight:maxHeight];
 				break;
-			}
+
+			default:
+				size = CGSizeZero;
+				break;
 		}
 
 		_portraitMessageSize = size;
@@ -427,6 +322,7 @@
 				break;
 			}
 			default:
+				size = CGSizeZero;
 				break;
 		}
 		
@@ -495,6 +391,10 @@
 						maxHeight:maxHeight];
 				break;
 			}
+
+			default:
+				size = CGSizeZero;
+				break;
 		}
 
 		_landscapeMessageSize = size;
@@ -534,24 +434,21 @@
 	return _landscapeHintSize;
 }
 
+// -----------------------------------------------------------------------------
+#pragma mark - Other
+// -----------------------------------------------------------------------------
 - (void)makeTerminalMessage
 {
 	// Append a disconnect message for only one of the two streams
-
+	
 	gettimeofday(&timestamp, NULL);
 	type = LOGMSG_TYPE_DISCONNECT;
-
-#warning this is a dirty hack not to circulating around coredata save chain
+	
 	sequence = INT_MAX-2;
 	message = NSLocalizedString(@"Client disconnected", @"");
 	contentsType = kMessageString;
 }
 
-
-
-// -----------------------------------------------------------------------------
-#pragma mark - Other
-// -----------------------------------------------------------------------------
 - (void)computeTimeDelta:(struct timeval *)td since:(LoggerMessage *)previousMessage
 {
 	assert(previousMessage != NULL);

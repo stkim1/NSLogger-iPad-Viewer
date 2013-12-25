@@ -43,7 +43,7 @@
 #import <Foundation/Foundation.h>
 
 @interface LoggerPreferenceManager : NSObject
-+(LoggerPreferenceManager *)sharedPrefManager;
++(instancetype)sharedPrefManager;
 @property (nonatomic, readonly) BOOL		shouldPublishBonjourService;
 @property (nonatomic, readonly) BOOL		hasDirectTCPIPResponder;
 @property (nonatomic, readonly) NSInteger	directTCPIPResponderPort;

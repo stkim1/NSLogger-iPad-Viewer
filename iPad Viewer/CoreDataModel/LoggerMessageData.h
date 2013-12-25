@@ -40,7 +40,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
-#include "LoggerConstModel.h"
+#import "LoggerConstModel.h"
 
 @class LoggerMessageCell;
 
@@ -50,6 +50,7 @@
 @property (nonatomic, retain) NSNumber * contentsType;
 @property (nonatomic, retain) NSString * dataFilepath;
 @property (nonatomic, retain) NSString * filename;
+@property (nonatomic, retain) NSString * fileFuncRepresentation;
 @property (nonatomic, retain) NSString * functionName;
 @property (nonatomic, retain) NSString * imageSize;
 @property (nonatomic, retain) NSNumber * landscapeHeight;
@@ -72,7 +73,6 @@
 @property (nonatomic, retain) NSNumber * truncated;
 @property (nonatomic, retain) NSNumber * type;
 
-#warning fix this naming
 -(LoggerMessageType)dataType;
 -(void)imageForCell:(LoggerMessageCell *)aCell;
 -(void)cancelImageForCell:(LoggerMessageCell *)aCell;

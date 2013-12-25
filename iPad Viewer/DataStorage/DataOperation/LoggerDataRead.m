@@ -47,7 +47,7 @@
 	dispatch_async(aQueue,^{
 		int fd = open([[self absTargetFilePath] UTF8String],O_RDONLY);
 		
-		MTLogVerify(@"%s %@",__PRETTY_FUNCTION__,[self absTargetFilePath]);
+		MTLog(@"%s %@",__PRETTY_FUNCTION__,[self absTargetFilePath]);
 
 		
 		dispatch_io_t channel_data_read = \
@@ -75,7 +75,7 @@
 							 ,SIZE_MAX
 							 ,[self queue_io_handler]
 							 ,^(bool done, dispatch_data_t data, int error) {
-
+								 
 								 if(data != NULL)
 								 {
 									 size_t data_size = dispatch_data_get_size(data);
@@ -84,7 +84,6 @@
 										 if(lead == NULL)
 										 {
 											 lead = data;
-											 #warning fix retain error
 											 dispatch_retain(lead);
 										 }
 										 else

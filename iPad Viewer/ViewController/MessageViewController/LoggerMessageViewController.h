@@ -49,8 +49,6 @@
 ,UITableViewDelegate
 ,NSFetchedResultsControllerDelegate>
 @property (nonatomic, assign) LoggerDataManager			*dataManager;
-@property (nonatomic, readonly) uLong					clientHash;
-@property (nonatomic, readonly) int32_t					runCount;
 @property (nonatomic, assign) IBOutlet UITableView		*tableView;
 @property (nonatomic, assign) IBOutlet UILabel			*timeLabel;
 @property (nonatomic, assign) IBOutlet UILabel			*runCountLabel;
@@ -58,8 +56,4 @@
 @property (nonatomic, assign) IBOutlet UISearchBar		*searchBar;
 @property (nonatomic, strong) IBOutlet KGNoiseLinearGradientView *titleBar;
 @property (nonatomic, assign) IBOutlet KGNoiseLinearGradientView *toolBar;
-
--(id)initWithHashCode:(uLong)aClientHash dataManager:(LoggerDataManager *)aDataManager;
--(void)startMonitoringRun:(int32_t)aLatestRun;
--(IBAction)deletePath:(id)sender;
 @end

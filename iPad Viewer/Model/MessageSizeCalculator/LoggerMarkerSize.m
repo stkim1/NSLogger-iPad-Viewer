@@ -42,25 +42,18 @@
 #import "LoggerMarkerSize.h"
 #import "LoggerMessage.h"
 
-extern UIFont	*measureDefaultFont;
-extern UIFont	*measureTagAndLevelFont;
-extern UIFont	*measureMonospacedFont;
 
 @implementation LoggerMarkerSize
 + (CGSize)sizeOfMessage:(LoggerMessage *)aMessage
 				maxWidth:(CGFloat)aMaxWidth
 			   maxHeight:(CGFloat)aMaxHeight
 {
-	UIFont *monospacedFont   = measureMonospacedFont;
 	
 	CGSize sz = CGSizeMake(aMaxWidth, aMaxHeight);
 	CGSize const maxConstraint = CGSizeMake(aMaxWidth,aMaxHeight);
-	
+
 	NSString *s = aMessage.textRepresentation;
-	CGSize lr = [s
-				 sizeWithFont:monospacedFont
-				 constrainedToSize:maxConstraint
-				 lineBreakMode:NSLineBreakByWordWrapping];
+	CGSize lr = [LoggerTextStyleManager sizeForStringWithDefaultMonospacedFont:s constraint:maxConstraint];
 
 	sz.height = fminf(lr.height, sz.height);
 	return sz;

@@ -45,11 +45,13 @@
 #import "LoggerPreferenceManager.h"
 #import "LoggerDataManager.h"
 #import "LoggerDataStorage.h"
+#import "LoggerTextStyleManager.h"
 
 int main(int argc, char *argv[])
 {
     @autoreleasepool {
 
+		[LoggerTextStyleManager sharedStyleManager];
 		LoggerDataStorage *dataStorage = [LoggerDataStorage sharedDataStorage];
 		LoggerDataManager *dataManager = [LoggerDataManager sharedDataManager];
 		[dataManager setDataStorage:dataStorage];

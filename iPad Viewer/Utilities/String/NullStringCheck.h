@@ -38,6 +38,9 @@
  *
  */
 
+/*
+ * returns true if __POINTER is null string
+ */
 
 #define IS_NULL_STRING(__POINTER) \
 		(__POINTER == nil || \

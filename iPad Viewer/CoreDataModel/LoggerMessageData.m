@@ -58,6 +58,7 @@
 @dynamic dataFilepath;
 @dynamic filename;
 @dynamic functionName;
+@dynamic fileFuncRepresentation;
 @dynamic imageSize;
 @dynamic landscapeHeight;
 @dynamic landscapeHintSize;
@@ -79,6 +80,7 @@
 @dynamic truncated;
 @dynamic type;
 
+
 -(unsigned long)rawDataSize
 {
 	unsigned long size = 0;
@@ -88,21 +90,29 @@
 	size += [[self dataFilepath] length];
 	size += [[self filename] length];
 	size += [[self functionName] length];
+	size += [[self fileFuncRepresentation] length];
 	size += [[self imageSize] length];
 	size += 4; // landscape height
+	size += [[self landscapeHintSize] length];
+	size += [[self landscapeMessageSize] length];
+	size += 4; // level
+	size += 4; // line num
+	size += [[self messageText] length];
+	size += [[self messageType] length];
+	size += 4; // portraight height
+	size += [[self portraitHintSize] length];
+	size += [[self portraitMessageSize] length];
 	size += 4; // run count
 	size += 4; // sequence
 	size += 4; // tag
+	size += [[self textRepresentation] length];
 	size += [[self threadID] length];
 	size += 8; // timestamp
+	size += [[self timestampString] length];
+	size += 4; // truncated
 	size += 2; // type;
-	size += 4; // lineNumber
-	size += [[self messageText] length];
-	size += [[self messageType] length];
-	size += [[self textRepresentation] length];
 	
 	return size;
-	
 }
 
 -(LoggerMessageCell *)messageCell
@@ -124,10 +134,9 @@
 {
 	if(_targetCell != nil && !_isReadImageTriggered)
 	{
-		MTLogError(@"%s this really shouldn't happen",__PRETTY_FUNCTION__);
 		[_targetCell release],_targetCell = nil;
 	}
-
+	
 	[super didTurnIntoFault];
 }
 
@@ -135,7 +144,6 @@
 {
 	if(_targetCell != nil && !_isReadImageTriggered)
 	{
-		MTLogError(@"%s this really shouldn't happen",__PRETTY_FUNCTION__);
 		[_targetCell release],_targetCell = nil;
 	}
 	
@@ -152,35 +160,33 @@
 
 -(void)imageForCell:(LoggerMessageCell *)aCell
 {
-
+	
 	LoggerMessageType type = [self dataType];
-
+	
 	//now store datas
 	if(type != kMessageImage)
 		return;
-
-	//MTLogVerify(@"%s %p %@",__PRETTY_FUNCTION__,aCell,[self dataFilepath]);
 	
 	[self setMessageCell:aCell];
 	
 	if(!_isReadImageTriggered)
 	{
 		_isReadImageTriggered = YES;
-
+		
 		[[LoggerDataStorage sharedDataStorage]
 		 readDataFromPath:[self dataFilepath]
 		 forType:type
 		 withResult:^(NSData *aData) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				//MTLogAssert(@"%s read done # of cells : %p, image : %@",__PRETTY_FUNCTION__, [self messageCell], [self dataFilepath]);
-				if(aData != nil && [aData length])
-				{
-					[[self messageCell] setImagedata:aData forRect:CGRectZero];
-				}
-				// release the cell after use
-				[self setMessageCell:nil];
-				_isReadImageTriggered = NO;
-			});
+			 dispatch_async(dispatch_get_main_queue(), ^{
+				 
+				 if(aData != nil && [aData length])
+				 {
+					 [[self messageCell] setImagedata:aData forRect:CGRectZero];
+				 }
+				 // release the cell after use
+				 [self setMessageCell:nil];
+				 _isReadImageTriggered = NO;
+			 });
 		 }];
 	}
 }
@@ -192,11 +198,8 @@
 	//now store datas
 	if(type != kMessageImage)
 		return;
-
-	//MTLogError(@"%s %p",__PRETTY_FUNCTION__,aCell);
 	
 	[self setMessageCell:nil];
 }
-
 
 @end

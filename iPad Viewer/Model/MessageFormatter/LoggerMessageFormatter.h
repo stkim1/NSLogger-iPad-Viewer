@@ -51,6 +51,8 @@
 @interface LoggerMessageFormatter : NSObject
 +(NSString *)formatTimestamp:(struct timeval * const)aTimestamp;
 
++(NSString *)formatFileFuncLine:(LoggerMessage *)message;
+
 // client message should formatted here.
 + (NSString *)formatClientInfoMessage:(LoggerMessage *)message;
 

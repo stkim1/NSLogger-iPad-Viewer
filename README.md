@@ -1,6 +1,6 @@
 #NSLogger-iPad-Viewer
 
-## Ver 0.4.1 is available on the main repo. (Aug.3. 13) 
+## Ver 0.4.1 is available on [the main repo](https://github.com/fpillet/NSLogger). (Aug. 3, 13) 
 
 
 NSLogger viewer app on iPad  
@@ -80,7 +80,7 @@ The one that is most clutter-free and provides best possible use case is, so far
 <img width="320" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/iphone_13_04_27.png" />
 
 ###iPad Viewer (13/05/10)
-<img width="576" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ios_13_05_10.png" />
+<img width="576" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ipad_13_05_09.png" />
 
 
 ##License

@@ -41,12 +41,14 @@
 
 
 #import <Foundation/Foundation.h>
-#import "LoggerConstApp.h"
-#import "LoggerConstController.h"
 #import <zlib.h>
 
-@class LoggerConnection, LoggerMessage;
+#import "LoggerConstApp.h"
+#import "LoggerConstController.h"
 
+#import "LoggerMessage.h"
+
+@class LoggerConnection;
 // -----------------------------------------------------------------------------
 // LoggerConnectionDelegate protocol
 // -----------------------------------------------------------------------------
@@ -128,10 +130,6 @@ didDisconnectWithMessage:(LoggerMessage *)theMessage;
 - (NSString *)clientAppDescription;
 - (NSString *)clientAddressDescription;
 - (NSString *)clientDescription;
-
-#ifdef CHECK_DUPLICATED_CONNECTION
-- (BOOL)isNewRunOfClient:(LoggerConnection *)aConnection;
-#endif
 
 @end
 

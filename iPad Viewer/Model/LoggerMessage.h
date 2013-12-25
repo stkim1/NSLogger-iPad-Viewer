@@ -42,6 +42,8 @@
 #include <time.h>
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+
+#import "LoggerCommon.h"
 #import "LoggerConstModel.h"
 
 @class LoggerConnection;
@@ -71,6 +73,7 @@
 	CGSize						imageSize;
 
 	NSString					*_timestampString;
+	NSString					*_fileFuncString;// text refresentation of file,func line
 	NSString					*_textRepresentation; // text representation of this message
 
 	// stkim1 Apr.04,2013
@@ -100,6 +103,7 @@
 @property (nonatomic, assign) short					contentsType;
 @property (nonatomic, readonly) CGSize				imageSize;
 @property (nonatomic, readonly) NSString			*timestampString;
+@property (nonatomic, readonly) NSString			*fileFuncString;
 @property (nonatomic, readonly) NSString			*textRepresentation;
 @property (nonatomic, readonly) NSString			*messageText;
 @property (nonatomic, readonly) NSString			*messageType;
@@ -112,9 +116,9 @@
 @property (nonatomic, readonly) CGSize				landscapeMessageSize;
 @property (nonatomic, readonly) CGSize				landscapeHintSize;
 
-- (void)computeTimeDelta:(struct timeval *)td since:(LoggerMessage *)previousMessage;
-- (void)formatMessage;
 
+- (void)formatMessage;
 - (void)makeTerminalMessage;
 
+- (void)computeTimeDelta:(struct timeval *)td since:(LoggerMessage *)previousMessage;
 @end

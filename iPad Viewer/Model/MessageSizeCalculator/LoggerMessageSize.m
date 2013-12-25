@@ -41,37 +41,28 @@
 
 #import "LoggerMessageSize.h"
 #import "LoggerMessage.h"
+#import <CoreText/CoreText.h>
 
-UIFont			*measureDefaultFont = nil;
-UIFont			*measureTagAndLevelFont = nil;
-UIFont			*measureMonospacedFont = nil;
 NSString		*hintForLongText = nil;
 NSString		*hintForLargeData = nil;
+
+CGFloat			_minHeightForCell;
+CGFloat			_heightFileLineFunction;
+CGFloat			_heightSingleDataLine;
 
 @implementation LoggerMessageSize
 + (void)initialize
 {
-	// load font resource and reuse it throughout app's lifecycle
-	// since these font will never go out on main thread for drawing,
-	// it is fine to do that
-	if(measureDefaultFont == nil)
-	{
-		measureDefaultFont = \
-			[[UIFont fontWithName:kDefaultFontName size:DEFAULT_FONT_SIZE] retain];
-	}
+	_minHeightForCell = 0;
+	_heightFileLineFunction =  0;
+	_heightSingleDataLine = 0;
+
+	//initialize base values
+	[LoggerMessageSize minimumHeightForCellOnWidth:MSG_CELL_PORTRAIT_WIDTH];
+	[LoggerMessageSize heightOfFileLineFunctionOnWidth:MSG_CELL_PORTRAIT_WIDTH];
+	[LoggerMessageSize heightOfSingleDataLineOnWidth:MSG_CELL_PORTRAIT_WIDTH];
 	
-	if(measureTagAndLevelFont == nil)
-	{
-		measureTagAndLevelFont = \
-			[[UIFont fontWithName:kTagAndLevelFontName size:DEFAULT_TAG_LEVEL_SIZE] retain];
-	}
-	
-	if(measureMonospacedFont == nil)
-	{
-		measureMonospacedFont = \
-			[[UIFont fontWithName:kMonospacedFontName size:DEFAULT_MONOSPACED_SIZE] retain];
-	}
-	
+
 	// hint text should be short, and small at the bottom so that its size,
 	// especially the width, won't exceed the smallest possible width, the portrait width
 	
@@ -89,42 +80,47 @@ NSString		*hintForLargeData = nil;
 
 + (CGFloat)minimumHeightForCellOnWidth:(CGFloat)aWidth
 {
-	UIFont *defaultSizedFont = measureDefaultFont;
-	UIFont *tagAndLevelFont  = measureTagAndLevelFont;
-	
-	CGSize r1 = [@"10:10:10.256"
-				 sizeWithFont:defaultSizedFont
-				 forWidth:aWidth
-				 lineBreakMode:NSLineBreakByWordWrapping];
-	
-	CGSize r2 = [@"+999ms"
-				 sizeWithFont:defaultSizedFont
-				 forWidth:aWidth
-				 lineBreakMode:NSLineBreakByWordWrapping];
-	
-	CGSize r3 = [@"Main Thread"
-				 sizeWithFont:defaultSizedFont
-				 forWidth:aWidth
-				 lineBreakMode:NSLineBreakByWordWrapping];
-	
-	CGSize r4 = [@"qWTy"
-				 sizeWithFont:tagAndLevelFont
-				 forWidth:aWidth
-				 lineBreakMode:NSLineBreakByWordWrapping];
+	// we're to fix the min size of cell since it only is a sets of short strings
+	if(_minHeightForCell != 0)
+		return _minHeightForCell;
+
+	CGSize const maxConstraint = CGSizeMake(MSG_CELL_PORTRAIT_WIDTH,MSG_CELL_PORTRAIT_MAX_HEIGHT);
+
+	CGSize r1 = [LoggerTextStyleManager sizeForStringWithDefaultFont:@"10:10:10.256" constraint:maxConstraint];
+	CGSize r2 = [LoggerTextStyleManager sizeForStringWithDefaultFont:@"+999ms" constraint:maxConstraint];
+	CGSize r3 = [LoggerTextStyleManager sizeForStringWithDefaultFont:@"Main Thread" constraint:maxConstraint];
+	CGSize r4 = [LoggerTextStyleManager sizeForStringWithDefaultTagAndLevelFont:@"qWTy" constraint:maxConstraint];
 		
-	return fmaxf((r1.height + r2.height), (r3.height + r4.height)) + 4;
+	_minHeightForCell = fmaxf((r1.height + r2.height), (r3.height + r4.height)) + 4;
+
+	return _minHeightForCell;
 }
 
-+ (CGFloat)sizeOfFileLineFunctionOnWidth:(CGFloat)aWidth
++ (CGFloat)heightOfFileLineFunctionOnWidth:(CGFloat)aWidth
 {
-	UIFont *tagAndLevelFont  = measureTagAndLevelFont;
+	if(_heightFileLineFunction != 0)
+		return _heightFileLineFunction;
+
+	CGSize const maxConstraint = CGSizeMake(MSG_CELL_PORTRAIT_WIDTH,MSG_CELL_PORTRAIT_MAX_HEIGHT);
+
+	CGSize r = [LoggerTextStyleManager sizeForStringWithDefaultTagAndLevelFont:@"file:100 funcQyTg" constraint:maxConstraint];
 	
-	CGSize r = [@"file:100 funcQyTg"
-				sizeWithFont:tagAndLevelFont
-				forWidth:aWidth
-				lineBreakMode:NSLineBreakByWordWrapping];
-	
-	return r.height + MSG_CELL_TOP_BOTTOM_PADDING;
+	_heightFileLineFunction = r.height + MSG_CELL_TOP_BOTTOM_PADDING;
+
+	return _heightFileLineFunction;
+}
+
++(CGFloat)heightOfSingleDataLineOnWidth:(CGFloat)aWidth
+{
+	if(_heightSingleDataLine != 0)
+		return _heightSingleDataLine;
+
+	CGSize const maxConstraint = CGSizeMake(MSG_CELL_PORTRAIT_WIDTH,MSG_CELL_PORTRAIT_MAX_HEIGHT);
+	CGSize r = [LoggerTextStyleManager sizeForStringWithDefaultMonospacedFont:@"000:" constraint:maxConstraint];
+
+	_heightSingleDataLine = r.height;
+
+	return _heightFileLineFunction;
 }
 
 + (CGSize)sizeOfMessage:(LoggerMessage * const)aMessage
@@ -134,7 +130,6 @@ NSString		*hintForLargeData = nil;
 	CGFloat minimumHeight = \
 		[LoggerMessageSize minimumHeightForCellOnWidth:aMaxWidth];
 
-	UIFont *monospacedFont   = measureMonospacedFont;
 	CGSize sz = CGSizeMake(aMaxWidth,aMaxHeight);
 	CGSize const maxConstraint = CGSizeMake(aMaxWidth,aMaxHeight);
 	
@@ -143,15 +138,8 @@ NSString		*hintForLargeData = nil;
 		case kMessageString: {
 			
 			NSString *s = aMessage.textRepresentation;
-			
-			// calcuate string drawable size
-			CGSize lr = [s
-						 sizeWithFont:monospacedFont
-						 constrainedToSize:maxConstraint
-						 lineBreakMode:NSLineBreakByWordWrapping];
-
-
-			sz.height = fminf(lr.height, sz.height);
+			CGSize frameSize = [LoggerTextStyleManager sizeForStringWithDefaultFont:s constraint:maxConstraint];
+			sz.height = fminf(frameSize.height, sz.height);
 			break;
 		}
 
@@ -160,12 +148,9 @@ NSString		*hintForLargeData = nil;
 			int nLines = (numBytes >> 4) + ((numBytes & 15) ? 1 : 0) + 1;
 			if (nLines > MAX_DATA_LINES)
 				nLines = MAX_DATA_LINES + 1;
-			CGSize lr = [@"000:"
-						 sizeWithFont:monospacedFont
-						 constrainedToSize:maxConstraint
-						 lineBreakMode:NSLineBreakByWordWrapping];
-
-			sz.height = lr.height * nLines;
+			
+			CGFloat slh = [LoggerMessageSize heightOfSingleDataLineOnWidth:aMaxWidth];
+			sz.height = slh * nLines;
 			break;
 		}
 
@@ -174,8 +159,6 @@ NSString		*hintForLargeData = nil;
 			CGSize imgSize = aMessage.imageSize;
 			CGFloat ratio = fmaxf(1.0f, fmaxf(imgSize.width / sz.width, imgSize.height / (sz.height / 2.0f)));
 			sz.height = ceilf(imgSize.height / ratio);
-			
-			//MTLogVerify(@"---- image size %@ ---- cell size %@ --- ratio %5.2f",NSStringFromCGSize(imgSize),NSStringFromCGSize(sz),ratio);
 			break;
 		}
 		default:
@@ -193,32 +176,19 @@ NSString		*hintForLargeData = nil;
 			maxWidth:(CGFloat)aMaxWidth
 		   maxHeight:(CGFloat)aMaxHeight
 {
-	UIFont *monospacedFont   = measureMonospacedFont;
 	CGSize sz = CGSizeMake(aMaxWidth,aMaxHeight);
 	CGSize const maxConstraint = CGSizeMake(aMaxWidth,aMaxHeight);
-	
 	switch (aMessage.contentsType)
 	{
 		case kMessageString: {
 			
-			CGSize hr =\
-				[hintForLongText
-				 sizeWithFont:monospacedFont
-				 constrainedToSize:maxConstraint
-				 lineBreakMode:NSLineBreakByWordWrapping];
-
+			CGSize hr = [LoggerTextStyleManager sizeForStringWithDefaultMonospacedFont:hintForLongText constraint:maxConstraint];
 			sz.height = fminf(hr.height, sz.height);
 			break;
 		}
 			
 		case kMessageData: {
-			
-			CGSize hr =\
-				[hintForLargeData
-				 sizeWithFont:monospacedFont
-				 constrainedToSize:maxConstraint
-				 lineBreakMode:NSLineBreakByWordWrapping];
-
+			CGSize hr = [LoggerTextStyleManager sizeForStringWithDefaultMonospacedFont:hintForLargeData constraint:maxConstraint];
 			sz.height = fminf(hr.height, sz.height);
 			break;
 		}

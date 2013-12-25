@@ -56,11 +56,20 @@ extern UIFont *displayMonospacedFont;
 		 reuseIdentifier:kMarkerCellReuseID];
 }
 
+
+-(void)setupForIndexpath:(NSIndexPath *)anIndexPath
+			 messageData:(LoggerMessageData *)aMessageData
+{
+	self.messageData = aMessageData;
+	self.imageData = nil;
+	
+	
+	[self setNeedsDisplay];
+}
+
 - (void)drawMessageView:(CGRect)cellFrame
 {
 	CGContextRef context = UIGraphicsGetCurrentContext();
-	CGContextSaveGState(context);
-
 	BOOL highlighted = NO;
 	
 	UIColor *separatorColor =
@@ -111,8 +120,6 @@ extern UIFont *displayMonospacedFont;
 	 withFont:displayMonospacedFont
 	 lineBreakMode:NSLineBreakByWordWrapping
 	 alignment:NSTextAlignmentCenter];
-
-	CGContextRestoreGState(context);
 }
 
 @end

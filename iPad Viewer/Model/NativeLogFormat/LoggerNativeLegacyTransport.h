@@ -39,27 +39,13 @@
  *
  */
 
-#import <Foundation/Foundation.h>
-#import "LoggerTextStyleManager.h"
-#import "LoggerConstModel.h"
-#import "LoggerConstView.h"
+/*
+ * stkim1 08/03/13
+ * This class handles Bonjour Service with DNS-SD for BT connectivity separated in iOS 5 & 6
+ */
 
-@class LoggerMessage;
+#import "LoggerTCPTransport.h"
 
-@interface LoggerMessageSize : NSObject
-+ (CGFloat)minimumHeightForCellOnWidth:(CGFloat)aWidth;
-
-+ (CGFloat)heightOfFileLineFunctionOnWidth:(CGFloat)aWidth;
-
-+ (CGSize)sizeOfMessage:(LoggerMessage * const)aMessage
-				maxWidth:(CGFloat)aMaxWidth
-			   maxHeight:(CGFloat)aMaxHeight;
-
-+ (CGSize)sizeOfHint:(LoggerMessage * const)aMessage
-			maxWidth:(CGFloat)aMaxWidth
-		   maxHeight:(CGFloat)aMaxHeight;
-
-+ (CGSize)sizeOfFileLineFunctionOfMessage:(LoggerMessage * const)aMessage
-								   onWidth:(CGFloat)aWidth;
-
+@interface LoggerNativeLegacyTransport : LoggerTCPTransport
+@property (nonatomic, assign) BOOL useBluetooth;
 @end

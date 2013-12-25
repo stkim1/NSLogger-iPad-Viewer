@@ -1,9 +1,9 @@
 /*
- * LoggerNativeTransport.h
+ * LoggerJSONMessage.m
  *
  * BSD license follows (http://www.opensource.org/licenses/bsd-license.php)
  * 
- * Copyright (c) 2010-2013 Florent Pillet <fpillet@gmail.com> All Rights Reserved.
+ * Copyright (c) 2013 Florent Pillet <fpillet@gmail.com> All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -28,15 +28,18 @@
  * SOFTWARE,   EVEN  IF   ADVISED  OF   THE  POSSIBILITY   OF  SUCH   DAMAGE.
  * 
  */
+#import "LoggerJSONMessage.h"
+#import "LoggerCommon.h"
 
-/*
- * Default transport for NSLogger messages, publishes a Bonjour service,
- * and can listen on a specific port (or by default on a port attributed by
- * the OS). In case we listen on a specific, user-defined port, the Bonjour
- * service name will be suffixed
- */
+@implementation LoggerJSONMessage
 
-#import "LoggerTCPTransport.h"
+- (id)initWithData:(NSData *)data connection:(LoggerConnection *)aConnection
+{
+	if ((self = [super init]) != nil)
+	{
+		// TODO
+	}
+	return self;
+}
 
-@interface LoggerNativeTransport : LoggerTCPTransport
 @end

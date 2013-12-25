@@ -46,8 +46,10 @@
 #import "LoggerMessage.h"
 #import "LoggerCommon.h"
 #include <sys/time.h>
+#include "NullStringCheck.h"
 
 @implementation LoggerMessageFormatter
+
 +(NSString *)formatTimestamp:(struct timeval * const)aTimestamp
 {
 	if(aTimestamp == NULL)
@@ -63,6 +65,37 @@
 		timestampStr = [NSString stringWithFormat:@"%02d:%02d:%02d.%03d", t->tm_hour, t->tm_min, t->tm_sec, aTimestamp->tv_usec / 1000];
 	
 	return timestampStr;
+}
+
++(NSString *)formatFileFuncLine:(LoggerMessage *)message
+{
+	NSString *s = @"";
+	BOOL hasFilename = !IS_NULL_STRING(message.filename);
+	BOOL hasFunction = !IS_NULL_STRING(message.functionName);
+	
+	if (hasFunction && hasFilename)
+	{
+		if (message.lineNumber)
+			s = [NSString stringWithFormat:@"%@ (%@:%d)", message.functionName, [message.filename lastPathComponent], message.lineNumber];
+		else
+			s = [NSString stringWithFormat:@"%@ (%@)", message.functionName, [message.filename lastPathComponent]];
+	}
+	else if (hasFunction)
+	{
+		if (message.lineNumber)
+			s = [NSString stringWithFormat:NSLocalizedString(@"%@ (line %d)", @""), message.functionName, message.lineNumber];
+		else
+			s = message.functionName;
+	}
+	else
+	{
+		if (message.lineNumber)
+			s = [NSString stringWithFormat:@"%@:%d", [message.filename lastPathComponent], message.lineNumber];
+		else
+			s = [message.filename lastPathComponent];
+	}
+	
+	return s;
 }
 
 + (NSString *)formatClientInfoMessage:(LoggerMessage *)message

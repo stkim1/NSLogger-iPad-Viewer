@@ -39,27 +39,31 @@
  *
  */
 
-#import <Foundation/Foundation.h>
-#import "LoggerTextStyleManager.h"
-#import "LoggerConstModel.h"
-#import "LoggerConstView.h"
-
+@class LoggerTransport;
+@class LoggerConnection;
 @class LoggerMessage;
 
-@interface LoggerMessageSize : NSObject
-+ (CGFloat)minimumHeightForCellOnWidth:(CGFloat)aWidth;
+@protocol LoggerTransportDelegate <NSObject>
 
-+ (CGFloat)heightOfFileLineFunctionOnWidth:(CGFloat)aWidth;
+// report a new connection from transport (new connection is considered live
+// once we have received the ClientInfo message) or reuse an existing document
+// if this is a reconnection
+- (void)transport:(LoggerTransport *)theTransport
+didEstablishConnection:(LoggerConnection *)theConnection
+	   clientInfo:(LoggerMessage *)theInfoMessage;
 
-+ (CGSize)sizeOfMessage:(LoggerMessage * const)aMessage
-				maxWidth:(CGFloat)aMaxWidth
-			   maxHeight:(CGFloat)aMaxHeight;
+// method reporting messages to transport maanger
+- (void)transport:(LoggerTransport *)theTransport
+	   connection:(LoggerConnection *)theConnection
+didReceiveMessages:(NSArray *)theMessages
+			range:(NSRange)rangeInMessagesList;
 
-+ (CGSize)sizeOfHint:(LoggerMessage * const)aMessage
-			maxWidth:(CGFloat)aMaxWidth
-		   maxHeight:(CGFloat)aMaxHeight;
+// method reporting to transport manager
+- (void)transport:(LoggerTransport *)theTransport
+didDisconnectRemote:(LoggerConnection *)theConnection
+	  lastMessage:(LoggerMessage *)theLastMessage;
 
-+ (CGSize)sizeOfFileLineFunctionOfMessage:(LoggerMessage * const)aMessage
-								   onWidth:(CGFloat)aWidth;
+- (void)transport:(LoggerTransport *)theTransport
+ removeConnection:(LoggerConnection *)theConnection;
 
 @end

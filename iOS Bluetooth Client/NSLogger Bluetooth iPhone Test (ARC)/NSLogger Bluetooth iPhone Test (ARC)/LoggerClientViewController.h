@@ -1,9 +1,9 @@
 /*
- * LoggerNativeTransport.h
+ * LoggerClientViewController.h
  *
  * BSD license follows (http://www.opensource.org/licenses/bsd-license.php)
  * 
- * Copyright (c) 2010-2013 Florent Pillet <fpillet@gmail.com> All Rights Reserved.
+ * Copyright (c) 2010 Florent Pillet <fpillet@gmail.com> All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -28,15 +28,29 @@
  * SOFTWARE,   EVEN  IF   ADVISED  OF   THE  POSSIBILITY   OF  SUCH   DAMAGE.
  * 
  */
+#import <UIKit/UIKit.h>
+#import "LoggerClient.h"
 
-/*
- * Default transport for NSLogger messages, publishes a Bonjour service,
- * and can listen on a specific port (or by default on a port attributed by
- * the OS). In case we listen on a specific, user-defined port, the Bonjour
- * service name will be suffixed
- */
+@interface LoggerClientViewController : UIViewController
+{
+	IBOutlet UIButton *timerButton;
+	IBOutlet UILabel *messagesSentLabel;
+	IBOutlet UILabel *imagesSentLabel;
+	IBOutlet UITextField *viewerHostField;
+	IBOutlet UITextField *viewerPortField;
+	IBOutlet UISwitch *browseBonjour;
+	IBOutlet UISwitch *browseLocalDomainOnly;
+	IBOutlet UISwitch *connecToBluetooth;
 
-#import "LoggerTCPTransport.h"
+	NSTimer *sendTimer;
+	__strong NSArray *tagsArray;
+	int counter;
+	int imagesCounter;
+}
 
-@interface LoggerNativeTransport : LoggerTCPTransport
+- (IBAction)startStopSendingMessages;
+- (IBAction)bonjourSettingChanged;
+- (IBAction)browseLocalDomainOnlySettingChanged;
+
 @end
+

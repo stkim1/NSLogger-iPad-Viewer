@@ -2,7 +2,7 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:NSLogger Bluetooth iPhone Test (ARC)/NSLogger Bluetooth iPhone Test (ARC).xcodeproj">
+      location = "group:iOS Bluetooth Client/NSLogger Bluetooth iPhone Test (ARC)/NSLogger Bluetooth iPhone Test (ARC).xcodeproj">
    </FileRef>
    <FileRef
       location = "group:iPad Viewer/iPad Viewer.xcodeproj">

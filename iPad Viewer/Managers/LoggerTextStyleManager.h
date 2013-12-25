@@ -40,26 +40,42 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "LoggerTextStyleManager.h"
+#import <CoreText/CoreText.h>
 #import "LoggerConstModel.h"
 #import "LoggerConstView.h"
 
-@class LoggerMessage;
+@interface LoggerTextStyleManager : NSObject
++(instancetype)sharedStyleManager;
 
-@interface LoggerMessageSize : NSObject
-+ (CGFloat)minimumHeightForCellOnWidth:(CGFloat)aWidth;
+/*
+ * https://developer.apple.com/library/mac/#documentation/Carbon/Reference/CoreText_Framework_Ref/_index.html
+ *
+ * Multicore Considerations: All individual functions in Core Text are thread safe.
+ * Font objects (CTFont, CTFontDescriptor, and associated objects) can be used 
+ * simultaneously by multiple operations, work queues, or threads. However, the
+ * layout objects (CTTypesetter, CTFramesetter, CTRun, CTLine, CTFrame, and
+ * associated objects) should be used in a single operation, work queue, or thread.
+ *
+ */
+@property (nonatomic, readonly) __attribute__((NSObject)) CTFontRef				defaultFont;
+@property (nonatomic, readonly) __attribute__((NSObject)) CTFontRef				defaultTagAndLevelFont;
+@property (nonatomic, readonly) __attribute__((NSObject)) CTFontRef				defaultMonospacedFont;
 
-+ (CGFloat)heightOfFileLineFunctionOnWidth:(CGFloat)aWidth;
 
-+ (CGSize)sizeOfMessage:(LoggerMessage * const)aMessage
-				maxWidth:(CGFloat)aMaxWidth
-			   maxHeight:(CGFloat)aMaxHeight;
+/* 
+ * CTParagraphStyleCreate
+ *
+ * Using this function is the easiest and most efficient way to create a 
+ * paragraph style. Paragraph styles should be kept immutable for totally 
+ * lock-free operation.
+ *
+ */
+@property (nonatomic, readonly) __attribute__((NSObject)) CTParagraphStyleRef	defaultParagraphStyle;
+@property (nonatomic, readonly) __attribute__((NSObject)) CTParagraphStyleRef	defaultTagAndLevelParagraphStyle;
+@property (nonatomic, readonly) __attribute__((NSObject)) CTParagraphStyleRef	defaultMonospacedStyle;
 
-+ (CGSize)sizeOfHint:(LoggerMessage * const)aMessage
-			maxWidth:(CGFloat)aMaxWidth
-		   maxHeight:(CGFloat)aMaxHeight;
-
-+ (CGSize)sizeOfFileLineFunctionOfMessage:(LoggerMessage * const)aMessage
-								   onWidth:(CGFloat)aWidth;
++(CGSize)sizeForStringWithDefaultFont:(NSString *)aString constraint:(CGSize)aConstraint;
++(CGSize)sizeForStringWithDefaultTagAndLevelFont:(NSString *)aString constraint:(CGSize)aConstraint;
++(CGSize)sizeForStringWithDefaultMonospacedFont:(NSString *)aString constraint:(CGSize)aConstraint;
 
 @end
