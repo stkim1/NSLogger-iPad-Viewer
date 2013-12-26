@@ -409,8 +409,9 @@ heightForRowAtIndexPath:(NSIndexPath *)anIndexPath
 {
 	LoggerMessageData *data = [self.messageFetchResultController objectAtIndexPath:anIndexPath];
 	if([[data truncated] boolValue]){
-		CGSize hint = CGSizeFromString([data portraitHintSize]);
 		
+		//@@TODO:: find accruate height
+		CGSize hint = CGSizeFromString([data portraitHintSize]);
 		return [[data portraitHeight] floatValue]  + hint.height + 100;
 	}
 	return [[data portraitHeight] floatValue];

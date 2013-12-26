@@ -338,18 +338,30 @@ NSString *defaultDataHint = nil;
 		CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString(as);
 		self.textFrameSetter = framesetter;
 		CFRelease(framesetter);
+
 		
-		CGRect cellFrame = self.bounds;
+
+		BOOL isTruncated = [aMessageData.truncated boolValue];
+		CGRect cellFrame;
+		if(isTruncated){
+			
+			//@@TODO:: find accruate height
+			CGSize hint = CGSizeFromString([aMessageData portraitHintSize]);
+			cellFrame = (CGRect){CGPointZero,{MSG_CELL_PORTRAIT_WIDTH,[[aMessageData portraitHeight] floatValue] + hint.height + 100}};
+			
+		}else{
+			cellFrame = (CGRect){CGPointZero,{MSG_CELL_PORTRAIT_WIDTH,[[aMessageData portraitHeight] floatValue]}};
+		}
 
 #ifdef DEBUG_DRAW_AREA
-		MTLog(@"cellFrame %@",NSStringFromCGRect(cellFrame));
+		MTLog(@"[s]cellFrame %@ %@",[[self.messageData sequence] stringValue],NSStringFromCGRect(cellFrame));
 #endif
 		
 		//timestamp and delta
-		CGRect drawRect = [self timestampAndDeltaFrame:cellFrame];
+		CGRect drawRect = [self timestampAndDeltaRect:cellFrame];
 		CTFrameRef frame = \
 			[self
-			 timestampAndDeltaTextInRect:drawRect
+			 timestampAndDeltaText:drawRect
 			 stringForRect:as
 			 timestampRange:CFRangeMake(0, abs(locThread - locTimestamp))
 			 deltaRange:CFRangeMake(0, abs(locThread - locTimestamp))
@@ -359,10 +371,10 @@ NSString *defaultDataHint = nil;
 		CFRelease(frame);
 
 		//thread id & tag
-		drawRect = [self threadIDAndTagTextInRect:cellFrame];
+		drawRect = [self threadIDAndTagTextRect:cellFrame];
 		frame = \
 			[self
-			 threadIDAndTagTextInRect:drawRect
+			 threadIDAndTagText:drawRect
 			 stringForRect:as
 			 threadRange:CFRangeMake(locThread, [aMessageData.threadID length])
 			 tagRange:CFRangeMake(locTag, [aMessageData.tag length])
@@ -376,10 +388,10 @@ NSString *defaultDataHint = nil;
 		if(!IS_NULL_STRING(aMessageData.fileFuncRepresentation)  && false )
 		{
 			
-			drawRect = [self fileLineFunctionTextInRect:cellFrame];
+			drawRect = [self fileLineFunctionTextRect:cellFrame];
 			frame = \
 				[self
-				 fileLineFunctionTextInRect:drawRect
+				 fileLineFunctionText:drawRect
 				 stringForRect:as
 				 stringRange:CFRangeMake(locFileFunc, [aMessageData.fileFuncRepresentation length])
 				 frameSetter:framesetter];
@@ -389,14 +401,15 @@ NSString *defaultDataHint = nil;
 		}
 
 		//message
-		if([self.messageData dataType] != kMessageImage)
+		if([aMessageData dataType] != kMessageImage)
 		{
-			drawRect = [self messageTextInRect:cellFrame];
+			drawRect = [self messageTextRect:cellFrame];
 			frame = \
 				[self
-				 messageTextInRect:drawRect
+				 messageText:drawRect
 				 stringForRect:as
-				 messageTruncated:[aMessageData.truncated boolValue]
+				 truncated:isTruncated
+				 messageType:[aMessageData dataType]
 				 messageRange:CFRangeMake(locMessage, [aMessageData.textRepresentation length])
 				 hintRange:CFRangeMake(locHint, (([self.messageData dataType] == kMessageString)?[defaultTextHint length]:[defaultDataHint length]))
 				 frameSetter:framesetter];
@@ -433,7 +446,7 @@ NSString *defaultDataHint = nil;
 //------------------------------------------------------------------------------
 #pragma mark - Draw Frame
 //------------------------------------------------------------------------------
-- (CGRect)timestampAndDeltaFrame:(CGRect)aBoundRect
+- (CGRect)timestampAndDeltaRect:(CGRect)aBoundRect
 {
 	// Draw timestamp and time delta column
 	CGRect r = CGRectMake(CGRectGetMinX(aBoundRect),
@@ -443,7 +456,7 @@ NSString *defaultDataHint = nil;
 	return r;
 }
 
-- (CGRect)threadIDAndTagTextInRect:(CGRect)aBoundRect
+- (CGRect)threadIDAndTagTextRect:(CGRect)aBoundRect
 {
 	// Draw thread ID and tag
 	CGRect r = CGRectMake(CGRectGetMinX(aBoundRect) + TIMESTAMP_COLUMN_WIDTH,
@@ -454,12 +467,12 @@ NSString *defaultDataHint = nil;
 	return r;
 }
 
-- (CGRect)fileLineFunctionTextInRect:(CGRect)aBoundRect
+- (CGRect)fileLineFunctionTextRect:(CGRect)aBoundRect
 {
 	return CGRectZero;
 }
 
-- (CGRect)messageTextInRect:(CGRect)aBoundRect
+- (CGRect)messageTextRect:(CGRect)aBoundRect
 {
 	CGRect r =	CGRectMake(CGRectGetMinX(aBoundRect) + (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_LEFT_PADDING),
 						   CGRectGetMinY(aBoundRect) + MSG_CELL_TOP_PADDING,
@@ -471,11 +484,11 @@ NSString *defaultDataHint = nil;
 //------------------------------------------------------------------------------
 #pragma mark - CoreText Frame
 //------------------------------------------------------------------------------
-- (CTFrameRef)timestampAndDeltaTextInRect:(CGRect)aDrawRect
-							stringForRect:(CFMutableAttributedStringRef)aString
-						   timestampRange:(CFRange)aTimestampRange
-							   deltaRange:(CFRange)aDeltaRange
-							  frameSetter:(CTFramesetterRef)aFrameSetter
+- (CTFrameRef)timestampAndDeltaText:(CGRect)aDrawRect
+					  stringForRect:(CFMutableAttributedStringRef)aString
+					 timestampRange:(CFRange)aTimestampRange
+						 deltaRange:(CFRange)aDeltaRange
+						frameSetter:(CTFramesetterRef)aFrameSetter
 {
 #ifdef DEBUG_CT_STR_RANGE
 	NSAttributedString *s = (NSAttributedString *)aString;
@@ -501,12 +514,12 @@ NSString *defaultDataHint = nil;
 	return frame;
 }
 
-- (CTFrameRef)threadIDAndTagTextInRect:(CGRect)aDrawRect
-						 stringForRect:(CFMutableAttributedStringRef)aString
-						   threadRange:(CFRange)aThreadRange
-							  tagRange:(CFRange)aTagRange
-							levelRange:(CFRange)aLevelRange
-						   frameSetter:(CTFramesetterRef)aFrameSetter
+- (CTFrameRef)threadIDAndTagText:(CGRect)aDrawRect
+				   stringForRect:(CFMutableAttributedStringRef)aString
+					 threadRange:(CFRange)aThreadRange
+						tagRange:(CFRange)aTagRange
+					  levelRange:(CFRange)aLevelRange
+					 frameSetter:(CTFramesetterRef)aFrameSetter
 {
 #ifdef DEBUG_CT_STR_RANGE
 	NSAttributedString *s = (NSAttributedString *)aString;
@@ -515,18 +528,21 @@ NSString *defaultDataHint = nil;
 	MTLog(@"level : %@",[[s attributedSubstringFromRange:NSMakeRange(aLevelRange.location, aLevelRange.length)] string]);
 #endif
 
-	CTFontRef f = [[LoggerTextStyleManager sharedStyleManager] defaultTagAndLevelFont];
-	CTParagraphStyleRef p = [[LoggerTextStyleManager sharedStyleManager] defaultTagAndLevelParagraphStyle];
-	
-	//@@TODO :: apply
+	CTFontRef f = [[LoggerTextStyleManager sharedStyleManager] defaultFont];
+	CTParagraphStyleRef p = [[LoggerTextStyleManager sharedStyleManager] defaultParagraphStyle];
+
 	CFAttributedStringSetAttribute(aString, aThreadRange, kCTFontAttributeName, f);
 	CFAttributedStringSetAttribute(aString, aThreadRange, kCTParagraphStyleAttributeName, p);
 
-	CFAttributedStringSetAttribute(aString, aTagRange, kCTFontAttributeName, f);
-	CFAttributedStringSetAttribute(aString, aTagRange, kCTParagraphStyleAttributeName, p);
 	
-	CFAttributedStringSetAttribute(aString, aLevelRange, kCTFontAttributeName, f);
-	CFAttributedStringSetAttribute(aString, aLevelRange, kCTParagraphStyleAttributeName, p);
+	CTFontRef tlf = [[LoggerTextStyleManager sharedStyleManager] defaultTagAndLevelFont];
+	CTParagraphStyleRef tlp = [[LoggerTextStyleManager sharedStyleManager] defaultTagAndLevelParagraphStyle];
+
+	CFAttributedStringSetAttribute(aString, aTagRange, kCTFontAttributeName, tlf);
+	CFAttributedStringSetAttribute(aString, aTagRange, kCTParagraphStyleAttributeName, tlp);
+	
+	CFAttributedStringSetAttribute(aString, aLevelRange, kCTFontAttributeName, tlf);
+	CFAttributedStringSetAttribute(aString, aLevelRange, kCTParagraphStyleAttributeName, tlp);
 	
 	CGMutablePathRef path = CGPathCreateMutable();
 
@@ -539,14 +555,14 @@ NSString *defaultDataHint = nil;
 	CGPathAddRect(path, NULL, CGRectInset(aDrawRect, 3, 0));
 	
 	CTFrameRef frame = CTFramesetterCreateFrame(aFrameSetter, CFRangeMake(aThreadRange.location, aThreadRange.length + aTagRange.length + aLevelRange.length), path, NULL);
-	
+
 	return frame;
 }
 
-- (CTFrameRef)fileLineFunctionTextInRect:(CGRect)aDrawRect
-						   stringForRect:(CFMutableAttributedStringRef)aString
-							 stringRange:(CFRange)aStringRange
-							 frameSetter:(CTFramesetterRef)aFrameSetter
+- (CTFrameRef)fileLineFunctionText:(CGRect)aDrawRect
+					 stringForRect:(CFMutableAttributedStringRef)aString
+					   stringRange:(CFRange)aStringRange
+					   frameSetter:(CTFramesetterRef)aFrameSetter
 {
 #ifdef DEBUG_CT_STR_RANGE
 	NSAttributedString *s = (NSAttributedString *)aString;
@@ -568,12 +584,13 @@ NSString *defaultDataHint = nil;
 	return frame;
 }
 
-- (CTFrameRef)messageTextInRect:(CGRect)aDrawRect
-				  stringForRect:(CFMutableAttributedStringRef)aString
-			   messageTruncated:(BOOL)truncated
-				   messageRange:(CFRange)aMessageRange
-					  hintRange:(CFRange)aHintRange
-					frameSetter:(CTFramesetterRef)aFrameSetter
+- (CTFrameRef)messageText:(CGRect)aDrawRect
+			stringForRect:(CFMutableAttributedStringRef)aString
+				truncated:(BOOL)isTruncated
+			  messageType:(LoggerMessageType)aMessageType
+			 messageRange:(CFRange)aMessageRange
+				hintRange:(CFRange)aHintRange
+			  frameSetter:(CTFramesetterRef)aFrameSetter
 {
 #ifdef DEBUG_CT_STR_RANGE
 	NSAttributedString *s = (NSAttributedString *)aString;
@@ -585,14 +602,29 @@ NSString *defaultDataHint = nil;
 	}
 #endif
 	
-	
-	CTFontRef f = [[LoggerTextStyleManager sharedStyleManager] defaultFont];
-	CTParagraphStyleRef p = [[LoggerTextStyleManager sharedStyleManager] defaultParagraphStyle];
+	if(aMessageType == kMessageString){
+				
+		CTFontRef f = [[LoggerTextStyleManager sharedStyleManager] defaultFont];
+		CTParagraphStyleRef p = [[LoggerTextStyleManager sharedStyleManager] defaultParagraphStyle];
+		
+		CFAttributedStringSetAttribute(aString, aMessageRange, kCTFontAttributeName, f);
+		CFAttributedStringSetAttribute(aString, aMessageRange, kCTParagraphStyleAttributeName, p);
+		
+	}else if(aMessageType == kMessageData){
 
-	CFAttributedStringSetAttribute(aString, aMessageRange, kCTFontAttributeName, f);
-	CFAttributedStringSetAttribute(aString, aMessageRange, kCTParagraphStyleAttributeName, p);
+		//@@TODO:: find what's going on.
+		CTFontRef f = [[LoggerTextStyleManager sharedStyleManager] defaultMonospacedFont];
+		CTParagraphStyleRef p = [[LoggerTextStyleManager sharedStyleManager] defaultMonospacedStyle];
+		
+		CFAttributedStringSetAttribute(aString, aMessageRange, kCTFontAttributeName, f);
+		CFAttributedStringSetAttribute(aString, aMessageRange, kCTParagraphStyleAttributeName, p);
+
+	}
 	
-	if(truncated){
+	if(isTruncated){
+		CTFontRef f = [[LoggerTextStyleManager sharedStyleManager] defaultFont];
+		CTParagraphStyleRef p = [[LoggerTextStyleManager sharedStyleManager] defaultParagraphStyle];
+		
 		CFAttributedStringSetAttribute(aString, aHintRange, kCTFontAttributeName, f);
 		CFAttributedStringSetAttribute(aString, aHintRange, kCTParagraphStyleAttributeName, p);
 	}
@@ -601,7 +633,7 @@ NSString *defaultDataHint = nil;
 	CGPathAddRect(path, NULL, aDrawRect);
 	
 	CFRange range;
-	if(truncated){
+	if(isTruncated){
 		range = CFRangeMake(aMessageRange.location, aMessageRange.length + aHintRange.length);
 	}else{
 		range = aMessageRange;
@@ -899,9 +931,9 @@ NSString *defaultDataHint = nil;
 //------------------------------------------------------------------------------
 #pragma mark - drawRect()
 //------------------------------------------------------------------------------
-//TODO::try to come up with one big blob of texture
 - (void)drawMessageView:(CGRect)cellFrame
 {
+	
 	CGContextRef context = UIGraphicsGetCurrentContext();
 	
 	// turn antialiasing off
@@ -952,16 +984,17 @@ NSString *defaultDataHint = nil;
 	CGContextSetShouldAntialias(context, true);
 
 	// Draw timestamp and time delta column
-	CGRect drawRect = [self timestampAndDeltaFrame:cellFrame];
+	CGRect drawRect = [self timestampAndDeltaRect:cellFrame];
 	[self drawTimestampAndDeltaInRect:drawRect highlightedTextColor:nil];
 
 #ifdef DEBUG_DRAW_AREA
+	MTLog(@"[d]cellFrame %@ %@\n\n",[[self.messageData sequence] stringValue],NSStringFromCGRect(cellFrame));
 	CGContextSetFillColorWithColor(context, [UIColor redColor].CGColor);
 	CGContextFillRect(context, drawRect);
 #endif
 	
 	// Draw thread ID and tag
-	drawRect = [self threadIDAndTagTextInRect:cellFrame];
+	drawRect = [self threadIDAndTagTextRect:cellFrame];
 	[self drawThreadIDAndTagInRect:drawRect highlightedTextColor:nil];
 
 #ifdef DEBUG_DRAW_AREA
@@ -972,7 +1005,7 @@ NSString *defaultDataHint = nil;
 	//@@TODO:: draw file && func area
 
 	// Draw message
-	drawRect = [self messageTextInRect:cellFrame];
+	drawRect = [self messageTextRect:cellFrame];
 	[self drawMessageInRect:drawRect highlightedTextColor:nil];
 
 #ifdef DEBUG_DRAW_AREA
