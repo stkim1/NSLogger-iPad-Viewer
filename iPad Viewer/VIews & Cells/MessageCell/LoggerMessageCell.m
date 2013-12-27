@@ -58,7 +58,10 @@ NSString *defaultDataHint = nil;
 
 //#define USE_UIKIT_FOR_DRAWING
 //#define DEBUG_CT_STR_RANGE
+//#define DEBUG_CT_FRAME_RANGE
 //#define DEBUG_DRAW_AREA
+
+#define TEXT_LENGH_BETWEEN_LOCS(LOCATION_1,LOCATION_0) (abs(LOCATION_1 - LOCATION_0))
 
 @interface LoggerMessageView : UIView
 @end
@@ -78,8 +81,6 @@ NSString *defaultDataHint = nil;
 @synthesize hostTableView = _hostTableView;
 @synthesize messageData = _messageData;
 @synthesize imageData = _imageData;
-@synthesize displayString = _displayString;
-@synthesize textFrameSetter = _textFrameSetter;
 @synthesize textFrameContainer = _textFrameContainer;
 
 +(void)initialize
@@ -176,8 +177,6 @@ NSString *defaultDataHint = nil;
 	self.hostTableView = nil;
 	self.messageData = nil;
 	self.imageData = nil;
-	self.displayString = nil;
-	self.textFrameSetter = nil;
 	CFArrayRemoveAllValues(self.textFrameContainer);
 	self.textFrameContainer = nil;
 
@@ -227,8 +226,6 @@ NSString *defaultDataHint = nil;
 
 	self.imageData = nil;
 	self.messageData = nil;
-	self.displayString = nil;
-	self.textFrameSetter = nil;
 	CFArrayRemoveAllValues(self.textFrameContainer);
 }
 
@@ -258,9 +255,9 @@ NSString *defaultDataHint = nil;
 		int locTimestamp	= 0;
 		
 		//@@TODO:: timedelta
-		int locTimedelta	= locTimestamp;// + [aMessageData.timedelta length];
+		int locTimedelta	= locTimestamp + [aMessageData.timestampString length];
+		int locThread		= locTimedelta;// + [aMessageData.timeDeltaString length];
 		
-		int locThread		= locTimedelta + [aMessageData.timestampString length];
 		int locTag			= locThread + [aMessageData.threadID length];
 		int locLevel		= locTag + [aMessageData.tag length];
 		int locFileFunc		= locLevel + [[aMessageData.level stringValue] length];
@@ -335,12 +332,6 @@ NSString *defaultDataHint = nil;
 		}
 		
 		
-		CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString(as);
-		self.textFrameSetter = framesetter;
-		CFRelease(framesetter);
-
-		
-
 		BOOL isTruncated = [aMessageData.truncated boolValue];
 		CGRect cellFrame;
 		if(isTruncated){
@@ -357,14 +348,58 @@ NSString *defaultDataHint = nil;
 		MTLog(@"[s]cellFrame %@ %@",[[self.messageData sequence] stringValue],NSStringFromCGRect(cellFrame));
 #endif
 		
+		//timestamp & delta
+		[self
+		 timestampAndDeltaAttribute:as
+		 timestampRange:CFRangeMake(locTimestamp, TEXT_LENGH_BETWEEN_LOCS(locTimedelta,locTimestamp))
+		 deltaRange:CFRangeMake(locTimedelta, TEXT_LENGH_BETWEEN_LOCS(locThread,locTimedelta))
+		 hightlighted:NO];
+		
+		// thread id & tag
+		[self
+		 threadIDAndTagAttribute:as
+		 threadRange:CFRangeMake(locThread, TEXT_LENGH_BETWEEN_LOCS(locTag,locThread))
+		 tagRange:CFRangeMake(locTag, TEXT_LENGH_BETWEEN_LOCS(locLevel,locTag))
+		 levelRange:CFRangeMake(locLevel, TEXT_LENGH_BETWEEN_LOCS(locFileFunc,locLevel))
+		 hightlighted:NO];
+		
+		// file name & function name
+		if(!IS_NULL_STRING(aMessageData.fileFuncRepresentation))
+		{
+			[self
+			 fileLineFunctionAttribute:as
+			 stringRange:CFRangeMake(locFileFunc, TEXT_LENGH_BETWEEN_LOCS(locMessage,locFileFunc))
+			 hightlighted:NO];
+		}
+
+		// message body & hint
+		if([aMessageData dataType] != kMessageImage)
+		{
+			[self
+			 messageAttribute:as
+			 truncated:truncated
+			 messageType:[aMessageData dataType]
+			 messageRange:CFRangeMake(locMessage, TEXT_LENGH_BETWEEN_LOCS(locHint,locMessage))
+			 hintRange:CFRangeMake(locHint, TEXT_LENGH_BETWEEN_LOCS(totalTextLength,locHint))
+			 hightlighted:NO];
+		}
+		
+		// done editing the attributed string
+		CFAttributedStringEndEditing(as);
+		
+		
+		
+		
+		
+		CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString(as);
+
 		//timestamp and delta
 		CGRect drawRect = [self timestampAndDeltaRect:cellFrame];
 		CTFrameRef frame = \
 			[self
 			 timestampAndDeltaText:drawRect
 			 stringForRect:as
-			 timestampRange:CFRangeMake(0, abs(locThread - locTimestamp))
-			 deltaRange:CFRangeMake(0, abs(locThread - locTimestamp))
+			 stringRange:CFRangeMake(locTimestamp, TEXT_LENGH_BETWEEN_LOCS(locThread,locTimestamp))
 			 frameSetter:framesetter];
 			 
 		CFArrayAppendValue(self.textFrameContainer,frame);
@@ -376,9 +411,7 @@ NSString *defaultDataHint = nil;
 			[self
 			 threadIDAndTagText:drawRect
 			 stringForRect:as
-			 threadRange:CFRangeMake(locThread, [aMessageData.threadID length])
-			 tagRange:CFRangeMake(locTag, [aMessageData.tag length])
-			 levelRange:CFRangeMake(locLevel, [[aMessageData.level stringValue] length])
+			 stringRange:CFRangeMake(locThread, TEXT_LENGH_BETWEEN_LOCS(locFileFunc,locThread))
 			 frameSetter:framesetter];
 		
 		CFArrayAppendValue(self.textFrameContainer,frame);
@@ -408,18 +441,15 @@ NSString *defaultDataHint = nil;
 				[self
 				 messageText:drawRect
 				 stringForRect:as
-				 truncated:isTruncated
-				 messageType:[aMessageData dataType]
-				 messageRange:CFRangeMake(locMessage, [aMessageData.textRepresentation length])
-				 hintRange:CFRangeMake(locHint, (([self.messageData dataType] == kMessageString)?[defaultTextHint length]:[defaultDataHint length]))
+				 stringRange:CFRangeMake(locMessage, TEXT_LENGH_BETWEEN_LOCS(totalTextLength,locMessage))
 				 frameSetter:framesetter];
 			 
 			 CFArrayAppendValue(self.textFrameContainer,frame);
 			 CFRelease(frame);
 		}
 
-		CFAttributedStringEndEditing(as);
-		self.displayString = as;
+		// throw attributed string as well as frame setter.
+		CFRelease(framesetter);
 		CFRelease(as);
 	}
 	
@@ -482,21 +512,19 @@ NSString *defaultDataHint = nil;
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - CoreText Frame
+#pragma mark - Text Attribute
 //------------------------------------------------------------------------------
-- (CTFrameRef)timestampAndDeltaText:(CGRect)aDrawRect
-					  stringForRect:(CFMutableAttributedStringRef)aString
-					 timestampRange:(CFRange)aTimestampRange
-						 deltaRange:(CFRange)aDeltaRange
-						frameSetter:(CTFramesetterRef)aFrameSetter
+-(void)timestampAndDeltaAttribute:(CFMutableAttributedStringRef)aString
+				   timestampRange:(CFRange)aTimestampRange
+					   deltaRange:(CFRange)aDeltaRange
+					 hightlighted:(BOOL)isHighlighted
 {
 #ifdef DEBUG_CT_STR_RANGE
 	NSAttributedString *s = (NSAttributedString *)aString;
 	MTLog(@"\n\nts : %@",[[s attributedSubstringFromRange:NSMakeRange(aTimestampRange.location, aTimestampRange.length)] string]);
 	MTLog(@"delta : %@",[[s attributedSubstringFromRange:NSMakeRange(aDeltaRange.location, aDeltaRange.length)] string]);
 #endif
-	CGRect tr = CGRectInset(aDrawRect, 2, 2);
-	
+
 	//TODO:: get color, underline, bold, hightlight etc
 	CTFontRef f = [[LoggerTextStyleManager sharedStyleManager] defaultFont];
 	CTParagraphStyleRef p = [[LoggerTextStyleManager sharedStyleManager] defaultParagraphStyle];
@@ -504,22 +532,13 @@ NSString *defaultDataHint = nil;
 	//  Apply our font and line spacing attributes over the span
 	CFAttributedStringSetAttribute(aString, aTimestampRange, kCTFontAttributeName, f);
 	CFAttributedStringSetAttribute(aString, aTimestampRange, kCTParagraphStyleAttributeName, p);
-	
-	CGMutablePathRef path = CGPathCreateMutable();
-	CGPathAddRect(path, NULL, tr);
-	
-	CTFrameRef frame = CTFramesetterCreateFrame(aFrameSetter, aTimestampRange, path, NULL);
-	CGPathRelease(path);
-	
-	return frame;
 }
 
-- (CTFrameRef)threadIDAndTagText:(CGRect)aDrawRect
-				   stringForRect:(CFMutableAttributedStringRef)aString
-					 threadRange:(CFRange)aThreadRange
-						tagRange:(CFRange)aTagRange
-					  levelRange:(CFRange)aLevelRange
-					 frameSetter:(CTFramesetterRef)aFrameSetter
+- (void)threadIDAndTagAttribute:(CFMutableAttributedStringRef)aString
+					threadRange:(CFRange)aThreadRange
+					   tagRange:(CFRange)aTagRange
+					 levelRange:(CFRange)aLevelRange
+				   hightlighted:(BOOL)isHighlighted
 {
 #ifdef DEBUG_CT_STR_RANGE
 	NSAttributedString *s = (NSAttributedString *)aString;
@@ -527,42 +546,26 @@ NSString *defaultDataHint = nil;
 	MTLog(@"delta : %@",[[s attributedSubstringFromRange:NSMakeRange(aTagRange.location, aTagRange.length)] string]);
 	MTLog(@"level : %@",[[s attributedSubstringFromRange:NSMakeRange(aLevelRange.location, aLevelRange.length)] string]);
 #endif
-
+	
 	CTFontRef f = [[LoggerTextStyleManager sharedStyleManager] defaultFont];
 	CTParagraphStyleRef p = [[LoggerTextStyleManager sharedStyleManager] defaultParagraphStyle];
-
+	
 	CFAttributedStringSetAttribute(aString, aThreadRange, kCTFontAttributeName, f);
 	CFAttributedStringSetAttribute(aString, aThreadRange, kCTParagraphStyleAttributeName, p);
-
 	
 	CTFontRef tlf = [[LoggerTextStyleManager sharedStyleManager] defaultTagAndLevelFont];
 	CTParagraphStyleRef tlp = [[LoggerTextStyleManager sharedStyleManager] defaultTagAndLevelParagraphStyle];
-
+	
 	CFAttributedStringSetAttribute(aString, aTagRange, kCTFontAttributeName, tlf);
 	CFAttributedStringSetAttribute(aString, aTagRange, kCTParagraphStyleAttributeName, tlp);
 	
 	CFAttributedStringSetAttribute(aString, aLevelRange, kCTFontAttributeName, tlf);
 	CFAttributedStringSetAttribute(aString, aLevelRange, kCTParagraphStyleAttributeName, tlp);
-	
-	CGMutablePathRef path = CGPathCreateMutable();
-
-/*
-	CGSize threadBounds = [LoggerTextStyleManager
-	sizeForStringWithDefaultTagAndLevelFont:self.messageData.threadID
-	constraint:aDrawRect.size];
-*/
-	
-	CGPathAddRect(path, NULL, CGRectInset(aDrawRect, 3, 0));
-	
-	CTFrameRef frame = CTFramesetterCreateFrame(aFrameSetter, CFRangeMake(aThreadRange.location, aThreadRange.length + aTagRange.length + aLevelRange.length), path, NULL);
-
-	return frame;
 }
 
-- (CTFrameRef)fileLineFunctionText:(CGRect)aDrawRect
-					 stringForRect:(CFMutableAttributedStringRef)aString
-					   stringRange:(CFRange)aStringRange
-					   frameSetter:(CTFramesetterRef)aFrameSetter
+- (void)fileLineFunctionAttribute:(CFMutableAttributedStringRef)aString
+					  stringRange:(CFRange)aStringRange
+					 hightlighted:(BOOL)isHighlighted
 {
 #ifdef DEBUG_CT_STR_RANGE
 	NSAttributedString *s = (NSAttributedString *)aString;
@@ -575,50 +578,48 @@ NSString *defaultDataHint = nil;
 	//@@TODO :: apply
 	CFAttributedStringSetAttribute(aString, aStringRange, kCTFontAttributeName, f);
 	CFAttributedStringSetAttribute(aString, aStringRange, kCTParagraphStyleAttributeName, p);
-	
-	CGMutablePathRef path = CGPathCreateMutable();
-	CGPathAddRect(path, NULL, CGRectInset(aDrawRect, 3, 0));
-	
-	CTFrameRef frame = CTFramesetterCreateFrame(aFrameSetter, aStringRange, path, NULL);
-	
-	return frame;
 }
 
-- (CTFrameRef)messageText:(CGRect)aDrawRect
-			stringForRect:(CFMutableAttributedStringRef)aString
-				truncated:(BOOL)isTruncated
-			  messageType:(LoggerMessageType)aMessageType
-			 messageRange:(CFRange)aMessageRange
-				hintRange:(CFRange)aHintRange
-			  frameSetter:(CTFramesetterRef)aFrameSetter
+- (void)messageAttribute:(CFMutableAttributedStringRef)aString
+			   truncated:(BOOL)isTruncated
+			 messageType:(LoggerMessageType)aMessageType
+			messageRange:(CFRange)aMessageRange
+			   hintRange:(CFRange)aHintRange
+			hightlighted:(BOOL)isHighlighted
 {
 #ifdef DEBUG_CT_STR_RANGE
 	NSAttributedString *s = (NSAttributedString *)aString;
 	MTLog(@"message : %@",[[s attributedSubstringFromRange:NSMakeRange(aMessageRange.location, aMessageRange.length)] string]);
-
-	if(truncated)
+	
+	if(isTruncated)
 	{
 		MTLog(@"hint : %@",[[s attributedSubstringFromRange:NSMakeRange(aHintRange.location, aHintRange.length)] string]);
 	}
 #endif
 	
 	if(aMessageType == kMessageString){
-				
+		
 		CTFontRef f = [[LoggerTextStyleManager sharedStyleManager] defaultFont];
 		CTParagraphStyleRef p = [[LoggerTextStyleManager sharedStyleManager] defaultParagraphStyle];
 		
 		CFAttributedStringSetAttribute(aString, aMessageRange, kCTFontAttributeName, f);
 		CFAttributedStringSetAttribute(aString, aMessageRange, kCTParagraphStyleAttributeName, p);
 		
+		// Create a color and add it as an attribute to the string.
+		CGColorSpaceRef rgbColorSpace = CGColorSpaceCreateDeviceRGB();
+		CGFloat components[] = { 1.0, 0.0, 0.0, 0.8 };
+		CGColorRef red = CGColorCreate(rgbColorSpace, components);
+		CGColorSpaceRelease(rgbColorSpace);
+		CFAttributedStringSetAttribute(aString, aMessageRange,kCTForegroundColorAttributeName, red);
+		
 	}else if(aMessageType == kMessageData){
-
-		//@@TODO:: find what's going on.
+		
 		CTFontRef f = [[LoggerTextStyleManager sharedStyleManager] defaultMonospacedFont];
 		CTParagraphStyleRef p = [[LoggerTextStyleManager sharedStyleManager] defaultMonospacedStyle];
-		
+
 		CFAttributedStringSetAttribute(aString, aMessageRange, kCTFontAttributeName, f);
 		CFAttributedStringSetAttribute(aString, aMessageRange, kCTParagraphStyleAttributeName, p);
-
+		
 	}
 	
 	if(isTruncated){
@@ -628,18 +629,84 @@ NSString *defaultDataHint = nil;
 		CFAttributedStringSetAttribute(aString, aHintRange, kCTFontAttributeName, f);
 		CFAttributedStringSetAttribute(aString, aHintRange, kCTParagraphStyleAttributeName, p);
 	}
+}
+
+
+//------------------------------------------------------------------------------
+#pragma mark - CoreText Frame
+//------------------------------------------------------------------------------
+- (CTFrameRef)timestampAndDeltaText:(CGRect)aDrawRect
+					  stringForRect:(CFMutableAttributedStringRef)aString
+						stringRange:(CFRange)aStringRange
+						frameSetter:(CTFramesetterRef)aFrameSetter
+{
+#ifdef DEBUG_CT_FRAME_RANGE
+	NSAttributedString *s = (NSAttributedString *)aString;
+	MTLog(@"timestampAndDeltaText : %@",[[s attributedSubstringFromRange:NSMakeRange(aStringRange.location, aStringRange.length)] string]);
+#endif
+	
+	CGRect tr = CGRectInset(aDrawRect, 2, 2);
+
+	CGMutablePathRef path = CGPathCreateMutable();
+	CGPathAddRect(path, NULL, tr);
+	CTFrameRef frame = CTFramesetterCreateFrame(aFrameSetter, aStringRange, path, NULL);
+	CGPathRelease(path);
+	
+	return frame;
+}
+
+- (CTFrameRef)threadIDAndTagText:(CGRect)aDrawRect
+				   stringForRect:(CFMutableAttributedStringRef)aString
+					 stringRange:(CFRange)aStringRange
+					 frameSetter:(CTFramesetterRef)aFrameSetter
+{
+#ifdef DEBUG_CT_FRAME_RANGE
+	NSAttributedString *s = (NSAttributedString *)aString;
+	MTLog(@"threadIDAndTagText : %@",[[s attributedSubstringFromRange:NSMakeRange(aStringRange.location, aStringRange.length)] string]);
+#endif
+
+	CGMutablePathRef path = CGPathCreateMutable();
+
+/*
+	CGSize threadBounds = [LoggerTextStyleManager
+	sizeForStringWithDefaultTagAndLevelFont:self.messageData.threadID
+	constraint:aDrawRect.size];
+*/
+	CGPathAddRect(path, NULL, CGRectInset(aDrawRect, 3, 0));
+	CTFrameRef frame = CTFramesetterCreateFrame(aFrameSetter,aStringRange, path, NULL);
+	return frame;
+}
+
+- (CTFrameRef)fileLineFunctionText:(CGRect)aDrawRect
+					 stringForRect:(CFMutableAttributedStringRef)aString
+					   stringRange:(CFRange)aStringRange
+					   frameSetter:(CTFramesetterRef)aFrameSetter
+{
+#ifdef DEBUG_CT_FRAME_RANGE
+	NSAttributedString *s = (NSAttributedString *)aString;
+	MTLog(@"fileLineFunctionText : %@",[[s attributedSubstringFromRange:NSMakeRange(aStringRange.location, aStringRange.length)] string]);
+#endif
 	
 	CGMutablePathRef path = CGPathCreateMutable();
-	CGPathAddRect(path, NULL, aDrawRect);
-	
-	CFRange range;
-	if(isTruncated){
-		range = CFRangeMake(aMessageRange.location, aMessageRange.length + aHintRange.length);
-	}else{
-		range = aMessageRange;
-	}
+	CGPathAddRect(path, NULL, CGRectInset(aDrawRect, 3, 0));
+	CTFrameRef frame = CTFramesetterCreateFrame(aFrameSetter, aStringRange, path, NULL);
+	return frame;
+}
 
-	CTFrameRef frame = CTFramesetterCreateFrame(aFrameSetter,range, path, NULL);
+- (CTFrameRef)messageText:(CGRect)aDrawRect
+			stringForRect:(CFMutableAttributedStringRef)aString
+			  stringRange:(CFRange)aStringRange
+			  frameSetter:(CTFramesetterRef)aFrameSetter
+{
+#ifdef DEBUG_CT_FRAME_RANGE
+	NSAttributedString *s = (NSAttributedString *)aString;
+	MTLog(@"messageText : %@\n\n",[[s attributedSubstringFromRange:NSMakeRange(aStringRange.location, aStringRange.length)] string]);
+#endif
+
+	CGMutablePathRef path = CGPathCreateMutable();
+	CGPathAddRect(path, NULL, aDrawRect);
+
+	CTFrameRef frame = CTFramesetterCreateFrame(aFrameSetter,aStringRange, path, NULL);
 	CGPathRelease(path);;
 	return frame;
 }

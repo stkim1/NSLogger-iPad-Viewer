@@ -65,8 +65,6 @@ extern NSString * const kMessageCellReuseID;
 @property (nonatomic, assign) UITableView				*hostTableView;
 @property (nonatomic, retain) LoggerMessageData			*messageData;
 @property (nonatomic, retain) UIImage					*imageData;
-@property (nonatomic, retain) __attribute__((NSObject)) CFMutableAttributedStringRef displayString;
-@property (nonatomic, retain) __attribute__((NSObject)) CTFramesetterRef textFrameSetter;
 @property (nonatomic, retain) __attribute__((NSObject)) CFMutableArrayRef textFrameContainer;
 
 + (UIColor *)colorForTag:(NSString *)tag;

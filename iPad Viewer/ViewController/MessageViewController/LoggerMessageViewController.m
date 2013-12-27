@@ -162,8 +162,8 @@
 -(void)readMessages:(NSNotification *)aNotification
 {
 #ifdef TEST_SHOW
-	uLong clientHash = 0xe2a5197f;
-	int32_t runCount = 24;
+	uLong clientHash = 0x48d4119d;
+	int32_t runCount = 26;
 #else
 	NSDictionary *userInfo = [aNotification userInfo];
 	
