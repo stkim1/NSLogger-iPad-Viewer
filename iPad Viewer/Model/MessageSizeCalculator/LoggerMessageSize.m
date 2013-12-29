@@ -123,6 +123,16 @@ CGFloat			_heightSingleDataLine;
 	return _heightFileLineFunction;
 }
 
++ (CGFloat)heightOfFileLineFunctionOfMessage:(LoggerMessage * const)aMessage
+									maxWidth:(CGFloat)aMaxWidth
+								   maxHeight:(CGFloat)aMaxHeight
+{
+	CGSize const maxConstraint = CGSizeMake(aMaxWidth,aMaxHeight);
+	NSString *s = aMessage.textRepresentation;
+	CGSize fs = [LoggerTextStyleManager sizeForStringWithDefaultFont:s constraint:maxConstraint];
+	return fs.height;
+}
+
 + (CGSize)sizeOfMessage:(LoggerMessage * const)aMessage
 				maxWidth:(CGFloat)aMaxWidth
 			   maxHeight:(CGFloat)aMaxHeight
@@ -201,13 +211,5 @@ CGFloat			_heightSingleDataLine;
 	// return calculated drawing size
 	return sz;
 }
-
-
-+ (CGSize)sizeOfFileLineFunctionOfMessage:(LoggerMessage * const)aMessage
-								   onWidth:(CGFloat)aWidth
-{
-	return CGSizeZero;
-}
-
 
 @end

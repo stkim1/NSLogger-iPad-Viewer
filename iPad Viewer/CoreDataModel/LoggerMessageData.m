@@ -60,6 +60,7 @@
 @dynamic functionName;
 @dynamic fileFuncRepresentation;
 @dynamic imageSize;
+@dynamic landscapeFileFuncHeight;
 @dynamic landscapeHeight;
 @dynamic landscapeHintSize;
 @dynamic landscapeMessageSize;
@@ -67,6 +68,7 @@
 @dynamic lineNumber;
 @dynamic messageText;
 @dynamic messageType;
+@dynamic portraitFileFuncHeight;
 @dynamic portraitHeight;
 @dynamic portraitHintSize;
 @dynamic portraitMessageSize;
@@ -80,7 +82,7 @@
 @dynamic truncated;
 @dynamic type;
 
-
+//@@TODO :: remove and have faith in the power of CoreData!!!
 -(unsigned long)rawDataSize
 {
 	unsigned long size = 0;

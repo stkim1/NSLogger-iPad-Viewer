@@ -69,10 +69,12 @@
 @dynamic messageType;
 
 @dynamic portraitHeight;
+@synthesize portraitFileFuncHeight = _portraitFileFuncHeight;
 @dynamic portraitMessageSize;
 @dynamic portraitHintSize;
 
 @dynamic landscapeHeight;
+@synthesize landscaleFileFuncHeight = _landscaleFileFuncHeight;
 @dynamic landscapeMessageSize;
 @dynamic landscapeHintSize;
 
@@ -81,8 +83,10 @@
 	self = [super init];
 	if (self != nil)
 	{
+		
 		_portraitMessageSize = _landscapeMessageSize = CGSizeZero;
 		_portraitHintSize = _landscapeHintSize = CGSizeZero;
+		_portraitFileFuncHeight = _landscaleFileFuncHeight = 0.f;
 		_truncated = NO;
 	}
 	return self;
@@ -124,11 +128,11 @@
 // -----------------------------------------------------------------------------
 - (void)formatMessage
 {
-	switch (type) {
+	switch (type){
+
 		case LOGMSG_TYPE_CLIENTINFO:{
-			NSString *formattedMessage = \
-				[LoggerMessageFormatter
-				 formatClientInfoMessage:self];
+			
+			NSString *formattedMessage = [LoggerMessageFormatter formatClientInfoMessage:self];
 			[formattedMessage retain];
 
 			// set message body
@@ -145,10 +149,8 @@
 		}
 
 		case LOGMSG_TYPE_DISCONNECT:{
-			NSString *formattedMessage =
-				[LoggerMessageFormatter
-				 formatAndTruncateDisplayMessage:self
-				 truncated:&_truncated];
+			
+			NSString *formattedMessage = [LoggerMessageFormatter formatAndTruncateDisplayMessage:self truncated:&_truncated];
 			[formattedMessage retain];
 
 			// set message body
@@ -157,7 +159,7 @@
 			
 			threadID = nil;
 			_truncated = NO;
-			
+
 			// initially compute sizes before storage in CoreData
 			[self portraitMessageSize];
 			[self landscapeMessageSize];
@@ -166,10 +168,7 @@
 			
 		default:{
 			// message format
-			NSString *formattedMessage =
-				[LoggerMessageFormatter
-				 formatAndTruncateDisplayMessage:self
-				 truncated:&_truncated];
+			NSString *formattedMessage = [LoggerMessageFormatter formatAndTruncateDisplayMessage:self truncated:&_truncated];
 			[formattedMessage retain];
 
 			// set message body
@@ -190,6 +189,7 @@
 				[self image];
 			}
 
+			//@@TODO :: think about a sec. what would happen when tag or thread string gets bigger than it should be?. we need to handle so that we can have tag-tree visualization
 			// initially compute sizes before storage in CoreData
 			[self portraitMessageSize];
 			[self landscapeMessageSize];
@@ -250,10 +250,9 @@
 	if(CGSizeEqualToSize(_portraitMessageSize, CGSizeZero))
 	{
 		CGSize size;
-		CGFloat maxWidth = \
-			MSG_CELL_PORTRAIT_WIDTH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING);
-		
+		CGFloat maxWidth = MSG_CELL_PORTRAIT_WIDTH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING);
 		CGFloat maxHeight = MSG_CELL_PORTRAIT_MAX_HEIGHT;
+
 		if(_truncated)
 		{
 			maxHeight -= MSG_CELL_TOP_PADDING;
@@ -263,35 +262,35 @@
 			maxHeight -= MSG_CELL_TOP_BOTTOM_PADDING;
 		}
 		
-		switch (self.type)
-		{
+		switch (self.type){
 			case LOGMSG_TYPE_LOG:
 			case LOGMSG_TYPE_BLOCKSTART:
-			case LOGMSG_TYPE_BLOCKEND:
-				size = [LoggerMessageSize
-						sizeOfMessage:self
-						maxWidth:maxWidth
-						maxHeight:maxHeight];
+			case LOGMSG_TYPE_BLOCKEND:{
+
+				//@@TODO:: straighten up this!
+				if(!IS_NULL_STRING(_fileFuncString)){
+					_portraitFileFuncHeight = [LoggerMessageSize heightOfFileLineFunctionOfMessage:self maxWidth:maxWidth maxHeight:maxHeight];
+				}
+				
+				size = [LoggerMessageSize sizeOfMessage:self maxWidth:maxWidth maxHeight:maxHeight];
 				break;
+			}
 
 			case LOGMSG_TYPE_CLIENTINFO:
-			case LOGMSG_TYPE_DISCONNECT:
-				size = [LoggerClientSize
-						sizeOfMessage:self
-						maxWidth:maxWidth
-						maxHeight:maxHeight];
+			case LOGMSG_TYPE_DISCONNECT:{
+				size = [LoggerClientSize sizeOfMessage:self maxWidth:maxWidth maxHeight:maxHeight];
 				break;
+			}
 
-			case LOGMSG_TYPE_MARK:
-				size = [LoggerMarkerSize
-						sizeOfMessage:self
-						maxWidth:maxWidth
-						maxHeight:maxHeight];
+			case LOGMSG_TYPE_MARK:{
+				size = [LoggerMarkerSize sizeOfMessage:self maxWidth:maxWidth maxHeight:maxHeight];
 				break;
+			}
 
-			default:
+			default:{
 				size = CGSizeZero;
 				break;
+			}
 		}
 
 		_portraitMessageSize = size;
@@ -304,26 +303,22 @@
 {
 	if(CGSizeEqualToSize(_portraitHintSize, CGSizeZero))
 	{
-		
 		CGSize size;
-		CGFloat maxWidth = \
-			MSG_CELL_PORTRAIT_WIDTH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING);
+		CGFloat maxWidth = MSG_CELL_PORTRAIT_WIDTH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING);
 		CGFloat maxHeight = MSG_CELL_PORTRAIT_MAX_HEIGHT - MSG_CELL_TOP_PADDING;
-		
-		switch (self.type)
-		{
+
+		switch (self.type){
 			case LOGMSG_TYPE_LOG:
 			case LOGMSG_TYPE_BLOCKSTART:
 			case LOGMSG_TYPE_BLOCKEND:{
-				size = [LoggerMessageSize
-						sizeOfHint:self
-						maxWidth:maxWidth
-						maxHeight:maxHeight];
+				size = [LoggerMessageSize sizeOfHint:self maxWidth:maxWidth maxHeight:maxHeight];
 				break;
 			}
-			default:
+
+			default:{
 				size = CGSizeZero;
 				break;
+			}
 		}
 		
 		_portraitHintSize = size;
@@ -350,9 +345,7 @@
 	if(CGSizeEqualToSize(_landscapeMessageSize, CGSizeZero))
 	{
 		CGSize size;
-		CGFloat maxWidth = \
-			MSG_CELL_LANDSCAPE_WDITH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING);
-		
+		CGFloat maxWidth = MSG_CELL_LANDSCAPE_WDITH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING);
 		CGFloat maxHeight = MSG_CELL_LANDSCALE_MAX_HEIGHT;
 
 		if(_truncated)
@@ -363,38 +356,37 @@
 		{
 			maxHeight -= MSG_CELL_TOP_BOTTOM_PADDING;
 		}
-			
 
-		switch (self.type)
-		{
+		switch (self.type){
+
 			case LOGMSG_TYPE_LOG:
 			case LOGMSG_TYPE_BLOCKSTART:
 			case LOGMSG_TYPE_BLOCKEND:{
-				size = [LoggerMessageSize
-						sizeOfMessage:self
-						maxWidth:maxWidth
-						maxHeight:maxHeight];
-				break;
-			}
-			case LOGMSG_TYPE_CLIENTINFO:
-			case LOGMSG_TYPE_DISCONNECT:{
-				size = [LoggerClientSize
-						sizeOfMessage:self
-						maxWidth:maxWidth
-						maxHeight:maxHeight];
-				break;
-			}
-			case LOGMSG_TYPE_MARK:{
-				size = [LoggerMarkerSize
-						sizeOfMessage:self
-						maxWidth:maxWidth
-						maxHeight:maxHeight];
+
+				//@@TODO:: straighten up this!
+				if(!IS_NULL_STRING(_fileFuncString)){
+					_landscaleFileFuncHeight = [LoggerMessageSize heightOfFileLineFunctionOfMessage:self maxWidth:maxWidth maxHeight:maxHeight];
+				}
+				
+				size = [LoggerMessageSize sizeOfMessage:self maxWidth:maxWidth maxHeight:maxHeight];
 				break;
 			}
 
-			default:
+			case LOGMSG_TYPE_CLIENTINFO:
+			case LOGMSG_TYPE_DISCONNECT:{
+				size = [LoggerClientSize sizeOfMessage:self maxWidth:maxWidth maxHeight:maxHeight];
+				break;
+			}
+
+			case LOGMSG_TYPE_MARK:{
+				size = [LoggerMarkerSize sizeOfMessage:self maxWidth:maxWidth maxHeight:maxHeight];
+				break;
+			}
+
+			default:{
 				size = CGSizeZero;
 				break;
+			}
 		}
 
 		_landscapeMessageSize = size;
@@ -408,19 +400,15 @@
 	if (CGSizeEqualToSize(_landscapeHintSize, CGSizeZero))
 	{
 		CGSize size;
-		CGFloat maxWidth = \
-			MSG_CELL_LANDSCAPE_WDITH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING);
+		CGFloat maxWidth = MSG_CELL_LANDSCAPE_WDITH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING);
 		CGFloat maxHeight = MSG_CELL_LANDSCALE_MAX_HEIGHT - MSG_CELL_TOP_PADDING;
-		
-		switch (self.type)
-		{
+
+		switch (self.type){
+
 			case LOGMSG_TYPE_LOG:
 			case LOGMSG_TYPE_BLOCKSTART:
 			case LOGMSG_TYPE_BLOCKEND:{
-				size = [LoggerMessageSize
-						sizeOfHint:self
-						maxWidth:maxWidth
-						maxHeight:maxHeight];
+				size = [LoggerMessageSize sizeOfHint:self maxWidth:maxWidth maxHeight:maxHeight];
 				break;
 			}
 			default:

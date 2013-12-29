@@ -617,7 +617,7 @@ didReceiveMessages:(NSArray *)theMessages
 					[messageData setFilename:		[aMessage filename]];
 					[messageData setFunctionName:	[aMessage functionName]];
 					[messageData setFileFuncRepresentation:[aMessage fileFuncString]];
-										
+					
 					[messageData setSequence:		[NSNumber numberWithUnsignedInteger:[aMessage sequence]]];
 					[messageData setThreadID:		[aMessage threadID]];
 					[messageData setLineNumber:		[NSNumber numberWithInt:[aMessage lineNumber]]];
@@ -627,8 +627,11 @@ didReceiveMessages:(NSArray *)theMessages
 					[messageData setContentsType:	[NSNumber numberWithShort:[aMessage contentsType]]];
 					[messageData setMessageType:	[aMessage messageType]];
 
+					[messageData setPortraitFileFuncHeight:[NSNumber numberWithFloat:[aMessage portraitFileFuncHeight]]];
 					[messageData setPortraitHeight: [NSNumber numberWithFloat:[aMessage portraitHeight]]];
 					[messageData setPortraitMessageSize:NSStringFromCGSize([aMessage portraitMessageSize])];
+
+					[messageData setLandscapeFileFuncHeight:[NSNumber numberWithFloat:[aMessage landscaleFileFuncHeight]]];
 					[messageData setLandscapeHeight:[NSNumber numberWithFloat:[aMessage landscapeHeight]]];
 					[messageData setLandscapeMessageSize:NSStringFromCGSize([aMessage landscapeMessageSize])];
 

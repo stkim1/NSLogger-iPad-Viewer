@@ -80,9 +80,12 @@
 	// width of cells in iOS version is fixed so we can pre-calculate and cache
 	// heights for two orientations at messageProcessingQueue of LoggerConnection
 	BOOL						_truncated;
+	
+	CGFloat						_portraitFileFuncHeight;
 	CGSize						_portraitMessageSize;
 	CGSize						_portraitHintSize;
 
+	CGFloat						_landscaleFileFuncHeight;
 	CGSize						_landscapeMessageSize;
 	CGSize						_landscapeHintSize;
 	
@@ -109,10 +112,14 @@
 @property (nonatomic, readonly) NSString			*messageType;
 
 @property (nonatomic, readonly, getter = isTruncated) BOOL truncated;
+
 @property (nonatomic, readonly) CGFloat				portraitHeight;
+@property (nonatomic, readonly) CGFloat				portraitFileFuncHeight;
 @property (nonatomic, readonly) CGSize				portraitMessageSize;
 @property (nonatomic, readonly) CGSize				portraitHintSize;
+
 @property (nonatomic, readonly) CGFloat				landscapeHeight;
+@property (nonatomic, readonly) CGFloat				landscaleFileFuncHeight;
 @property (nonatomic, readonly) CGSize				landscapeMessageSize;
 @property (nonatomic, readonly) CGSize				landscapeHintSize;
 

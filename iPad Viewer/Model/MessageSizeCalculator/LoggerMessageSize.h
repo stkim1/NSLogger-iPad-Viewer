@@ -51,15 +51,15 @@
 
 + (CGFloat)heightOfFileLineFunctionOnWidth:(CGFloat)aWidth;
 
++ (CGFloat)heightOfFileLineFunctionOfMessage:(LoggerMessage * const)aMessage
+									maxWidth:(CGFloat)aMaxWidth
+								   maxHeight:(CGFloat)aMaxHeight;
+
 + (CGSize)sizeOfMessage:(LoggerMessage * const)aMessage
-				maxWidth:(CGFloat)aMaxWidth
-			   maxHeight:(CGFloat)aMaxHeight;
+			   maxWidth:(CGFloat)aMaxWidth
+			  maxHeight:(CGFloat)aMaxHeight;
 
 + (CGSize)sizeOfHint:(LoggerMessage * const)aMessage
 			maxWidth:(CGFloat)aMaxWidth
 		   maxHeight:(CGFloat)aMaxHeight;
-
-+ (CGSize)sizeOfFileLineFunctionOfMessage:(LoggerMessage * const)aMessage
-								   onWidth:(CGFloat)aWidth;
-
 @end
