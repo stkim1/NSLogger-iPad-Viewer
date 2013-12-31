@@ -408,13 +408,15 @@
 heightForRowAtIndexPath:(NSIndexPath *)anIndexPath
 {
 	LoggerMessageData *data = [self.messageFetchResultController objectAtIndexPath:anIndexPath];
+	CGFloat h = [[data portraitHeight] floatValue] + [[data portraitFileFuncHeight] floatValue];
 	if([[data truncated] boolValue]){
 		
 		//@@TODO:: find accruate height
 		CGSize hint = CGSizeFromString([data portraitHintSize]);
-		return [[data portraitHeight] floatValue]  + hint.height + 100;
+		h += hint.height + 100;
 	}
-	return [[data portraitHeight] floatValue];
+	
+	return h;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView

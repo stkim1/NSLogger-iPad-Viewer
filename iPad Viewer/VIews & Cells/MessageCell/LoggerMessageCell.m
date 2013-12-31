@@ -250,7 +250,29 @@ NSString *defaultDataHint = nil;
 	if(aMessageData != nil)
 	{
 		BOOL truncated = [[aMessageData truncated] boolValue];
+		float height = [[aMessageData portraitHeight] floatValue];
+		float fflh = [aMessageData.portraitFileFuncHeight floatValue];
 		
+		// file func height
+		if(!IS_NULL_STRING(aMessageData.fileFuncRepresentation))
+		{
+			height += fflh;
+		}
+		
+		// add hint height if truncated
+		if(truncated){
+			//@@TODO:: find accruate height
+			CGSize hint = CGSizeFromString([aMessageData portraitHintSize]);
+			height += hint.height + 100;
+		}
+		
+		CGRect cellFrame = (CGRect){CGPointZero,{MSG_CELL_PORTRAIT_WIDTH,height}};
+		
+#ifdef DEBUG_DRAW_AREA
+		MTLog(@"[s]cellFrame %@ %@",[[self.messageData sequence] stringValue],NSStringFromCGRect(cellFrame));
+#endif
+		
+		// string range indexes
 		int totalTextLength = 0;
 		int locTimestamp	= 0;
 		
@@ -330,24 +352,7 @@ NSString *defaultDataHint = nil;
 			default:
 				break;
 		}
-		
-		
-		BOOL isTruncated = [aMessageData.truncated boolValue];
-		CGRect cellFrame;
-		if(isTruncated){
-			
-			//@@TODO:: find accruate height
-			CGSize hint = CGSizeFromString([aMessageData portraitHintSize]);
-			cellFrame = (CGRect){CGPointZero,{MSG_CELL_PORTRAIT_WIDTH,[[aMessageData portraitHeight] floatValue] + hint.height + 100}};
-			
-		}else{
-			cellFrame = (CGRect){CGPointZero,{MSG_CELL_PORTRAIT_WIDTH,[[aMessageData portraitHeight] floatValue]}};
-		}
-
-#ifdef DEBUG_DRAW_AREA
-		MTLog(@"[s]cellFrame %@ %@",[[self.messageData sequence] stringValue],NSStringFromCGRect(cellFrame));
-#endif
-		
+	
 		//timestamp & delta
 		[self
 		 timestampAndDeltaAttribute:as
@@ -391,8 +396,8 @@ NSString *defaultDataHint = nil;
 		
 		
 		
+		
 		CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString(as);
-
 		//timestamp and delta
 		CGRect drawRect = [self timestampAndDeltaRect:cellFrame];
 		CTFrameRef frame = \
@@ -418,10 +423,9 @@ NSString *defaultDataHint = nil;
 		CFRelease(frame);
 
 		//file and function
-		if(!IS_NULL_STRING(aMessageData.fileFuncRepresentation)  && false )
+		if(!IS_NULL_STRING(aMessageData.fileFuncRepresentation))
 		{
-			
-			drawRect = [self fileLineFunctionTextRect:cellFrame];
+			drawRect = [self fileLineFunctionTextRect:cellFrame lineHeight:fflh];
 			frame = \
 				[self
 				 fileLineFunctionText:drawRect
@@ -436,7 +440,7 @@ NSString *defaultDataHint = nil;
 		//message
 		if([aMessageData dataType] != kMessageImage)
 		{
-			drawRect = [self messageTextRect:cellFrame];
+			drawRect = [self messageTextRect:cellFrame fileFuncLineHeight:fflh];
 			frame = \
 				[self
 				 messageText:drawRect
@@ -493,21 +497,27 @@ NSString *defaultDataHint = nil;
 						  CGRectGetMinY(aBoundRect),
 						  DEFAULT_THREAD_COLUMN_WIDTH,
 						  CGRectGetHeight(aBoundRect));
-
 	return r;
 }
 
-- (CGRect)fileLineFunctionTextRect:(CGRect)aBoundRect
+- (CGRect)fileLineFunctionTextRect:(CGRect)aBoundRect lineHeight:(CGFloat)aLineHeight
 {
-	return CGRectZero;
+	//@@TODO : handle flipped coordinate system
+	CGRect r = CGRectMake(CGRectGetMinX(aBoundRect) + (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_LEFT_PADDING),
+						  CGRectGetMinY(aBoundRect) + MSG_CELL_TOP_PADDING,
+						  CGRectGetWidth(aBoundRect) - (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING),
+						  aLineHeight);
+	
+	return r;
 }
 
-- (CGRect)messageTextRect:(CGRect)aBoundRect
+- (CGRect)messageTextRect:(CGRect)aBoundRect fileFuncLineHeight:(CGFloat)aLineHeight
 {
+	//@@TODO : handle flipped coordinate system
 	CGRect r =	CGRectMake(CGRectGetMinX(aBoundRect) + (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_LEFT_PADDING),
-						   CGRectGetMinY(aBoundRect) + MSG_CELL_TOP_PADDING,
+						   CGRectGetMinY(aBoundRect) + MSG_CELL_TOP_PADDING + aLineHeight,
 						   CGRectGetWidth(aBoundRect) - (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING),
-						   CGRectGetHeight(aBoundRect) - MSG_CELL_TOP_BOTTOM_PADDING);
+						   CGRectGetHeight(aBoundRect) - MSG_CELL_TOP_BOTTOM_PADDING - aLineHeight);
 	return r;
 }
 
@@ -666,14 +676,14 @@ NSString *defaultDataHint = nil;
 #endif
 
 	CGMutablePathRef path = CGPathCreateMutable();
-
 /*
 	CGSize threadBounds = [LoggerTextStyleManager
 	sizeForStringWithDefaultTagAndLevelFont:self.messageData.threadID
 	constraint:aDrawRect.size];
 */
-	CGPathAddRect(path, NULL, CGRectInset(aDrawRect, 3, 0));
+	CGPathAddRect(path, NULL, aDrawRect);
 	CTFrameRef frame = CTFramesetterCreateFrame(aFrameSetter,aStringRange, path, NULL);
+	CGPathRelease(path);
 	return frame;
 }
 
@@ -688,8 +698,9 @@ NSString *defaultDataHint = nil;
 #endif
 	
 	CGMutablePathRef path = CGPathCreateMutable();
-	CGPathAddRect(path, NULL, CGRectInset(aDrawRect, 3, 0));
+	CGPathAddRect(path, NULL, aDrawRect);
 	CTFrameRef frame = CTFramesetterCreateFrame(aFrameSetter, aStringRange, path, NULL);
+	CGPathRelease(path);
 	return frame;
 }
 
@@ -702,12 +713,10 @@ NSString *defaultDataHint = nil;
 	NSAttributedString *s = (NSAttributedString *)aString;
 	MTLog(@"messageText : %@\n\n",[[s attributedSubstringFromRange:NSMakeRange(aStringRange.location, aStringRange.length)] string]);
 #endif
-
 	CGMutablePathRef path = CGPathCreateMutable();
 	CGPathAddRect(path, NULL, aDrawRect);
-
 	CTFrameRef frame = CTFramesetterCreateFrame(aFrameSetter,aStringRange, path, NULL);
-	CGPathRelease(path);;
+	CGPathRelease(path);
 	return frame;
 }
 
@@ -1072,7 +1081,9 @@ NSString *defaultDataHint = nil;
 	//@@TODO:: draw file && func area
 
 	// Draw message
-	drawRect = [self messageTextRect:cellFrame];
+
+	float fflh = [[self.messageData portraitFileFuncHeight] floatValue];
+	drawRect = [self messageTextRect:cellFrame fileFuncLineHeight:fflh];
 	[self drawMessageInRect:drawRect highlightedTextColor:nil];
 
 #ifdef DEBUG_DRAW_AREA
