@@ -503,21 +503,24 @@ NSString *defaultDataHint = nil;
 - (CGRect)fileLineFunctionTextRect:(CGRect)aBoundRect lineHeight:(CGFloat)aLineHeight
 {
 	//@@TODO : handle flipped coordinate system
-	CGRect r = CGRectMake(CGRectGetMinX(aBoundRect) + (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_LEFT_PADDING),
-						  CGRectGetMinY(aBoundRect) + MSG_CELL_TOP_PADDING,
-						  CGRectGetWidth(aBoundRect) - (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING),
-						  aLineHeight);
+	CGRect r =	CGRectMake(CGRectGetMinX(aBoundRect) + (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_LEFT_PADDING),
+						   CGRectGetMaxY(aBoundRect) - MSG_CELL_TOP_PADDING - aLineHeight,
+						   CGRectGetWidth(aBoundRect) - (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING),
+						   aLineHeight);
 	
+	MTLog(@"%s lineHeight %5.2f %@ %@",__PRETTY_FUNCTION__, aLineHeight, NSStringFromCGRect(r),self.messageData.fileFuncRepresentation);
 	return r;
 }
 
 - (CGRect)messageTextRect:(CGRect)aBoundRect fileFuncLineHeight:(CGFloat)aLineHeight
 {
 	//@@TODO : handle flipped coordinate system
-	CGRect r =	CGRectMake(CGRectGetMinX(aBoundRect) + (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_LEFT_PADDING),
-						   CGRectGetMinY(aBoundRect) + MSG_CELL_TOP_PADDING + aLineHeight,
-						   CGRectGetWidth(aBoundRect) - (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING),
-						   CGRectGetHeight(aBoundRect) - MSG_CELL_TOP_BOTTOM_PADDING - aLineHeight);
+	CGRect r = CGRectMake(CGRectGetMinX(aBoundRect) + (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_LEFT_PADDING),
+						  CGRectGetMinY(aBoundRect) + MSG_CELL_TOP_PADDING,
+						  CGRectGetWidth(aBoundRect) - (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING),
+						  CGRectGetHeight(aBoundRect) - MSG_CELL_TOP_BOTTOM_PADDING - aLineHeight);
+
+	//MTLog(@"%s lineHeight %5.2f %@",__PRETTY_FUNCTION__, aLineHeight, NSStringFromCGRect(r));
 	return r;
 }
 
@@ -1098,6 +1101,32 @@ NSString *defaultDataHint = nil;
 	CGContextSetTextMatrix(context, CGAffineTransformIdentity);
 	CGContextTranslateCTM(context, 0, self.bounds.size.height);
 	CGContextScaleCTM(context, 1.0, -1.0);
+	
+#if DEBUG_DRAW_AREA ||  1
+	CGRect d;
+	CGMutablePathRef path;
+	
+	
+	if(!IS_NULL_STRING(self.messageData.fileFuncRepresentation))
+	{
+		d = [self fileLineFunctionTextRect:cellFrame lineHeight:fflh];
+		path = CGPathCreateMutable();
+		CGPathAddRect(path, NULL, d);
+		CGContextSetFillColorWithColor(context, [UIColor orangeColor].CGColor);
+		CGContextFillRect(context, CGPathGetBoundingBox(path));
+		CGPathRelease(path),path = nil;
+	}
+
+	if(YES)
+	{
+		d = [self messageTextRect:cellFrame fileFuncLineHeight:fflh];
+		path = CGPathCreateMutable();
+		CGPathAddRect(path, NULL, d);
+		CGContextSetFillColorWithColor(context, [UIColor cyanColor].CGColor);
+		CGContextFillRect(context, CGPathGetBoundingBox(path));
+		CGPathRelease(path);
+	}
+#endif
 	
 	// draw all text frames
 	CFIndex count = CFArrayGetCount(self.textFrameContainer);
