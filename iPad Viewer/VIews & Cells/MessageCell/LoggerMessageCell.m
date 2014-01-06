@@ -51,6 +51,7 @@ UIFont *displayTagAndLevelFont = nil;
 UIFont *displayMonospacedFont = nil;
 
 UIColor *defaultBackgroundColor = nil;
+UIColor *defaultFileFuncBackgroundColor = nil;
 UIColor *defaultTagAndLevelColor = nil;
 
 NSString *defaultTextHint = nil;
@@ -62,6 +63,7 @@ NSString *defaultDataHint = nil;
 //#define DEBUG_DRAW_AREA
 
 #define TEXT_LENGH_BETWEEN_LOCS(LOCATION_1,LOCATION_0) (abs(LOCATION_1 - LOCATION_0))
+#define BORDER_LINE_WIDTH 1.f
 
 @interface LoggerMessageView : UIView
 @end
@@ -115,12 +117,20 @@ NSString *defaultDataHint = nil;
 	
 	if(defaultBackgroundColor == nil)
 	{
-		defaultBackgroundColor =
+		defaultBackgroundColor = [[UIColor whiteColor] retain];
+/*
 			[[UIColor
 			 colorWithRed:DEAFULT_BACKGROUND_GRAY_VALUE
 			 green:DEAFULT_BACKGROUND_GRAY_VALUE
 			 blue:DEAFULT_BACKGROUND_GRAY_VALUE
 			 alpha:1] retain];
+*/
+	}
+
+	if(defaultFileFuncBackgroundColor == nil)
+	{
+		defaultFileFuncBackgroundColor =
+			[[UIColor colorWithRed:(239.f / 255.f) green:(233.f / 255.f) blue:(252.f / 255.f) alpha:1.f] retain];
 	}
 	
 	if(defaultTagAndLevelColor == nil)
@@ -508,7 +518,7 @@ NSString *defaultDataHint = nil;
 						   CGRectGetWidth(aBoundRect) - (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING),
 						   aLineHeight);
 	
-	MTLog(@"%s lineHeight %5.2f %@ %@",__PRETTY_FUNCTION__, aLineHeight, NSStringFromCGRect(r),self.messageData.fileFuncRepresentation);
+	//MTLog(@"%s lineHeight %5.2f %@ %@",__PRETTY_FUNCTION__, aLineHeight, NSStringFromCGRect(r),self.messageData.fileFuncRepresentation);
 	return r;
 }
 
@@ -1026,14 +1036,14 @@ NSString *defaultDataHint = nil;
 	CGContextFillRect(context, cellFrame);
 	
 	// Draw separators
-	CGContextSetLineWidth(context, 1.0f);
+	CGContextSetLineWidth(context, BORDER_LINE_WIDTH);
 	CGContextSetLineCap(context, kCGLineCapSquare);
 	UIColor *cellSeparatorColor = GRAYCOLOR(0.8f);
 #if 0
 	if (highlighted)
-		cellSeparatorColor = CGColorCreateGenericGray(1.0f, 1.0f);
+		cellSeparatorColor = CGColorCreateGenericGray(1.0f, BORDER_LINE_WIDTH);
 	else
-		cellSeparatorColor = CGColorCreateGenericGray(0.80f, 1.0f);
+		cellSeparatorColor = CGColorCreateGenericGray(0.80f, BORDER_LINE_WIDTH);
 #endif
 
 	CGContextSetStrokeColorWithColor(context, [cellSeparatorColor CGColor]);
@@ -1103,25 +1113,22 @@ NSString *defaultDataHint = nil;
 	CGContextScaleCTM(context, 1.0, -1.0);
 	
 #if DEBUG_DRAW_AREA ||  1
-	CGRect d;
-	CGMutablePathRef path;
-	
 	
 	if(!IS_NULL_STRING(self.messageData.fileFuncRepresentation))
 	{
-		d = [self fileLineFunctionTextRect:cellFrame lineHeight:fflh];
-		path = CGPathCreateMutable();
-		CGPathAddRect(path, NULL, d);
-		CGContextSetFillColorWithColor(context, [UIColor orangeColor].CGColor);
-		CGContextFillRect(context, CGPathGetBoundingBox(path));
-		CGPathRelease(path),path = nil;
+		CGRect d =
+			(CGRect){{CGRectGetMinX(cellFrame) + (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + BORDER_LINE_WIDTH),CGRectGetMaxY(cellFrame)  - fflh},
+					{CGRectGetWidth(cellFrame) - (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + BORDER_LINE_WIDTH),fflh}};
+
+		UIColor *ffbg = defaultFileFuncBackgroundColor;
+		CGContextSetFillColorWithColor(context, ffbg.CGColor);
+		CGContextFillRect(context,d);
 	}
 
-	if(YES)
+	if(NO)
 	{
-		d = [self messageTextRect:cellFrame fileFuncLineHeight:fflh];
-		path = CGPathCreateMutable();
-		CGPathAddRect(path, NULL, d);
+		CGRect d = [self messageTextRect:cellFrame fileFuncLineHeight:fflh];
+		CGPathRef path = CGPathCreateWithRect(d,NULL);
 		CGContextSetFillColorWithColor(context, [UIColor cyanColor].CGColor);
 		CGContextFillRect(context, CGPathGetBoundingBox(path));
 		CGPathRelease(path);

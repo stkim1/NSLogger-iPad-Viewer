@@ -269,7 +269,7 @@
 
 				//@@TODO:: straighten up this!
 				if(!IS_NULL_STRING(_fileFuncString)){
-					_portraitFileFuncHeight = [LoggerMessageSize heightOfFileLineFunctionOfMessage:self maxWidth:maxWidth maxHeight:maxHeight];
+					_portraitFileFuncHeight = [LoggerMessageSize heightOfFileLineFunction:self maxWidth:maxWidth maxHeight:maxHeight];
 				}
 				
 				size = [LoggerMessageSize sizeOfMessage:self maxWidth:maxWidth maxHeight:maxHeight];
@@ -365,7 +365,7 @@
 
 				//@@TODO:: straighten up this!
 				if(!IS_NULL_STRING(_fileFuncString)){
-					_landscaleFileFuncHeight = [LoggerMessageSize heightOfFileLineFunctionOfMessage:self maxWidth:maxWidth maxHeight:maxHeight];
+					_landscaleFileFuncHeight = [LoggerMessageSize heightOfFileLineFunction:self maxWidth:maxWidth maxHeight:maxHeight];
 				}
 				
 				size = [LoggerMessageSize sizeOfMessage:self maxWidth:maxWidth maxHeight:maxHeight];

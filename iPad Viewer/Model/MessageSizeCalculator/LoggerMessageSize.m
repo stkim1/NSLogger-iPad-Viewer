@@ -123,13 +123,13 @@ CGFloat			_heightSingleDataLine;
 	return _heightFileLineFunction;
 }
 
-+ (CGFloat)heightOfFileLineFunctionOfMessage:(LoggerMessage * const)aMessage
++ (CGFloat)heightOfFileLineFunction:(LoggerMessage * const)aMessage
 									maxWidth:(CGFloat)aMaxWidth
 								   maxHeight:(CGFloat)aMaxHeight
 {
 	CGSize const maxConstraint = CGSizeMake(aMaxWidth,aMaxHeight);
-	NSString *s = aMessage.textRepresentation;
-	CGSize fs = [LoggerTextStyleManager sizeForStringWithDefaultFont:s constraint:maxConstraint];
+	NSString *s = aMessage.fileFuncString;
+	CGSize fs = [LoggerTextStyleManager sizeForStringWithDefaultTagAndLevelFont:s constraint:maxConstraint];
 	return fs.height;
 }
 
