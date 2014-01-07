@@ -59,6 +59,7 @@
  */
 @property (nonatomic, readonly) __attribute__((NSObject)) CTFontRef				defaultFont;
 @property (nonatomic, readonly) __attribute__((NSObject)) CTFontRef				defaultTagAndLevelFont;
+@property (nonatomic, readonly) __attribute__((NSObject)) CTFontRef				defaultFileAndFunctionFont;
 @property (nonatomic, readonly) __attribute__((NSObject)) CTFontRef				defaultMonospacedFont;
 
 
@@ -71,11 +72,13 @@
  *
  */
 @property (nonatomic, readonly) __attribute__((NSObject)) CTParagraphStyleRef	defaultParagraphStyle;
-@property (nonatomic, readonly) __attribute__((NSObject)) CTParagraphStyleRef	defaultTagAndLevelParagraphStyle;
+@property (nonatomic, readonly) __attribute__((NSObject)) CTParagraphStyleRef	defaultTagAndLevelStyle;
+@property (nonatomic, readonly) __attribute__((NSObject)) CTParagraphStyleRef	defaultFileAndFunctionStyle;
 @property (nonatomic, readonly) __attribute__((NSObject)) CTParagraphStyleRef	defaultMonospacedStyle;
 
 +(CGSize)sizeForStringWithDefaultFont:(NSString *)aString constraint:(CGSize)aConstraint;
 +(CGSize)sizeForStringWithDefaultTagAndLevelFont:(NSString *)aString constraint:(CGSize)aConstraint;
++(CGSize)sizeForStringWithDefaultFileAndFunctionFont:(NSString *)aString constraint:(CGSize)aConstraint;
 +(CGSize)sizeForStringWithDefaultMonospacedFont:(NSString *)aString constraint:(CGSize)aConstraint;
 
 @end

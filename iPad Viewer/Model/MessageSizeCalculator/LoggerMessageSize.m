@@ -129,7 +129,7 @@ CGFloat			_heightSingleDataLine;
 {
 	CGSize const maxConstraint = CGSizeMake(aMaxWidth,aMaxHeight);
 	NSString *s = aMessage.fileFuncString;
-	CGSize fs = [LoggerTextStyleManager sizeForStringWithDefaultTagAndLevelFont:s constraint:maxConstraint];
+	CGSize fs = [LoggerTextStyleManager sizeForStringWithDefaultFileAndFunctionFont:s constraint:maxConstraint];
 	return fs.height;
 }
 

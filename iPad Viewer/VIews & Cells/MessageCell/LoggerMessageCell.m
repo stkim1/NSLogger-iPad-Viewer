@@ -51,7 +51,7 @@ UIFont *displayTagAndLevelFont = nil;
 UIFont *displayMonospacedFont = nil;
 
 UIColor *defaultBackgroundColor = nil;
-UIColor *defaultFileFuncBackgroundColor = nil;
+CGColorRef defaultFileFuncBackgroundColor = NULL;
 UIColor *defaultTagAndLevelColor = nil;
 
 NSString *defaultTextHint = nil;
@@ -127,10 +127,13 @@ NSString *defaultDataHint = nil;
 */
 	}
 
-	if(defaultFileFuncBackgroundColor == nil)
+	if(defaultFileFuncBackgroundColor == NULL)
 	{
-		defaultFileFuncBackgroundColor =
-			[[UIColor colorWithRed:(239.f / 255.f) green:(233.f / 255.f) blue:(252.f / 255.f) alpha:1.f] retain];
+		CGColorSpaceRef csr = CGColorSpaceCreateDeviceRGB();
+		CGFloat comps[] = { (239.0f / 255.0f), (233.0f / 255.0f), (252.0f / 255.0f), 1.f };
+		CGColorRef c = CGColorCreate(csr, comps);
+		CGColorSpaceRelease(csr);
+		defaultFileFuncBackgroundColor = c;
 	}
 	
 	if(defaultTagAndLevelColor == nil)
@@ -577,7 +580,7 @@ NSString *defaultDataHint = nil;
 	CFAttributedStringSetAttribute(aString, aThreadRange, kCTParagraphStyleAttributeName, p);
 	
 	CTFontRef tlf = [[LoggerTextStyleManager sharedStyleManager] defaultTagAndLevelFont];
-	CTParagraphStyleRef tlp = [[LoggerTextStyleManager sharedStyleManager] defaultTagAndLevelParagraphStyle];
+	CTParagraphStyleRef tlp = [[LoggerTextStyleManager sharedStyleManager] defaultTagAndLevelStyle];
 	
 	CFAttributedStringSetAttribute(aString, aTagRange, kCTFontAttributeName, tlf);
 	CFAttributedStringSetAttribute(aString, aTagRange, kCTParagraphStyleAttributeName, tlp);
@@ -595,10 +598,8 @@ NSString *defaultDataHint = nil;
 	MTLog(@"fileFunc : %@",[[s attributedSubstringFromRange:NSMakeRange(aStringRange.location, aStringRange.length)] string]);
 #endif
 	
-	CTFontRef f = [[LoggerTextStyleManager sharedStyleManager] defaultTagAndLevelFont];
-	CTParagraphStyleRef p = [[LoggerTextStyleManager sharedStyleManager] defaultTagAndLevelParagraphStyle];
-	
-	//@@TODO :: apply
+	CTFontRef f = [[LoggerTextStyleManager sharedStyleManager] defaultFileAndFunctionFont];
+	CTParagraphStyleRef p = [[LoggerTextStyleManager sharedStyleManager] defaultFileAndFunctionStyle];
 	CFAttributedStringSetAttribute(aString, aStringRange, kCTFontAttributeName, f);
 	CFAttributedStringSetAttribute(aString, aStringRange, kCTParagraphStyleAttributeName, p);
 }
@@ -627,14 +628,7 @@ NSString *defaultDataHint = nil;
 		
 		CFAttributedStringSetAttribute(aString, aMessageRange, kCTFontAttributeName, f);
 		CFAttributedStringSetAttribute(aString, aMessageRange, kCTParagraphStyleAttributeName, p);
-		
-		// Create a color and add it as an attribute to the string.
-		CGColorSpaceRef rgbColorSpace = CGColorSpaceCreateDeviceRGB();
-		CGFloat components[] = { 1.0, 0.0, 0.0, 0.8 };
-		CGColorRef red = CGColorCreate(rgbColorSpace, components);
-		CGColorSpaceRelease(rgbColorSpace);
-		CFAttributedStringSetAttribute(aString, aMessageRange,kCTForegroundColorAttributeName, red);
-		
+				
 	}else if(aMessageType == kMessageData){
 		
 		CTFontRef f = [[LoggerTextStyleManager sharedStyleManager] defaultMonospacedFont];
@@ -1120,8 +1114,7 @@ NSString *defaultDataHint = nil;
 			(CGRect){{CGRectGetMinX(cellFrame) + (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + BORDER_LINE_WIDTH),CGRectGetMaxY(cellFrame)  - fflh},
 					{CGRectGetWidth(cellFrame) - (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + BORDER_LINE_WIDTH),fflh}};
 
-		UIColor *ffbg = defaultFileFuncBackgroundColor;
-		CGContextSetFillColorWithColor(context, ffbg.CGColor);
+		CGContextSetFillColorWithColor(context, defaultFileFuncBackgroundColor);
 		CGContextFillRect(context,d);
 	}
 
