@@ -131,12 +131,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTextStyleManager,sharedStyleM
 
 	CTFontRef font = [[LoggerTextStyleManager sharedStyleManager] defaultMonospacedFont];
 	CTParagraphStyleRef style = [[LoggerTextStyleManager sharedStyleManager] defaultMonospacedStyle];
-
-	return [LoggerTextStyleManager
-			_sizeForString:aString
-			constraint:aConstraint
-			font:font
-			style:style];
+	return [LoggerTextStyleManager _sizeForString:aString constraint:aConstraint font:font style:style];
 }
 
 -(id)init
@@ -156,14 +151,13 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTextStyleManager,sharedStyleM
 		//  the leading value of the font.
 		CGFloat defaultLeading = CTFontGetLeading(_defaultFont) + CTFontGetDescent(_defaultFont);
 		
-		CTParagraphStyleSetting defaultStyle[2] = {
+		// CTParagraphStyleSetting only takes CTParagraphStyle related parameters do not put anything else
+		CTParagraphStyleSetting dfs[] = {
 			{kCTParagraphStyleSpecifierLineSpacingAdjustment, sizeof (CGFloat), &defaultLeading }
 			,{kCTParagraphStyleSpecifierAlignment,sizeof(CTTextAlignment),&alignment}
 		};
 
-		_defaultParagraphStyle = CTParagraphStyleCreate(defaultStyle, 2);
-
-
+		_defaultParagraphStyle = CTParagraphStyleCreate(dfs, sizeof(dfs) / sizeof(dfs[0]));
 
 		//-------------------------- tag and level font ------------------------
 		// in ios, no Lucida Sans. we're going with 'Telugu Sangman MN'
@@ -171,12 +165,12 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTextStyleManager,sharedStyleM
 
 		CGFloat tagLevelLeading = CTFontGetLeading(_defaultTagAndLevelFont) + CTFontGetDescent(_defaultTagAndLevelFont);
 
-		CTParagraphStyleSetting tls[2] = {
+		CTParagraphStyleSetting tls[] = {
 			{kCTParagraphStyleSpecifierLineSpacingAdjustment, sizeof (CGFloat), &tagLevelLeading }
 			,{kCTParagraphStyleSpecifierAlignment,sizeof(CTTextAlignment),&alignment}
 		};
 
-		_defaultTagAndLevelStyle = CTParagraphStyleCreate(tls, 2);
+		_defaultTagAndLevelStyle = CTParagraphStyleCreate(tls, sizeof(tls) / sizeof(tls[0]));
 
 		//-------------------------- file and function -------------------------
 		// set the desired trait to be bold, Mask off the bold trait to indicate
@@ -191,27 +185,15 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTextStyleManager,sharedStyleM
 		}else{
 			_defaultFileAndFunctionFont = _defaultTagAndLevelFont;
 		}
-				
-		// Create a color and add it as an attribute to the string.
-		CGColorSpaceRef csr = CGColorSpaceCreateDeviceRGB();
-		//CGFloat comps[] = { 0.5f, 0.5f, 0.5f, 1.f };
-		CGFloat comps[] = { 1.f, 0.5f, 0.5f, 1.f };
-		CGColorRef c = CGColorCreate(csr, comps);
-		CGColorSpaceRelease(csr);
-
 
 		CTLineBreakMode lb = kCTLineBreakByTruncatingMiddle;
-		CTParagraphStyleSetting ffs[4] = {
+		CTParagraphStyleSetting ffs[] = {
 			{kCTParagraphStyleSpecifierLineSpacingAdjustment, sizeof (CGFloat), &tagLevelLeading }
 			,{kCTParagraphStyleSpecifierAlignment,sizeof(CTTextAlignment),&alignment}
-			//,{kCTParagraphStyleSpecifierLineBreakMode,sizeof(CTLineBreakMode),kCTLineBreakByTruncatingMiddle}
 			,{kCTParagraphStyleSpecifierLineBreakMode,sizeof(CTLineBreakMode),&lb}
-			,{kCTForegroundColorAttributeName,sizeof(CGColorRef),c}
 		};
 
-		_defaultFileAndFunctionStyle = CTParagraphStyleCreate(ffs, 4);
-		
-		CGColorRelease(c);
+		_defaultFileAndFunctionStyle = CTParagraphStyleCreate(ffs, sizeof(ffs) / sizeof(ffs[0]));
 		
 		//-------------------------- monospaced font ---------------------------
 		// this is for binary, so we're to go with cusom font
@@ -226,12 +208,12 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTextStyleManager,sharedStyleM
 		
 		CGFloat monospacedLeading = CTFontGetLeading(_defaultMonospacedFont) + CTFontGetDescent(_defaultMonospacedFont);
 		
-		CTParagraphStyleSetting monospacedStyle[2] = {
+		CTParagraphStyleSetting mfs[] = {
 			{kCTParagraphStyleSpecifierLineSpacingAdjustment, sizeof (CGFloat), &monospacedLeading }
 			,{kCTParagraphStyleSpecifierAlignment,sizeof(CTTextAlignment),&alignment}
 		};
 
-		_defaultMonospacedStyle = CTParagraphStyleCreate(monospacedStyle, 2);
+		_defaultMonospacedStyle = CTParagraphStyleCreate(mfs, sizeof(mfs) / sizeof(mfs[0]));
 		
 		CGDataProviderRelease(fontProvider);
 		CFRelease(cgFont);

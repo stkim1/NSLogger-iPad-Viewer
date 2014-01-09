@@ -51,7 +51,8 @@ UIFont *displayTagAndLevelFont = nil;
 UIFont *displayMonospacedFont = nil;
 
 UIColor *defaultBackgroundColor = nil;
-CGColorRef defaultFileFuncBackgroundColor = NULL;
+CGColorRef _fileFuncFgColor = NULL;
+CGColorRef _fileFuncBgColor = NULL;
 UIColor *defaultTagAndLevelColor = nil;
 
 NSString *defaultTextHint = nil;
@@ -127,23 +128,25 @@ NSString *defaultDataHint = nil;
 */
 	}
 
-	if(defaultFileFuncBackgroundColor == NULL)
-	{
-		CGColorSpaceRef csr = CGColorSpaceCreateDeviceRGB();
-		CGFloat comps[] = { (239.0f / 255.0f), (233.0f / 255.0f), (252.0f / 255.0f), 1.f };
-		CGColorRef c = CGColorCreate(csr, comps);
-		CGColorSpaceRelease(csr);
-		defaultFileFuncBackgroundColor = c;
-	}
 	
+	CGColorSpaceRef csr = CGColorSpaceCreateDeviceRGB();
+	if(_fileFuncFgColor == NULL){
+		CGFloat fcomps[] = { 0.5f, 0.5f, 0.5f, 1.f };
+		CGColorRef fc = CGColorCreate(csr, fcomps);
+		_fileFuncFgColor = fc;
+	}
+
+	if(_fileFuncBgColor == NULL)
+	{
+		CGFloat comps[] = { (239.0f / 255.0f), (233.0f / 255.0f), (252.0f / 255.0f), 1.f };
+		CGColorRef bc = CGColorCreate(csr, comps);
+		_fileFuncBgColor = bc;
+	}
+	CGColorSpaceRelease(csr);
+
 	if(defaultTagAndLevelColor == nil)
 	{
-		defaultTagAndLevelColor =
-			[[UIColor
-			  colorWithRed:0.51f
-			  green:0.57f
-			  blue:0.79f
-			  alpha:1.0f] retain];
+		defaultTagAndLevelColor = [[UIColor colorWithRed:0.51f green:0.57f blue:0.79f alpha:1.0f] retain];
 	}
 }
 
@@ -602,6 +605,13 @@ NSString *defaultDataHint = nil;
 	CTParagraphStyleRef p = [[LoggerTextStyleManager sharedStyleManager] defaultFileAndFunctionStyle];
 	CFAttributedStringSetAttribute(aString, aStringRange, kCTFontAttributeName, f);
 	CFAttributedStringSetAttribute(aString, aStringRange, kCTParagraphStyleAttributeName, p);
+	CFAttributedStringSetAttribute(aString, aStringRange, kCTForegroundColorAttributeName, _fileFuncFgColor);
+	
+	// not working *confirmed* :(
+	//CFAttributedStringSetAttribute(aString, aStringRange, (CFStringRef)NSBackgroundColorAttributeName, _fileFuncBgColor);
+
+	
+	
 }
 
 - (void)messageAttribute:(CFMutableAttributedStringRef)aString
@@ -1114,7 +1124,7 @@ NSString *defaultDataHint = nil;
 			(CGRect){{CGRectGetMinX(cellFrame) + (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + BORDER_LINE_WIDTH),CGRectGetMaxY(cellFrame)  - fflh},
 					{CGRectGetWidth(cellFrame) - (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + BORDER_LINE_WIDTH),fflh}};
 
-		CGContextSetFillColorWithColor(context, defaultFileFuncBackgroundColor);
+		CGContextSetFillColorWithColor(context, _fileFuncBgColor);
 		CGContextFillRect(context,d);
 	}
 
