@@ -55,11 +55,7 @@
 									maxWidth:(CGFloat)aMaxWidth
 								   maxHeight:(CGFloat)aMaxHeight;
 
-+ (CGSize)sizeOfMessage:(LoggerMessage * const)aMessage
-			   maxWidth:(CGFloat)aMaxWidth
-			  maxHeight:(CGFloat)aMaxHeight;
++ (CGSize)sizeOfMessage:(LoggerMessage * const)aMessage maxWidth:(CGFloat)aMaxWidth maxHeight:(CGFloat)aMaxHeight;
 
-+ (CGSize)sizeOfHint:(LoggerMessage * const)aMessage
-			maxWidth:(CGFloat)aMaxWidth
-		   maxHeight:(CGFloat)aMaxHeight;
++ (CGFloat)heightOfHint:(LoggerMessage * const)aMessage maxWidth:(CGFloat)aMaxWidth maxHeight:(CGFloat)aMaxHeight;
 @end

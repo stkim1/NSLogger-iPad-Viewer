@@ -55,7 +55,7 @@
 @property (nonatomic, retain) NSString * imageSize;
 @property (nonatomic, retain) NSNumber * landscapeFileFuncHeight;
 @property (nonatomic, retain) NSNumber * landscapeHeight;
-@property (nonatomic, retain) NSString * landscapeHintSize;
+@property (nonatomic, retain) NSNumber * landscapeHintHeight;
 @property (nonatomic, retain) NSString * landscapeMessageSize;
 @property (nonatomic, retain) NSNumber * level;
 @property (nonatomic, retain) NSNumber * lineNumber;
@@ -63,7 +63,7 @@
 @property (nonatomic, retain) NSString * messageType;
 @property (nonatomic, retain) NSNumber * portraitFileFuncHeight;
 @property (nonatomic, retain) NSNumber * portraitHeight;
-@property (nonatomic, retain) NSString * portraitHintSize;
+@property (nonatomic, retain) NSNumber * portraitHintHeight;
 @property (nonatomic, retain) NSString * portraitMessageSize;
 @property (nonatomic, retain) NSNumber * runCount;
 @property (nonatomic, retain) NSNumber * sequence;

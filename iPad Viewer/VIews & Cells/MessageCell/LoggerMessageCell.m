@@ -53,6 +53,8 @@ UIFont *displayMonospacedFont = nil;
 UIColor *defaultBackgroundColor = nil;
 CGColorRef _fileFuncFgColor = NULL;
 CGColorRef _fileFuncBgColor = NULL;
+CGColorRef _hintTextFgColor = NULL;
+
 UIColor *defaultTagAndLevelColor = nil;
 
 NSString *defaultTextHint = nil;
@@ -142,6 +144,14 @@ NSString *defaultDataHint = nil;
 		CGColorRef bc = CGColorCreate(csr, comps);
 		_fileFuncBgColor = bc;
 	}
+	
+	if(_hintTextFgColor == NULL)
+	{
+		CGFloat comps[] = { 0.3f, 0.3f, 0.3f, 1.f };
+		CGColorRef fc = CGColorCreate(csr, comps);
+		_hintTextFgColor = fc;
+	}
+	
 	CGColorSpaceRelease(csr);
 
 	if(defaultTagAndLevelColor == nil)
@@ -278,8 +288,8 @@ NSString *defaultDataHint = nil;
 		// add hint height if truncated
 		if(truncated){
 			//@@TODO:: find accruate height
-			CGSize hint = CGSizeFromString([aMessageData portraitHintSize]);
-			height += hint.height + 100;
+			CGFloat hint = [[aMessageData portraitHintHeight] floatValue];
+			height += hint + 100;
 		}
 		
 		CGRect cellFrame = (CGRect){CGPointZero,{MSG_CELL_PORTRAIT_WIDTH,height}};
@@ -650,11 +660,12 @@ NSString *defaultDataHint = nil;
 	}
 	
 	if(isTruncated){
-		CTFontRef f = [[LoggerTextStyleManager sharedStyleManager] defaultFont];
+		CTFontRef f = [[LoggerTextStyleManager sharedStyleManager] defaultHintFont];
 		CTParagraphStyleRef p = [[LoggerTextStyleManager sharedStyleManager] defaultParagraphStyle];
-		
+
 		CFAttributedStringSetAttribute(aString, aHintRange, kCTFontAttributeName, f);
 		CFAttributedStringSetAttribute(aString, aHintRange, kCTParagraphStyleAttributeName, p);
+		CFAttributedStringSetAttribute(aString, aHintRange, kCTForegroundColorAttributeName, _hintTextFgColor);
 	}
 }
 

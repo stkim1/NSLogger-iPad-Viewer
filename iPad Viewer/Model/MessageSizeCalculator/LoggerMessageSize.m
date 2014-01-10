@@ -43,12 +43,12 @@
 #import "LoggerMessage.h"
 #import <CoreText/CoreText.h>
 
-NSString		*hintForLongText = nil;
-NSString		*hintForLargeData = nil;
-
 CGFloat			_minHeightForCell;
 CGFloat			_heightFileLineFunction;
 CGFloat			_heightSingleDataLine;
+
+CGFloat			_hintHeightForLongText;
+CGFloat			_hintHeightForLongData;
 
 @implementation LoggerMessageSize
 + (void)initialize
@@ -62,19 +62,23 @@ CGFloat			_heightSingleDataLine;
 	[LoggerMessageSize heightOfFileLineFunctionOnWidth:MSG_CELL_PORTRAIT_WIDTH];
 	[LoggerMessageSize heightOfSingleDataLineOnWidth:MSG_CELL_PORTRAIT_WIDTH];
 	
-
+	//@@TODO:: we need a unified, size formatter
+	CGFloat maxWidth = MSG_CELL_PORTRAIT_WIDTH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING);
+	CGFloat maxHeight = MSG_CELL_PORTRAIT_MAX_HEIGHT - MSG_CELL_TOP_PADDING;
+	CGSize const maxConstraint = CGSizeMake(maxWidth,maxHeight);
+	
 	// hint text should be short, and small at the bottom so that its size,
 	// especially the width, won't exceed the smallest possible width, the portrait width
-	
-	if(hintForLongText == nil)
-	{
-		hintForLongText = [NSLocalizedString(kBottomHintText, nil) retain];
-	}
+	NSString *textHint = NSLocalizedString(kBottomHintText, nil);
+	CGSize htr = [LoggerTextStyleManager sizeforStringWithDefaultHintFont:textHint constraint:maxConstraint];
+	_hintHeightForLongText = htr.height;
 
-	if(hintForLargeData == nil)
-	{
-		hintForLargeData = [NSLocalizedString(kBottomHintData, nil) retain];
-	}
+	NSString *dataHint = NSLocalizedString(kBottomHintData, nil);
+	CGSize hdr = [LoggerTextStyleManager sizeforStringWithDefaultHintFont:dataHint constraint:maxConstraint];
+	_hintHeightForLongData = hdr.height;
+	
+MTLog(@"htr %@ hdr %@",NSStringFromCGSize(htr),NSStringFromCGSize(hdr));
+
 }
 
 
@@ -182,10 +186,9 @@ CGFloat			_heightSingleDataLine;
 	return sz;
 }
 
-+ (CGSize)sizeOfHint:(LoggerMessage * const)aMessage
-			maxWidth:(CGFloat)aMaxWidth
-		   maxHeight:(CGFloat)aMaxHeight
++ (CGFloat)heightOfHint:(LoggerMessage * const)aMessage maxWidth:(CGFloat)aMaxWidth maxHeight:(CGFloat)aMaxHeight
 {
+/*
 	CGSize sz = CGSizeMake(aMaxWidth,aMaxHeight);
 	CGSize const maxConstraint = CGSizeMake(aMaxWidth,aMaxHeight);
 	switch (aMessage.contentsType)
@@ -210,6 +213,24 @@ CGFloat			_heightSingleDataLine;
 
 	// return calculated drawing size
 	return sz;
+*/
+	
+	switch (aMessage.contentsType)
+	{
+		case kMessageString: {
+			return _hintHeightForLongText;
+		}
+			
+		case kMessageData: {
+			return _hintHeightForLongData;
+		}
+			
+		case kMessageImage:
+		default:
+			break;
+	}
+
+	return 0.f;
 }
 
 @end

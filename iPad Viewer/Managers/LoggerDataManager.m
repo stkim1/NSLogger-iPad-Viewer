@@ -651,8 +651,8 @@ didReceiveMessages:(NSArray *)theMessages
 							// set hint size
 							if([aMessage isTruncated])
 							{
-								[messageData setPortraitHintSize:NSStringFromCGSize([aMessage portraitHintSize])];
-								[messageData setLandscapeHintSize:NSStringFromCGSize([aMessage landscapeHintSize])];
+								[messageData setPortraitHintHeight:[NSNumber numberWithFloat:[aMessage portraitHintHeight]]];
+								[messageData setLandscapeHintHeight:[NSNumber numberWithFloat:[aMessage landscapeHintHeight]]];
 							}
 							break;
 						}
@@ -667,8 +667,8 @@ didReceiveMessages:(NSArray *)theMessages
 							// set hint size
 							if([aMessage isTruncated])
 							{
-								[messageData setPortraitHintSize:NSStringFromCGSize([aMessage portraitHintSize])];
-								[messageData setLandscapeHintSize:NSStringFromCGSize([aMessage landscapeHintSize])];
+								[messageData setPortraitHintHeight:[NSNumber numberWithFloat:[aMessage portraitHintHeight]]];
+								[messageData setLandscapeHintHeight:[NSNumber numberWithFloat:[aMessage landscapeHintHeight]]];
 							}
 
 							

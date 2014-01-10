@@ -187,8 +187,6 @@
 		04A4EEDA1738001E00479F0E /* LoggerMessageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerMessageCell.m; sourceTree = "<group>"; };
 		04A8844A17074A4100A64257 /* ICloudSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ICloudSupport.h; sourceTree = "<group>"; };
 		04A8844B17074A4100A64257 /* ICloudSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ICloudSupport.m; sourceTree = "<group>"; };
-		04B7992E186665C300AE01BF /* LoggerMessageData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LoggerMessageData.h; path = CoreDataModel/LoggerMessageData.h; sourceTree = "<group>"; };
-		04B7992F186665C300AE01BF /* LoggerMessageData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LoggerMessageData.m; path = CoreDataModel/LoggerMessageData.m; sourceTree = "<group>"; };
 		04C27EE31747B7B600765A3C /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = SOURCE_ROOT; };
 		04D13F4D16B56AF4004FDB3A /* LoggerNativeMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggerNativeMessage.h; sourceTree = "<group>"; };
 		04D13F4E16B56AF4004FDB3A /* LoggerNativeMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoggerNativeMessage.m; sourceTree = "<group>"; };
@@ -308,8 +306,6 @@
 			isa = PBXGroup;
 			children = (
 				0423104717AFF1CD006EB96E /* LoggerCommon.h */,
-				04B7992E186665C300AE01BF /* LoggerMessageData.h */,
-				04B7992F186665C300AE01BF /* LoggerMessageData.m */,
 				040AD41B16ACF5F60072DFAD /* Views & Cells */,
 				044FEF8A16AC4A810067FA53 /* ViewController */,
 				044FEF5916AC4A810067FA53 /* Managers */,

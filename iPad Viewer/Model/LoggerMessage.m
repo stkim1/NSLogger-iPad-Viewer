@@ -71,21 +71,20 @@
 @dynamic portraitHeight;
 @synthesize portraitFileFuncHeight = _portraitFileFuncHeight;
 @dynamic portraitMessageSize;
-@dynamic portraitHintSize;
+@dynamic portraitHintHeight;
 
 @dynamic landscapeHeight;
 @synthesize landscaleFileFuncHeight = _landscaleFileFuncHeight;
 @dynamic landscapeMessageSize;
-@dynamic landscapeHintSize;
+@dynamic landscapeHintHeight;
 
 - (id) init
 {
 	self = [super init];
 	if (self != nil)
 	{
-		
 		_portraitMessageSize = _landscapeMessageSize = CGSizeZero;
-		_portraitHintSize = _landscapeHintSize = CGSizeZero;
+		_portraitHintHeight = _landscapeHintHeight = -FLT_MAX;
 		_portraitFileFuncHeight = _landscaleFileFuncHeight = 0.f;
 		_truncated = NO;
 	}
@@ -196,8 +195,8 @@
 
 			if(_truncated)
 			{
-				[self portraitHintSize];
-				[self landscapeHintSize];
+				[self portraitHintHeight];
+				[self landscapeHintHeight];
 			}
 			
 			break;
@@ -235,10 +234,10 @@
 -(CGFloat)portraitHeight
 {
 	CGFloat height = _portraitMessageSize.height;
-	
+
 	if(_truncated)
 	{
-		height += _portraitHintSize.height;
+		height += [self portraitHintHeight];
 	}
 	
 	height += MSG_CELL_TOP_BOTTOM_PADDING;
@@ -299,11 +298,11 @@
 	return _portraitMessageSize;
 }
 
--(CGSize)portraitHintSize
+-(CGFloat)portraitHintHeight
 {
-	if(CGSizeEqualToSize(_portraitHintSize, CGSizeZero))
+	if(_portraitHintHeight <= 0.f)
 	{
-		CGSize size;
+		CGFloat height = 0.f;
 		CGFloat maxWidth = MSG_CELL_PORTRAIT_WIDTH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING);
 		CGFloat maxHeight = MSG_CELL_PORTRAIT_MAX_HEIGHT - MSG_CELL_TOP_PADDING;
 
@@ -311,20 +310,18 @@
 			case LOGMSG_TYPE_LOG:
 			case LOGMSG_TYPE_BLOCKSTART:
 			case LOGMSG_TYPE_BLOCKEND:{
-				size = [LoggerMessageSize sizeOfHint:self maxWidth:maxWidth maxHeight:maxHeight];
+				height = [LoggerMessageSize heightOfHint:self maxWidth:maxWidth maxHeight:maxHeight];
 				break;
 			}
 
-			default:{
-				size = CGSizeZero;
+			default:
 				break;
-			}
 		}
 		
-		_portraitHintSize = size;
+		_portraitHintHeight = height;
 	}
-	
-	return _portraitHintSize;
+
+	return _portraitHintHeight;
 }
 
 -(CGFloat)landscapeHeight
@@ -333,9 +330,9 @@
 	
 	if(_truncated)
 	{
-		height += _landscapeHintSize.height;
+		height += [self landscapeHintHeight];
 	}
-	
+
 	height += MSG_CELL_TOP_BOTTOM_PADDING;
 	return height;
 }
@@ -395,11 +392,11 @@
 	return _landscapeMessageSize;
 }
 
--(CGSize)landscapeHintSize
+-(CGFloat)landscapeHintHeight
 {
-	if (CGSizeEqualToSize(_landscapeHintSize, CGSizeZero))
+	if (_landscapeHintHeight <= 0.f)
 	{
-		CGSize size;
+		CGFloat height = 0.f;
 		CGFloat maxWidth = MSG_CELL_LANDSCAPE_WDITH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING);
 		CGFloat maxHeight = MSG_CELL_LANDSCALE_MAX_HEIGHT - MSG_CELL_TOP_PADDING;
 
@@ -408,18 +405,17 @@
 			case LOGMSG_TYPE_LOG:
 			case LOGMSG_TYPE_BLOCKSTART:
 			case LOGMSG_TYPE_BLOCKEND:{
-				size = [LoggerMessageSize sizeOfHint:self maxWidth:maxWidth maxHeight:maxHeight];
+				height = [LoggerMessageSize heightOfHint:self maxWidth:maxWidth maxHeight:maxHeight];
 				break;
 			}
 			default:
 				break;
 		}
 
-		_landscapeHintSize = size;
-
+		_landscapeHintHeight = height;
 	}
 	
-	return _landscapeHintSize;
+	return _landscapeHintHeight;
 }
 
 // -----------------------------------------------------------------------------

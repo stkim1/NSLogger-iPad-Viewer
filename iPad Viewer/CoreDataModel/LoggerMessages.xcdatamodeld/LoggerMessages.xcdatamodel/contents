@@ -29,7 +29,7 @@
         <attribute name="imageSize" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="landscapeFileFuncHeight" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
         <attribute name="landscapeHeight" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
-        <attribute name="landscapeHintSize" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="landscapeHintHeight" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
         <attribute name="landscapeMessageSize" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="level" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="lineNumber" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
@@ -37,7 +37,7 @@
         <attribute name="messageType" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="portraitFileFuncHeight" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
         <attribute name="portraitHeight" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
-        <attribute name="portraitHintSize" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="portraitHintHeight" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
         <attribute name="portraitMessageSize" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="runCount" attributeType="Integer 32" defaultValueString="0" indexed="YES" syncable="YES"/>
         <attribute name="sequence" attributeType="Integer 32" defaultValueString="0" indexed="YES" syncable="YES"/>

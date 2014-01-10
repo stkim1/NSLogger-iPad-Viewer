@@ -83,11 +83,11 @@
 	
 	CGFloat						_portraitFileFuncHeight;
 	CGSize						_portraitMessageSize;
-	CGSize						_portraitHintSize;
+	CGFloat						_portraitHintHeight;
 
 	CGFloat						_landscaleFileFuncHeight;
 	CGSize						_landscapeMessageSize;
-	CGSize						_landscapeHintSize;
+	CGFloat						_landscapeHintHeight;
 	
 	
 }
@@ -116,12 +116,12 @@
 @property (nonatomic, readonly) CGFloat				portraitHeight;
 @property (nonatomic, readonly) CGFloat				portraitFileFuncHeight;
 @property (nonatomic, readonly) CGSize				portraitMessageSize;
-@property (nonatomic, readonly) CGSize				portraitHintSize;
+@property (nonatomic, readonly) CGFloat				portraitHintHeight;
 
 @property (nonatomic, readonly) CGFloat				landscapeHeight;
 @property (nonatomic, readonly) CGFloat				landscaleFileFuncHeight;
 @property (nonatomic, readonly) CGSize				landscapeMessageSize;
-@property (nonatomic, readonly) CGSize				landscapeHintSize;
+@property (nonatomic, readonly) CGFloat				landscapeHintHeight;
 
 
 - (void)formatMessage;

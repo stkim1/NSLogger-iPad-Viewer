@@ -62,7 +62,7 @@
 @dynamic imageSize;
 @dynamic landscapeFileFuncHeight;
 @dynamic landscapeHeight;
-@dynamic landscapeHintSize;
+@dynamic landscapeHintHeight;
 @dynamic landscapeMessageSize;
 @dynamic level;
 @dynamic lineNumber;
@@ -70,7 +70,7 @@
 @dynamic messageType;
 @dynamic portraitFileFuncHeight;
 @dynamic portraitHeight;
-@dynamic portraitHintSize;
+@dynamic portraitHintHeight;
 @dynamic portraitMessageSize;
 @dynamic runCount;
 @dynamic sequence;
@@ -95,14 +95,14 @@
 	size += [[self fileFuncRepresentation] length];
 	size += [[self imageSize] length];
 	size += 4; // landscape height
-	size += [[self landscapeHintSize] length];
+	size += 4; // landscale hint
 	size += [[self landscapeMessageSize] length];
 	size += 4; // level
 	size += 4; // line num
 	size += [[self messageText] length];
 	size += [[self messageType] length];
 	size += 4; // portraight height
-	size += [[self portraitHintSize] length];
+	size += 4; // portraight hint
 	size += [[self portraitMessageSize] length];
 	size += 4; // run count
 	size += 4; // sequence

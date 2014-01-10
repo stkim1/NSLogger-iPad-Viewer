@@ -412,8 +412,8 @@ heightForRowAtIndexPath:(NSIndexPath *)anIndexPath
 	if([[data truncated] boolValue]){
 		
 		//@@TODO:: find accruate height
-		CGSize hint = CGSizeFromString([data portraitHintSize]);
-		h += hint.height + 100;
+		CGFloat hint = [[data portraitHintHeight] floatValue];
+		h += hint + 100;
 	}
 	
 	return h;

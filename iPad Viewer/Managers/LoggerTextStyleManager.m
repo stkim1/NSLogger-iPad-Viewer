@@ -65,6 +65,9 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTextStyleManager,sharedStyleM
 @synthesize defaultMonospacedFont = _defaultMonospacedFont;
 @synthesize defaultMonospacedStyle = _defaultMonospacedStyle;
 
+@synthesize defaultHintFont = _defaultHintFont;
+
+
 +(CGSize)_sizeForString:(NSString *)aString constraint:(CGSize)aConstraint font:(CTFontRef)aFont style:(CTParagraphStyleRef)aStyle
 {
 	
@@ -133,6 +136,18 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTextStyleManager,sharedStyleM
 	CTParagraphStyleRef style = [[LoggerTextStyleManager sharedStyleManager] defaultMonospacedStyle];
 	return [LoggerTextStyleManager _sizeForString:aString constraint:aConstraint font:font style:style];
 }
+
++(CGSize)sizeforStringWithDefaultHintFont:(NSString *)aString constraint:(CGSize)aConstraint
+{
+	if(IS_NULL_STRING(aString))
+		return CGSizeZero;
+
+	CTFontRef font = [[LoggerTextStyleManager sharedStyleManager] defaultHintFont];
+	CTParagraphStyleRef style = [[LoggerTextStyleManager sharedStyleManager] defaultParagraphStyle];
+	return [LoggerTextStyleManager _sizeForString:aString constraint:aConstraint font:font style:style];
+}
+
+
 
 -(id)init
 {
@@ -218,6 +233,14 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTextStyleManager,sharedStyleM
 		CGDataProviderRelease(fontProvider);
 		CFRelease(cgFont);
 
+		//------------------------------- hint font ----------------------------
+		CTFontRef hf = CTFontCreateCopyWithSymbolicTraits(_defaultFont, 0.0, NULL, kCTFontTraitItalic,kCTFontTraitItalic);
+		if(hf != NULL){
+			_defaultHintFont = hf;
+		}else{
+			_defaultHintFont = _defaultFont;
+		}
+		
 	}
 	return self;
 }

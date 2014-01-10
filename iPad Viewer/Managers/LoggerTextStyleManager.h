@@ -61,7 +61,7 @@
 @property (nonatomic, readonly) __attribute__((NSObject)) CTFontRef				defaultTagAndLevelFont;
 @property (nonatomic, readonly) __attribute__((NSObject)) CTFontRef				defaultFileAndFunctionFont;
 @property (nonatomic, readonly) __attribute__((NSObject)) CTFontRef				defaultMonospacedFont;
-
+@property (nonatomic, readonly) __attribute__((NSObject)) CTFontRef				defaultHintFont;
 
 /* 
  * CTParagraphStyleCreate
@@ -80,5 +80,5 @@
 +(CGSize)sizeForStringWithDefaultTagAndLevelFont:(NSString *)aString constraint:(CGSize)aConstraint;
 +(CGSize)sizeForStringWithDefaultFileAndFunctionFont:(NSString *)aString constraint:(CGSize)aConstraint;
 +(CGSize)sizeForStringWithDefaultMonospacedFont:(NSString *)aString constraint:(CGSize)aConstraint;
-
++(CGSize)sizeforStringWithDefaultHintFont:(NSString *)aString constraint:(CGSize)aConstraint;
 @end
