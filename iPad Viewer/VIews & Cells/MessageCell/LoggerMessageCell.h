@@ -61,6 +61,7 @@ extern NSString * const kMessageCellReuseID;
 	UITableView				*_hostTableView;	// a tableview hosting this cell
 	LoggerMessageData		*_messageData;
 	UIImage					*_imageData;
+	CGRect					_tagDrawRect;
 }
 @property (nonatomic, assign) UITableView				*hostTableView;
 @property (nonatomic, retain) LoggerMessageData			*messageData;

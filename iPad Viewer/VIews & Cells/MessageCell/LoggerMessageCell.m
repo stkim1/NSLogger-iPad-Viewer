@@ -43,7 +43,7 @@
  */
 
 #import "LoggerMessageCell.h"
-
+#import "LoggerUtils.h"
 
 NSString * const kMessageCellReuseID = @"messageCell";
 UIFont *displayDefaultFont = nil;
@@ -444,6 +444,17 @@ NSString *defaultDataHint = nil;
 			 stringForRect:as
 			 stringRange:CFRangeMake(locThread, TEXT_LENGH_BETWEEN_LOCS(locFileFunc,locThread))
 			 frameSetter:framesetter];
+				
+		CGSize tsz = \
+			[self
+			 tagTextRect:drawRect
+			 tagRange:CFRangeMake(locTag, TEXT_LENGH_BETWEEN_LOCS(locLevel,locTag))
+			 levelRange:CFRangeMake(locLevel, TEXT_LENGH_BETWEEN_LOCS(locFileFunc,locLevel))
+			 frameSetter:framesetter];
+
+		//@@TODO:: formalize this area
+		_tagDrawRect = (CGRect){drawRect.origin, tsz};
+		
 		
 		CFArrayAppendValue(self.textFrameContainer,frame);
 		CFRelease(frame);
@@ -524,6 +535,18 @@ NSString *defaultDataHint = nil;
 						  DEFAULT_THREAD_COLUMN_WIDTH,
 						  CGRectGetHeight(aBoundRect));
 	return r;
+}
+
+- (CGSize)tagTextRect:(CGRect)aConstraint
+			 tagRange:(CFRange)aTagRange
+		   levelRange:(CFRange)aLevelRange
+		  frameSetter:(CTFramesetterRef)framesetter
+{
+	CFRange fitRange;
+	CFRange textRange = CFRangeMake(aTagRange.location, aTagRange.length + aLevelRange.length);
+	CGSize frameSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, textRange, NULL, aConstraint.size, &fitRange);
+
+	return frameSize;
 }
 
 - (CGRect)fileLineFunctionTextRect:(CGRect)aBoundRect lineHeight:(CGFloat)aLineHeight
@@ -619,9 +642,6 @@ NSString *defaultDataHint = nil;
 	
 	// not working *confirmed* :(
 	//CFAttributedStringSetAttribute(aString, aStringRange, (CFStringRef)NSBackgroundColorAttributeName, _fileFuncBgColor);
-
-	
-	
 }
 
 - (void)messageAttribute:(CFMutableAttributedStringRef)aString
@@ -761,6 +781,17 @@ NSString *defaultDataHint = nil;
 - (void)drawThreadIDAndTagInRect:(CGRect)aDrawRect
 			highlightedTextColor:(UIColor *)aHighlightedTextColor
 {
+	
+	CGContextRef context = UIGraphicsGetCurrentContext();
+	UIColor *black = GRAYCOLOR(0.25f);
+	CGContextSaveGState(context);
+	CGContextSetFillColorWithColor(context, [black CGColor]);
+	CGContextClipToRect(context,_tagDrawRect);
+	MakeRoundedPath(context, _tagDrawRect, 3.0f);
+	CGContextFillPath(context);
+	CGContextRestoreGState(context);
+
+	
 	
 #if 0
 	
