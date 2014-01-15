@@ -63,7 +63,7 @@ CGFloat			_hintHeightForLongData;
 	[LoggerMessageSize heightOfSingleDataLineOnWidth:MSG_CELL_PORTRAIT_WIDTH];
 	
 	//@@TODO:: we need a unified, size formatter
-	CGFloat maxWidth = MSG_CELL_PORTRAIT_WIDTH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING);
+	CGFloat maxWidth = MSG_CELL_PORTRAIT_WIDTH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_LATERAL_PADDING);
 	CGFloat maxHeight = MSG_CELL_PORTRAIT_MAX_HEIGHT - MSG_CELL_TOP_PADDING;
 	CGSize const maxConstraint = CGSizeMake(maxWidth,maxHeight);
 	
@@ -109,7 +109,7 @@ MTLog(@"htr %@ hdr %@",NSStringFromCGSize(htr),NSStringFromCGSize(hdr));
 
 	CGSize r = [LoggerTextStyleManager sizeForStringWithDefaultTagAndLevelFont:@"file:100 funcQyTg" constraint:maxConstraint];
 	
-	_heightFileLineFunction = r.height + MSG_CELL_TOP_BOTTOM_PADDING;
+	_heightFileLineFunction = r.height + MSG_CELL_VERTICAL_PADDING;
 
 	return _heightFileLineFunction;
 }
@@ -179,7 +179,7 @@ MTLog(@"htr %@ hdr %@",NSStringFromCGSize(htr),NSStringFromCGSize(hdr));
 			break;
 	}
 
-	//CGFloat displayHeight = sz.height + MSG_CELL_TOP_BOTTOM_PADDING;
+	//CGFloat displayHeight = sz.height + MSG_CELL_VERTICAL_PADDING;
 	sz.height = fmaxf(sz.height, minimumHeight);
 
 	// return calculated drawing size

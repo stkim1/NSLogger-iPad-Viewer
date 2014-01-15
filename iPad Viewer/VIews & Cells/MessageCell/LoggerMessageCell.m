@@ -51,7 +51,8 @@ UIFont *displayTagAndLevelFont = nil;
 UIFont *displayMonospacedFont = nil;
 
 UIColor *defaultBackgroundColor = nil;
-CGColorRef _fileFuncFgColor = NULL;
+CGColorRef _defaultGrayColor = NULL;
+CGColorRef _defaultWhiteColor = NULL;
 CGColorRef _fileFuncBgColor = NULL;
 CGColorRef _hintTextFgColor = NULL;
 
@@ -132,12 +133,19 @@ NSString *defaultDataHint = nil;
 
 	
 	CGColorSpaceRef csr = CGColorSpaceCreateDeviceRGB();
-	if(_fileFuncFgColor == NULL){
+	if(_defaultGrayColor == NULL){
 		CGFloat fcomps[] = { 0.5f, 0.5f, 0.5f, 1.f };
 		CGColorRef fc = CGColorCreate(csr, fcomps);
-		_fileFuncFgColor = fc;
+		_defaultGrayColor = fc;
 	}
 
+	if(_defaultWhiteColor == NULL)
+	{
+		CGFloat fcomps[] = { 1.f, 0.f, 0.f, 1.f };
+		CGColorRef fc = CGColorCreate(csr, fcomps);
+		_defaultWhiteColor = fc;
+	}
+	
 	if(_fileFuncBgColor == NULL)
 	{
 		CGFloat comps[] = { (239.0f / 255.0f), (233.0f / 255.0f), (252.0f / 255.0f), 1.f };
@@ -385,12 +393,22 @@ NSString *defaultDataHint = nil;
 		 timestampRange:CFRangeMake(locTimestamp, TEXT_LENGH_BETWEEN_LOCS(locTimedelta,locTimestamp))
 		 deltaRange:CFRangeMake(locTimedelta, TEXT_LENGH_BETWEEN_LOCS(locThread,locTimedelta))
 		 hightlighted:NO];
-		
-		// thread id & tag
+
+		// thread id
 		[self
-		 threadIDAndTagAttribute:as
+		 threadIDAttribute:as
 		 threadRange:CFRangeMake(locThread, TEXT_LENGH_BETWEEN_LOCS(locTag,locThread))
+		 hightlighted:NO];
+		
+		// tag attribute
+		[self
+		 tagAttribute:as
 		 tagRange:CFRangeMake(locTag, TEXT_LENGH_BETWEEN_LOCS(locLevel,locTag))
+		 hightlighted:NO];
+		
+		// level attribute
+		[self
+		 levelAttribute:as
 		 levelRange:CFRangeMake(locLevel, TEXT_LENGH_BETWEEN_LOCS(locFileFunc,locLevel))
 		 hightlighted:NO];
 		
@@ -440,9 +458,9 @@ NSString *defaultDataHint = nil;
 		drawRect = [self threadIDAndTagTextRect:cellFrame];
 		frame = \
 			[self
-			 threadIDAndTagText:drawRect
+			 threadIDText:drawRect
 			 stringForRect:as
-			 stringRange:CFRangeMake(locThread, TEXT_LENGH_BETWEEN_LOCS(locFileFunc,locThread))
+			 stringRange:CFRangeMake(locThread, TEXT_LENGH_BETWEEN_LOCS(locTag,locThread))
 			 frameSetter:framesetter];
 				
 		CGSize tsz = \
@@ -530,10 +548,10 @@ NSString *defaultDataHint = nil;
 - (CGRect)threadIDAndTagTextRect:(CGRect)aBoundRect
 {
 	// Draw thread ID and tag
-	CGRect r = CGRectMake(CGRectGetMinX(aBoundRect) + TIMESTAMP_COLUMN_WIDTH,
-						  CGRectGetMinY(aBoundRect),
-						  DEFAULT_THREAD_COLUMN_WIDTH,
-						  CGRectGetHeight(aBoundRect));
+	CGRect r = CGRectMake(CGRectGetMinX(aBoundRect) + TIMESTAMP_COLUMN_WIDTH + MSG_CELL_LEFT_PADDING,
+						  CGRectGetMinY(aBoundRect) + MSG_CELL_TOP_PADDING,
+						  DEFAULT_THREAD_COLUMN_WIDTH - MSG_CELL_LATERAL_PADDING,
+						  CGRectGetHeight(aBoundRect) - MSG_CELL_VERTICAL_PADDING);
 	return r;
 }
 
@@ -554,7 +572,7 @@ NSString *defaultDataHint = nil;
 	//@@TODO : handle flipped coordinate system
 	CGRect r =	CGRectMake(CGRectGetMinX(aBoundRect) + (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_LEFT_PADDING),
 						   CGRectGetMaxY(aBoundRect) - MSG_CELL_TOP_PADDING - aLineHeight,
-						   CGRectGetWidth(aBoundRect) - (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING),
+						   CGRectGetWidth(aBoundRect) - (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_LATERAL_PADDING),
 						   aLineHeight);
 	
 	//MTLog(@"%s lineHeight %5.2f %@ %@",__PRETTY_FUNCTION__, aLineHeight, NSStringFromCGRect(r),self.messageData.fileFuncRepresentation);
@@ -566,8 +584,8 @@ NSString *defaultDataHint = nil;
 	//@@TODO : handle flipped coordinate system
 	CGRect r = CGRectMake(CGRectGetMinX(aBoundRect) + (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_LEFT_PADDING),
 						  CGRectGetMinY(aBoundRect) + MSG_CELL_TOP_PADDING,
-						  CGRectGetWidth(aBoundRect) - (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING),
-						  CGRectGetHeight(aBoundRect) - MSG_CELL_TOP_BOTTOM_PADDING - aLineHeight);
+						  CGRectGetWidth(aBoundRect) - (TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_LATERAL_PADDING),
+						  CGRectGetHeight(aBoundRect) - MSG_CELL_VERTICAL_PADDING - aLineHeight);
 
 	//MTLog(@"%s lineHeight %5.2f %@",__PRETTY_FUNCTION__, aLineHeight, NSStringFromCGRect(r));
 	return r;
@@ -596,17 +614,13 @@ NSString *defaultDataHint = nil;
 	CFAttributedStringSetAttribute(aString, aTimestampRange, kCTParagraphStyleAttributeName, p);
 }
 
-- (void)threadIDAndTagAttribute:(CFMutableAttributedStringRef)aString
-					threadRange:(CFRange)aThreadRange
-					   tagRange:(CFRange)aTagRange
-					 levelRange:(CFRange)aLevelRange
-				   hightlighted:(BOOL)isHighlighted
+- (void)threadIDAttribute:(CFMutableAttributedStringRef)aString
+			  threadRange:(CFRange)aThreadRange
+			 hightlighted:(BOOL)isHighlighted
 {
 #ifdef DEBUG_CT_STR_RANGE
 	NSAttributedString *s = (NSAttributedString *)aString;
 	MTLog(@"thread : %@",[[s attributedSubstringFromRange:NSMakeRange(aThreadRange.location, aThreadRange.length)] string]);
-	MTLog(@"delta : %@",[[s attributedSubstringFromRange:NSMakeRange(aTagRange.location, aTagRange.length)] string]);
-	MTLog(@"level : %@",[[s attributedSubstringFromRange:NSMakeRange(aLevelRange.location, aLevelRange.length)] string]);
 #endif
 	
 	CTFontRef f = [[LoggerTextStyleManager sharedStyleManager] defaultFont];
@@ -614,16 +628,47 @@ NSString *defaultDataHint = nil;
 	
 	CFAttributedStringSetAttribute(aString, aThreadRange, kCTFontAttributeName, f);
 	CFAttributedStringSetAttribute(aString, aThreadRange, kCTParagraphStyleAttributeName, p);
-	
+	CFAttributedStringSetAttribute(aString, aThreadRange, kCTForegroundColorAttributeName, _defaultGrayColor);
+}
+
+
+- (void)tagAttribute:(CFMutableAttributedStringRef)aString
+			tagRange:(CFRange)aTagRange
+		hightlighted:(BOOL)isHighlighted
+{
+#ifdef DEBUG_CT_STR_RANGE
+	NSAttributedString *s = (NSAttributedString *)aString;
+	MTLog(@"tag : %@",[[s attributedSubstringFromRange:NSMakeRange(aTagRange.location, aTagRange.length)] string]);
+	MTLog(@"level : %@",[[s attributedSubstringFromRange:NSMakeRange(aLevelRange.location, aLevelRange.length)] string]);
+#endif
+
 	CTFontRef tlf = [[LoggerTextStyleManager sharedStyleManager] defaultTagAndLevelFont];
 	CTParagraphStyleRef tlp = [[LoggerTextStyleManager sharedStyleManager] defaultTagAndLevelStyle];
 	
 	CFAttributedStringSetAttribute(aString, aTagRange, kCTFontAttributeName, tlf);
 	CFAttributedStringSetAttribute(aString, aTagRange, kCTParagraphStyleAttributeName, tlp);
+	CFAttributedStringSetAttribute(aString, aTagRange, kCTForegroundColorAttributeName, _defaultWhiteColor);
+}
+
+- (void)levelAttribute:(CFMutableAttributedStringRef)aString
+			levelRange:(CFRange)aLevelRange
+		  hightlighted:(BOOL)isHighlighted
+{
+#ifdef DEBUG_CT_STR_RANGE
+	NSAttributedString *s = (NSAttributedString *)aString;
+	MTLog(@"tag : %@",[[s attributedSubstringFromRange:NSMakeRange(aTagRange.location, aTagRange.length)] string]);
+	MTLog(@"level : %@",[[s attributedSubstringFromRange:NSMakeRange(aLevelRange.location, aLevelRange.length)] string]);
+#endif
+	
+	CTFontRef tlf = [[LoggerTextStyleManager sharedStyleManager] defaultTagAndLevelFont];
+	CTParagraphStyleRef tlp = [[LoggerTextStyleManager sharedStyleManager] defaultTagAndLevelStyle];
 	
 	CFAttributedStringSetAttribute(aString, aLevelRange, kCTFontAttributeName, tlf);
 	CFAttributedStringSetAttribute(aString, aLevelRange, kCTParagraphStyleAttributeName, tlp);
+	CFAttributedStringSetAttribute(aString, aLevelRange, kCTForegroundColorAttributeName, _defaultWhiteColor);
 }
+
+
 
 - (void)fileLineFunctionAttribute:(CFMutableAttributedStringRef)aString
 					  stringRange:(CFRange)aStringRange
@@ -638,7 +683,7 @@ NSString *defaultDataHint = nil;
 	CTParagraphStyleRef p = [[LoggerTextStyleManager sharedStyleManager] defaultFileAndFunctionStyle];
 	CFAttributedStringSetAttribute(aString, aStringRange, kCTFontAttributeName, f);
 	CFAttributedStringSetAttribute(aString, aStringRange, kCTParagraphStyleAttributeName, p);
-	CFAttributedStringSetAttribute(aString, aStringRange, kCTForegroundColorAttributeName, _fileFuncFgColor);
+	CFAttributedStringSetAttribute(aString, aStringRange, kCTForegroundColorAttributeName, _defaultGrayColor);
 	
 	// not working *confirmed* :(
 	//CFAttributedStringSetAttribute(aString, aStringRange, (CFStringRef)NSBackgroundColorAttributeName, _fileFuncBgColor);
@@ -713,10 +758,27 @@ NSString *defaultDataHint = nil;
 	return frame;
 }
 
-- (CTFrameRef)threadIDAndTagText:(CGRect)aDrawRect
-				   stringForRect:(CFMutableAttributedStringRef)aString
-					 stringRange:(CFRange)aStringRange
-					 frameSetter:(CTFramesetterRef)aFrameSetter
+- (CTFrameRef)threadIDText:(CGRect)aDrawRect
+			 stringForRect:(CFMutableAttributedStringRef)aString
+			   stringRange:(CFRange)aStringRange
+			   frameSetter:(CTFramesetterRef)aFrameSetter
+{
+#ifdef DEBUG_CT_FRAME_RANGE
+	NSAttributedString *s = (NSAttributedString *)aString;
+	MTLog(@"threadIDAndTagText : %@",[[s attributedSubstringFromRange:NSMakeRange(aStringRange.location, aStringRange.length)] string]);
+#endif
+	
+	CGMutablePathRef path = CGPathCreateMutable();
+	CGPathAddRect(path, NULL, aDrawRect);
+	CTFrameRef frame = CTFramesetterCreateFrame(aFrameSetter,aStringRange, path, NULL);
+	CGPathRelease(path);
+	return frame;
+}
+
+- (CTFrameRef)tagText:(CGRect)aDrawRect
+		stringForRect:(CFMutableAttributedStringRef)aString
+		  stringRange:(CFRange)aStringRange
+		  frameSetter:(CTFramesetterRef)aFrameSetter
 {
 #ifdef DEBUG_CT_FRAME_RANGE
 	NSAttributedString *s = (NSAttributedString *)aString;
@@ -734,6 +796,29 @@ NSString *defaultDataHint = nil;
 	CGPathRelease(path);
 	return frame;
 }
+
+- (CTFrameRef)LevelText:(CGRect)aDrawRect
+		  stringForRect:(CFMutableAttributedStringRef)aString
+			stringRange:(CFRange)aStringRange
+			frameSetter:(CTFramesetterRef)aFrameSetter
+{
+#ifdef DEBUG_CT_FRAME_RANGE
+	NSAttributedString *s = (NSAttributedString *)aString;
+	MTLog(@"threadIDAndTagText : %@",[[s attributedSubstringFromRange:NSMakeRange(aStringRange.location, aStringRange.length)] string]);
+#endif
+	
+	CGMutablePathRef path = CGPathCreateMutable();
+	/*
+	 CGSize threadBounds = [LoggerTextStyleManager
+	 sizeForStringWithDefaultTagAndLevelFont:self.messageData.threadID
+	 constraint:aDrawRect.size];
+	 */
+	CGPathAddRect(path, NULL, aDrawRect);
+	CTFrameRef frame = CTFramesetterCreateFrame(aFrameSetter,aStringRange, path, NULL);
+	CGPathRelease(path);
+	return frame;
+}
+
 
 - (CTFrameRef)fileLineFunctionText:(CGRect)aDrawRect
 					 stringForRect:(CFMutableAttributedStringRef)aString
@@ -1132,8 +1217,9 @@ NSString *defaultDataHint = nil;
 	drawRect = [self threadIDAndTagTextRect:cellFrame];
 	[self drawThreadIDAndTagInRect:drawRect highlightedTextColor:nil];
 
-#ifdef DEBUG_DRAW_AREA
-	CGContextSetFillColorWithColor(context, [UIColor blueColor].CGColor);
+//#ifdef DEBUG_DRAW_AREA
+#if 1
+	CGContextSetFillColorWithColor(context, [UIColor yellowColor].CGColor);
 	CGContextFillRect(context, drawRect);
 #endif
 
@@ -1149,9 +1235,8 @@ NSString *defaultDataHint = nil;
 	CGContextSetFillColorWithColor(context, [UIColor yellowColor].CGColor);
 	CGContextFillRect(context, drawRect);
 #endif
-	
 
-#if 1
+
 	CGContextSaveGState(context);
 	// flip context vertically
 	CGContextSetTextMatrix(context, CGAffineTransformIdentity);
@@ -1187,7 +1272,6 @@ NSString *defaultDataHint = nil;
 		CTFrameDraw(tf, context);
 	}
 	CGContextRestoreGState(context);
-#endif
 }
 
 @end

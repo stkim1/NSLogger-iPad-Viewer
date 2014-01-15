@@ -108,8 +108,8 @@ extern UIFont *displayMonospacedFont;
 	// Draw client info
 	CGRect r = CGRectMake(CGRectGetMinX(cellFrame) + MSG_CELL_LEFT_PADDING,
 						  CGRectGetMinY(cellFrame) + MSG_CELL_TOP_PADDING,
-						  CGRectGetWidth(cellFrame) - MSG_CELL_SIDE_PADDING,
-						  CGRectGetHeight(cellFrame) - MSG_CELL_TOP_BOTTOM_PADDING);
+						  CGRectGetWidth(cellFrame) - MSG_CELL_LATERAL_PADDING,
+						  CGRectGetHeight(cellFrame) - MSG_CELL_VERTICAL_PADDING);
 	
 	
 	// set black color for text

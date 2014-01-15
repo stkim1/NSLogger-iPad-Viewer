@@ -240,7 +240,7 @@
 		height += [self portraitHintHeight];
 	}
 	
-	height += MSG_CELL_TOP_BOTTOM_PADDING;
+	height += MSG_CELL_VERTICAL_PADDING;
 	return height;
 }
 
@@ -249,7 +249,7 @@
 	if(CGSizeEqualToSize(_portraitMessageSize, CGSizeZero))
 	{
 		CGSize size;
-		CGFloat maxWidth = MSG_CELL_PORTRAIT_WIDTH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING);
+		CGFloat maxWidth = MSG_CELL_PORTRAIT_WIDTH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_LATERAL_PADDING);
 		CGFloat maxHeight = MSG_CELL_PORTRAIT_MAX_HEIGHT;
 
 		if(_truncated)
@@ -258,7 +258,7 @@
 		}
 		else
 		{
-			maxHeight -= MSG_CELL_TOP_BOTTOM_PADDING;
+			maxHeight -= MSG_CELL_VERTICAL_PADDING;
 		}
 		
 		switch (self.type){
@@ -303,7 +303,7 @@
 	if(_portraitHintHeight <= 0.f)
 	{
 		CGFloat height = 0.f;
-		CGFloat maxWidth = MSG_CELL_PORTRAIT_WIDTH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING);
+		CGFloat maxWidth = MSG_CELL_PORTRAIT_WIDTH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_LATERAL_PADDING);
 		CGFloat maxHeight = MSG_CELL_PORTRAIT_MAX_HEIGHT - MSG_CELL_TOP_PADDING;
 
 		switch (self.type){
@@ -333,7 +333,7 @@
 		height += [self landscapeHintHeight];
 	}
 
-	height += MSG_CELL_TOP_BOTTOM_PADDING;
+	height += MSG_CELL_VERTICAL_PADDING;
 	return height;
 }
 
@@ -342,7 +342,7 @@
 	if(CGSizeEqualToSize(_landscapeMessageSize, CGSizeZero))
 	{
 		CGSize size;
-		CGFloat maxWidth = MSG_CELL_LANDSCAPE_WDITH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING);
+		CGFloat maxWidth = MSG_CELL_LANDSCAPE_WDITH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_LATERAL_PADDING);
 		CGFloat maxHeight = MSG_CELL_LANDSCALE_MAX_HEIGHT;
 
 		if(_truncated)
@@ -351,7 +351,7 @@
 		}
 		else
 		{
-			maxHeight -= MSG_CELL_TOP_BOTTOM_PADDING;
+			maxHeight -= MSG_CELL_VERTICAL_PADDING;
 		}
 
 		switch (self.type){
@@ -397,7 +397,7 @@
 	if (_landscapeHintHeight <= 0.f)
 	{
 		CGFloat height = 0.f;
-		CGFloat maxWidth = MSG_CELL_LANDSCAPE_WDITH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_SIDE_PADDING);
+		CGFloat maxWidth = MSG_CELL_LANDSCAPE_WDITH-(TIMESTAMP_COLUMN_WIDTH + DEFAULT_THREAD_COLUMN_WIDTH + MSG_CELL_LATERAL_PADDING);
 		CGFloat maxHeight = MSG_CELL_LANDSCALE_MAX_HEIGHT - MSG_CELL_TOP_PADDING;
 
 		switch (self.type){
