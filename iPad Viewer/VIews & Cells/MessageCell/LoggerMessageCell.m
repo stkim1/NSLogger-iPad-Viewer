@@ -141,7 +141,7 @@ NSString *defaultDataHint = nil;
 
 	if(_defaultWhiteColor == NULL)
 	{
-		CGFloat fcomps[] = { 1.f, 0.f, 0.f, 1.f };
+		CGFloat fcomps[] = { 1.f, 1.f, 1.f, 1.f };
 		CGColorRef fc = CGColorCreate(csr, fcomps);
 		_defaultWhiteColor = fc;
 	}
@@ -454,29 +454,49 @@ NSString *defaultDataHint = nil;
 		CFArrayAppendValue(self.textFrameContainer,frame);
 		CFRelease(frame);
 
-		//thread id & tag
+		//thread id
 		drawRect = [self threadIDAndTagTextRect:cellFrame];
-		frame = \
-			[self
-			 threadIDText:drawRect
-			 stringForRect:as
-			 stringRange:CFRangeMake(locThread, TEXT_LENGH_BETWEEN_LOCS(locTag,locThread))
-			 frameSetter:framesetter];
-				
-		CGSize tsz = \
-			[self
-			 tagTextRect:drawRect
-			 tagRange:CFRangeMake(locTag, TEXT_LENGH_BETWEEN_LOCS(locLevel,locTag))
-			 levelRange:CFRangeMake(locLevel, TEXT_LENGH_BETWEEN_LOCS(locFileFunc,locLevel))
-			 frameSetter:framesetter];
-
-		//@@TODO:: formalize this area
-		_tagDrawRect = (CGRect){drawRect.origin, tsz};
-		
-		
+		CFRange tidrng = CFRangeMake(locThread, TEXT_LENGH_BETWEEN_LOCS(locTag,locThread));
+		frame = [self threadIDText:drawRect stringForRect:as stringRange:tidrng frameSetter:framesetter];
 		CFArrayAppendValue(self.textFrameContainer,frame);
 		CFRelease(frame);
 
+
+
+		// tag & level
+		
+		// ranges
+		CFRange tgrng = CFRangeMake(locTag, TEXT_LENGH_BETWEEN_LOCS(locLevel,locTag));
+		CFRange lrng = CFRangeMake(locLevel, TEXT_LENGH_BETWEEN_LOCS(locFileFunc,locLevel));
+		CFRange tlrng = CFRangeMake(locTag, TEXT_LENGH_BETWEEN_LOCS(locFileFunc,locTag));
+		
+		// sizes
+		CGSize tidsz = [self desiredThreadIdSize:drawRect.size threadRange:tidrng frameSetter:framesetter];
+		CGSize tlsz = [self desiredTagAndLevelSize:drawRect.size tagAndLevelRange:tlrng frameSetter:framesetter];
+
+		// frame
+		_tagDrawRect = (CGRect){{CGRectGetMinX(drawRect),CGRectGetMinY(drawRect) + tidsz.height}, tlsz};
+
+		
+		CGRect tlr = (CGRect){{CGRectGetMinX(drawRect),CGRectGetMaxY(drawRect) - tlsz.height - tidsz.height}
+							,{CGRectGetWidth(drawRect),tlsz.height}};
+
+		//@@TODO:: formalize this area
+
+//MTLog(@"d %@ | t %@",NSStringFromCGRect(drawRect), NSStringFromCGRect(tlr));
+		
+		
+		frame = [self tagText:tlr stringForRect:as stringRange:tgrng frameSetter:framesetter];
+		CFArrayAppendValue(self.textFrameContainer,frame);
+		CFRelease(frame);
+
+		
+		
+		
+		
+		
+		
+		
 		//file and function
 		if(!IS_NULL_STRING(aMessageData.fileFuncRepresentation))
 		{
@@ -555,15 +575,20 @@ NSString *defaultDataHint = nil;
 	return r;
 }
 
-- (CGSize)tagTextRect:(CGRect)aConstraint
-			 tagRange:(CFRange)aTagRange
-		   levelRange:(CFRange)aLevelRange
-		  frameSetter:(CTFramesetterRef)framesetter
-{
-	CFRange fitRange;
-	CFRange textRange = CFRangeMake(aTagRange.location, aTagRange.length + aLevelRange.length);
-	CGSize frameSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, textRange, NULL, aConstraint.size, &fitRange);
 
+- (CGSize)desiredThreadIdSize:(CGSize)aConstraint
+				  threadRange:(CFRange)aThreadRange
+				  frameSetter:(CTFramesetterRef)framesetter
+{
+	CGSize frameSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, aThreadRange, NULL, aConstraint, NULL);
+	return frameSize;
+}
+
+- (CGSize)desiredTagAndLevelSize:(CGSize)aConstraint
+				tagAndLevelRange:(CFRange)aRange
+					 frameSetter:(CTFramesetterRef)framesetter
+{
+	CGSize frameSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, aRange, NULL, aConstraint, NULL);
 	return frameSize;
 }
 
@@ -781,17 +806,12 @@ NSString *defaultDataHint = nil;
 		  frameSetter:(CTFramesetterRef)aFrameSetter
 {
 #ifdef DEBUG_CT_FRAME_RANGE
+	MTLog(@"aDrawRect %@",NSStringFromCGRect(aDrawRect));
 	NSAttributedString *s = (NSAttributedString *)aString;
-	MTLog(@"threadIDAndTagText : %@",[[s attributedSubstringFromRange:NSMakeRange(aStringRange.location, aStringRange.length)] string]);
+	MTLog(@"tag : %@",[[s attributedSubstringFromRange:NSMakeRange(aStringRange.location, aStringRange.length)] string]);
 #endif
 
-	CGMutablePathRef path = CGPathCreateMutable();
-/*
-	CGSize threadBounds = [LoggerTextStyleManager
-	sizeForStringWithDefaultTagAndLevelFont:self.messageData.threadID
-	constraint:aDrawRect.size];
-*/
-	CGPathAddRect(path, NULL, aDrawRect);
+	CGPathRef path = CGPathCreateWithRect(aDrawRect,NULL);
 	CTFrameRef frame = CTFramesetterCreateFrame(aFrameSetter,aStringRange, path, NULL);
 	CGPathRelease(path);
 	return frame;
@@ -1217,8 +1237,7 @@ NSString *defaultDataHint = nil;
 	drawRect = [self threadIDAndTagTextRect:cellFrame];
 	[self drawThreadIDAndTagInRect:drawRect highlightedTextColor:nil];
 
-//#ifdef DEBUG_DRAW_AREA
-#if 1
+#ifdef DEBUG_DRAW_AREA
 	CGContextSetFillColorWithColor(context, [UIColor yellowColor].CGColor);
 	CGContextFillRect(context, drawRect);
 #endif
@@ -1226,7 +1245,6 @@ NSString *defaultDataHint = nil;
 	//@@TODO:: draw file && func area
 
 	// Draw message
-
 	float fflh = [[self.messageData portraitFileFuncHeight] floatValue];
 	drawRect = [self messageTextRect:cellFrame fileFuncLineHeight:fflh];
 	[self drawMessageInRect:drawRect highlightedTextColor:nil];

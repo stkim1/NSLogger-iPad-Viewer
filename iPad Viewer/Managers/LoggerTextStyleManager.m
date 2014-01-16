@@ -176,7 +176,22 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTextStyleManager,sharedStyleM
 
 		//-------------------------- tag and level font ------------------------
 		// in ios, no Lucida Sans. we're going with 'Telugu Sangman MN'
-		_defaultTagAndLevelFont =  CTFontCreateWithName(CFSTR("TeluguSangamMN"), DEFAULT_TAG_LEVEL_SIZE, NULL);
+		CTFontRef tlfr = CTFontCreateWithName(CFSTR("TeluguSangamMN"), DEFAULT_TAG_LEVEL_SIZE, NULL);
+		
+		// Create a copy of the original font with the masked trait set to the
+		// desired value. If the font family does not have the appropriate style,
+		// this will return NULL.
+		CTFontRef btlfr = CTFontCreateCopyWithSymbolicTraits(tlfr, 0.0, NULL, kCTFontBoldTrait,kCTFontBoldTrait);
+		if(btlfr == NULL)
+		{
+			_defaultTagAndLevelFont = tlfr;
+		}
+		else
+		{
+			_defaultTagAndLevelFont = btlfr;
+			CFRelease(tlfr);
+		}
+		
 
 		CGFloat tagLevelLeading = CTFontGetLeading(_defaultTagAndLevelFont) + CTFontGetDescent(_defaultTagAndLevelFont);
 
@@ -190,16 +205,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTextStyleManager,sharedStyleM
 		//-------------------------- file and function -------------------------
 		// set the desired trait to be bold, Mask off the bold trait to indicate
 		// that CTFontSymbolicTraits is the only trait desired to be modified.
-		
-		// Create a copy of the original font with the masked trait set to the
-		// desired value. If the font family does not have the appropriate style,
-		// this will return NULL.
-		CTFontRef fffr = CTFontCreateCopyWithSymbolicTraits(_defaultTagAndLevelFont, 0.0, NULL, kCTFontBoldTrait,kCTFontBoldTrait);
-		if(fffr != NULL){
-			_defaultFileAndFunctionFont = fffr;
-		}else{
-			_defaultFileAndFunctionFont = _defaultTagAndLevelFont;
-		}
+		_defaultFileAndFunctionFont = _defaultTagAndLevelFont;
 
 		CTLineBreakMode lb = kCTLineBreakByTruncatingMiddle;
 		CTParagraphStyleSetting ffs[] = {
