@@ -56,6 +56,8 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTextStyleManager,sharedStyleM
 @synthesize defaultFont = _defaultFont;
 @synthesize defaultParagraphStyle = _defaultParagraphStyle;
 
+@synthesize defaultThreadStyle = _defaultThreadStyle;
+
 @synthesize defaultTagAndLevelFont = _defaultTagAndLevelFont;
 @synthesize defaultTagAndLevelStyle = _defaultTagAndLevelStyle;
 
@@ -174,6 +176,17 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTextStyleManager,sharedStyleM
 
 		_defaultParagraphStyle = CTParagraphStyleCreate(dfs, sizeof(dfs) / sizeof(dfs[0]));
 
+
+		//------------------------ default thread style ------------------------
+		CTLineBreakMode mlb = kCTLineBreakByTruncatingMiddle;
+		CTParagraphStyleSetting dths[] = {
+			{kCTParagraphStyleSpecifierLineSpacingAdjustment, sizeof (CGFloat), &defaultLeading }
+			,{kCTParagraphStyleSpecifierAlignment,sizeof(CTTextAlignment),&alignment}
+			,{kCTParagraphStyleSpecifierLineBreakMode,sizeof(CTLineBreakMode),&mlb}
+		};
+		
+		_defaultThreadStyle = CTParagraphStyleCreate(dths, sizeof(dths) / sizeof(dths[0]));
+		
 		//-------------------------- tag and level font ------------------------
 		// in ios, no Lucida Sans. we're going with 'Telugu Sangman MN'
 		CTFontRef tlfr = CTFontCreateWithName(CFSTR("TeluguSangamMN"), DEFAULT_TAG_LEVEL_SIZE, NULL);
@@ -207,11 +220,10 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(LoggerTextStyleManager,sharedStyleM
 		// that CTFontSymbolicTraits is the only trait desired to be modified.
 		_defaultFileAndFunctionFont = _defaultTagAndLevelFont;
 
-		CTLineBreakMode lb = kCTLineBreakByTruncatingMiddle;
 		CTParagraphStyleSetting ffs[] = {
 			{kCTParagraphStyleSpecifierLineSpacingAdjustment, sizeof (CGFloat), &tagLevelLeading }
 			,{kCTParagraphStyleSpecifierAlignment,sizeof(CTTextAlignment),&alignment}
-			,{kCTParagraphStyleSpecifierLineBreakMode,sizeof(CTLineBreakMode),&lb}
+			,{kCTParagraphStyleSpecifierLineBreakMode,sizeof(CTLineBreakMode),&mlb}
 		};
 
 		_defaultFileAndFunctionStyle = CTParagraphStyleCreate(ffs, sizeof(ffs) / sizeof(ffs[0]));

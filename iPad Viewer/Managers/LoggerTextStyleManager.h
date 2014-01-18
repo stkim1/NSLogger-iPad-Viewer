@@ -72,6 +72,7 @@
  *
  */
 @property (nonatomic, readonly) __attribute__((NSObject)) CTParagraphStyleRef	defaultParagraphStyle;
+@property (nonatomic, readonly) __attribute__((NSObject)) CTParagraphStyleRef	defaultThreadStyle;
 @property (nonatomic, readonly) __attribute__((NSObject)) CTParagraphStyleRef	defaultTagAndLevelStyle;
 @property (nonatomic, readonly) __attribute__((NSObject)) CTParagraphStyleRef	defaultFileAndFunctionStyle;
 @property (nonatomic, readonly) __attribute__((NSObject)) CTParagraphStyleRef	defaultMonospacedStyle;

@@ -649,7 +649,7 @@ NSString *defaultDataHint = nil;
 #endif
 	
 	CTFontRef f = [[LoggerTextStyleManager sharedStyleManager] defaultFont];
-	CTParagraphStyleRef p = [[LoggerTextStyleManager sharedStyleManager] defaultParagraphStyle];
+	CTParagraphStyleRef p = [[LoggerTextStyleManager sharedStyleManager] defaultThreadStyle];
 	
 	CFAttributedStringSetAttribute(aString, aThreadRange, kCTFontAttributeName, f);
 	CFAttributedStringSetAttribute(aString, aThreadRange, kCTParagraphStyleAttributeName, p);
