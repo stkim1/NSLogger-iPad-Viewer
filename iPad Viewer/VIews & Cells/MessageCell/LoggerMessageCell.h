@@ -61,14 +61,11 @@ extern NSString * const kMessageCellReuseID;
 	UITableView				*_hostTableView;	// a tableview hosting this cell
 	LoggerMessageData		*_messageData;
 	UIImage					*_imageData;
-	CGRect					_tagDrawRect;
 }
 @property (nonatomic, assign) UITableView				*hostTableView;
 @property (nonatomic, retain) LoggerMessageData			*messageData;
 @property (nonatomic, retain) UIImage					*imageData;
 @property (nonatomic, retain) __attribute__((NSObject)) CFMutableArrayRef textFrameContainer;
-
-+ (UIColor *)colorForTag:(NSString *)tag;
 
 // initialize with predefined style and reuse identifier
 -(id)initWithPreConfig;

@@ -67,6 +67,9 @@
 
 #define VIEWCONTROLLER_TITLE_HEIGHT		79.f
 
+#define MSG_CELL_TAG_LEVEL_LEFT_PADDING	2.f
+#define MSG_CELL_TAG_LEVEL_TOP_PADDING	1.f
+
 extern NSString * const kBottomHintText;
 extern NSString * const kBottomHintData;
 
