@@ -1,6 +1,6 @@
 /*
  *
- * Modified BSD license.
+ * BSD license follows (http://www.opensource.org/licenses/bsd-license.php)
  *
  * Based on source code copyright (c) 2010-2014 Florent Pillet,
  * Copyright (c) 2012-2014 Sung-Taek, Kim <stkim1@colorfulglue.com> All Rights
@@ -40,7 +40,7 @@ extern UIFont *displayMonospacedFont;
 
 @implementation LoggerMarkerCell
 
--(id)initWithPreConfig
+-(id)initWithIdentifier
 {
 	return
 		[self
@@ -53,9 +53,6 @@ extern UIFont *displayMonospacedFont;
 			 messageData:(LoggerMessageData *)aMessageData
 {
 	self.messageData = aMessageData;
-	self.imageData = nil;
-	
-	
 	[self setNeedsDisplay];
 }
 

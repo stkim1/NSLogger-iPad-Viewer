@@ -1,6 +1,6 @@
 /*
  *
- * Modified BSD license.
+ * BSD license follows (http://www.opensource.org/licenses/bsd-license.php)
  *
  * Copyright (c) 2012-2013 Sung-Taek, Kim <stkim1@colorfulglue.com> All Rights
  * Reserved.
@@ -326,7 +326,7 @@
 	LoggerMessageData *msg = \
 		[self.messageFetchResultController objectAtIndexPath:anIndexPath];
 
-	LoggerMessageCell *cell = nil;
+	BaseMessageCell *cell = nil;
 
 	switch ([msg.type shortValue])
 	{
@@ -339,10 +339,7 @@
 
 			if(cell == nil)
 			{
-				cell = [[[LoggerMessageCell alloc]
-						initWithPreConfig]
-						autorelease];
-
+				cell = [[[LoggerMessageCell alloc] initWithIdentifier] autorelease];
 				cell.hostTableView = self.tableView;
 				cell.selectionStyle = UITableViewCellSelectionStyleNone;
 			}
@@ -358,10 +355,7 @@
 
 			if(cell == nil)
 			{
-				cell = [[[LoggerClientInfoCell alloc]
-						initWithPreConfig]
-						autorelease];
-				
+				cell = [[[LoggerClientInfoCell alloc] initWithIdentifier] autorelease];
 				cell.hostTableView = self.tableView;
 				cell.selectionStyle = UITableViewCellSelectionStyleNone;
 			}
@@ -376,10 +370,7 @@
 
 			if(cell == nil)
 			{
-				cell = [[[LoggerMarkerCell alloc]
-						initWithPreConfig]
-						autorelease];
-
+				cell = [[[LoggerMarkerCell alloc] initWithIdentifier] autorelease];
 				cell.hostTableView = self.tableView;
 				cell.selectionStyle = UITableViewCellSelectionStyleNone;
 			}

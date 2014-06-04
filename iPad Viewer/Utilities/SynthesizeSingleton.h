@@ -1,6 +1,6 @@
 /*
  *
- * Modified BSD license.
+ * BSD license follows (http://www.opensource.org/licenses/bsd-license.php)
  *
  * Based on source code 
  * Copyright 2008 Matt Gallagher. All rights reserved,

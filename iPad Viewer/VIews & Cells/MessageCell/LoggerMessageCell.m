@@ -1,6 +1,6 @@
 /*
  *
- * Modified BSD license.
+ * BSD license follows (http://www.opensource.org/licenses/bsd-license.php)
  *
  * Based on
  * Copyright (c) 2010-2011 Florent Pillet <fpillet@gmail.com>
@@ -35,97 +35,39 @@
 
 
 #import "LoggerMessageCell.h"
-#import "LoggerUtils.h"
 
-NSString * const kMessageCellReuseID = @"messageCell";
-UIFont *displayDefaultFont = nil;
-UIFont *displayTagAndLevelFont = nil;
-UIFont *displayMonospacedFont = nil;
+#define TEXT_LENGH_BETWEEN_LOCS(LOCATION_1,LOCATION_0) (abs(LOCATION_1 - LOCATION_0))
+#define BORDER_LINE_WIDTH 1.f
 
-CGColorRef _defaultGrayColor = NULL;
-CGColorRef _defaultWhiteColor = NULL;
 CGColorRef _fileFuncBackgroundColor = NULL;
 CGColorRef _hintTextForegroundColor = NULL;
 CGColorRef _defaultTagColor = NULL;
 CGColorRef _defaultLevelColor = NULL;
 
-NSString *defaultTextHint = nil;
-NSString *defaultDataHint = nil;
+NSString *_defaultTextHint = nil;
+NSString *_defaultDataHint = nil;
 
-//#define USE_UIKIT_FOR_DRAWING
-//#define DEBUG_CT_STR_RANGE
-//#define DEBUG_CT_FRAME_RANGE
-//#define DEBUG_DRAW_AREA
-
-#define TEXT_LENGH_BETWEEN_LOCS(LOCATION_1,LOCATION_0) (abs(LOCATION_1 - LOCATION_0))
-#define BORDER_LINE_WIDTH 1.f
-
-@interface LoggerMessageView : UIView
-@end
-@implementation LoggerMessageView
-- (void)drawRect:(CGRect)aRect
-{
-	[(LoggerMessageCell *)[[self superview] superview] drawMessageView:aRect];
-}
+@interface LoggerMessageCell()
+@property (nonatomic, retain) __attribute__((NSObject)) CFMutableArrayRef textFrameContainer;
 @end
 
 @implementation LoggerMessageCell
 {
-	CFMutableAttributedStringRef _displayString;
-	CTFramesetterRef _textFrameSetter;
-	CFMutableArrayRef _textFrameContainer;
-	
+    UIImage					*_imageData;
+	CFMutableArrayRef       _textFrameContainer;
+
 	CGRect					_tagHighlightRect;
 	CGRect					_levelHightlightRect;
 }
-@synthesize hostTableView = _hostTableView;
-@synthesize messageData = _messageData;
-@synthesize imageData = _imageData;
+@synthesize imageData       = _imageData;
 @synthesize textFrameContainer = _textFrameContainer;
 
 +(void)initialize
 {
-	defaultTextHint = [NSLocalizedString(@"Double-click to see all text...", nil) retain];
-
-	defaultDataHint = [NSLocalizedString(@"Double-click to see all data...", nil) retain];
-
-	if(displayDefaultFont == nil)
-	{
-		displayDefaultFont =
-			[[UIFont
-			  fontWithName:kDefaultFontName
-			  size:DEFAULT_FONT_SIZE] retain];
-	}
-	
-	if(displayTagAndLevelFont == nil)
-	{
-		displayTagAndLevelFont =
-			[[UIFont
-			  fontWithName:kTagAndLevelFontName
-			  size:DEFAULT_TAG_LEVEL_SIZE] retain];
-	}
-	
-	if(displayMonospacedFont == nil)
-	{
-		displayMonospacedFont =
-			[[UIFont
-			  fontWithName:kMonospacedFontName
-			  size:DEFAULT_MONOSPACED_SIZE] retain];
-	}
-	
+	_defaultTextHint = [NSLocalizedString(@"Double-click to see all text...", nil) retain];
+	_defaultDataHint = [NSLocalizedString(@"Double-click to see all data...", nil) retain];
+    
 	CGColorSpaceRef csr = CGColorSpaceCreateDeviceRGB();
-	if(_defaultGrayColor == NULL){
-		CGFloat fcomps[] = { 0.5f, 0.5f, 0.5f, 1.f };
-		CGColorRef fc = CGColorCreate(csr, fcomps);
-		_defaultGrayColor = fc;
-	}
-
-	if(_defaultWhiteColor == NULL)
-	{
-		CGFloat fcomps[] = { 1.f, 1.f, 1.f, 1.f };
-		CGColorRef fc = CGColorCreate(csr, fcomps);
-		_defaultWhiteColor = fc;
-	}
 	
 	if(_fileFuncBackgroundColor == NULL)
 	{
@@ -140,7 +82,7 @@ NSString *defaultDataHint = nil;
 		CGColorRef fc = CGColorCreate(csr, comps);
 		_hintTextForegroundColor = fc;
 	}
-
+    
 	if(_defaultTagColor == NULL){
 		CGFloat comps[] = { 0.25f, 0.25f, 0.25f, 1.f };
 		CGColorRef c = CGColorCreate(csr, comps);
@@ -154,10 +96,10 @@ NSString *defaultDataHint = nil;
 	}
 	
 	CGColorSpaceRelease(csr);
-
+    
 }
 
--(id)initWithPreConfig
+-(id)initWithIdentifier
 {
 	return
 		[self
@@ -170,16 +112,6 @@ NSString *defaultDataHint = nil;
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self)
 	{
-		self.accessoryType = UITableViewCellAccessoryNone;
-		_messageView = [[LoggerMessageView alloc] initWithFrame:CGRectZero];
-		
-		//@@TODO:: measure performance with this
-		_messageView.opaque = YES;
-		_messageView.clearsContextBeforeDrawing = NO;
-		[self addSubview:_messageView];
-		[_messageView release];
-		
-		
 		//@@TODO :: check if memory is properly released, retained
 		CFMutableArrayRef frameContainer = CFArrayCreateMutable(kCFAllocatorDefault,0, &kCFTypeArrayCallBacks );
 		self.textFrameContainer = frameContainer;
@@ -191,8 +123,6 @@ NSString *defaultDataHint = nil;
 
 -(void)dealloc
 {
-	self.hostTableView = nil;
-	self.messageData = nil;
 	self.imageData = nil;
 	CFArrayRemoveAllValues(self.textFrameContainer);
 	self.textFrameContainer = nil;
@@ -200,56 +130,18 @@ NSString *defaultDataHint = nil;
 	[super dealloc];
 }
 
-- (void)setFrame:(CGRect)aFrame
-{
-	[super setFrame:aFrame];
-	CGRect bound = [self bounds];
-
-	// leave room for the seperator line
-	//CGRect messageFrame = CGRectInset(bound, 0, 1);
-
-	[_messageView setFrame:bound];
-}
-
-- (void)setNeedsDisplay
-{
-	[super setNeedsDisplay];
-	[_messageView setNeedsDisplay];
-}
-
-- (void)setNeedsDisplayInRect:(CGRect)rect
-{
-	[super setNeedsDisplayInRect:rect];
-	[_messageView setNeedsDisplayInRect:rect];
-}
-
-
-#if 0
-- (void)setNeedsLayout
-{
-	[super setNeedsLayout];
-	[_messageView setNeedsLayout];
-}
-#endif
-
 -(void)prepareForReuse
 {
-	[super prepareForReuse];
-
 	if([self.messageData dataType] == kMessageImage)
 	{
 		[self.messageData cancelImageForCell:self];
 	}
 
+    // we need message data until this point.
+    [super prepareForReuse];
+    
 	self.imageData = nil;
-	self.messageData = nil;
 	CFArrayRemoveAllValues(self.textFrameContainer);
-}
-
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated
-{
-    [super setSelected:selected animated:animated];
-    // Configure the view for the selected state
 }
 
 -(void)setupForIndexpath:(NSIndexPath *)anIndexPath
@@ -304,7 +196,7 @@ NSString *defaultDataHint = nil;
 				locHint = locMessage + [aMessageData.textRepresentation length];
 				
 				if(truncated){
-					totalTextLength = locHint + [defaultTextHint length];
+					totalTextLength = locHint + [_defaultTextHint length];
 				}else{
 					totalTextLength = locHint;
 				}
@@ -314,7 +206,7 @@ NSString *defaultDataHint = nil;
 				locHint = locMessage + [aMessageData.textRepresentation length];
 				
 				if(truncated){
-					totalTextLength = locHint + [defaultDataHint length];
+					totalTextLength = locHint + [_defaultDataHint length];
 				}else{
 					totalTextLength = locHint;
 				}
@@ -350,7 +242,7 @@ NSString *defaultDataHint = nil;
 				CFAttributedStringReplaceString(as,CFRangeMake(locMessage, 0),(CFStringRef)aMessageData.textRepresentation);
 				
 				if(truncated){
-					CFAttributedStringReplaceString(as,CFRangeMake(locHint, 0),(CFStringRef)defaultTextHint);
+					CFAttributedStringReplaceString(as,CFRangeMake(locHint, 0),(CFStringRef)_defaultTextHint);
 				}
 				break;
 			}
@@ -358,7 +250,7 @@ NSString *defaultDataHint = nil;
 				CFAttributedStringReplaceString(as,CFRangeMake(locMessage, 0),(CFStringRef)aMessageData.textRepresentation);
 				
 				if(truncated){
-					CFAttributedStringReplaceString(as,CFRangeMake(locHint, 0),(CFStringRef)defaultDataHint);
+					CFAttributedStringReplaceString(as,CFRangeMake(locHint, 0),(CFStringRef)_defaultDataHint);
 				}
 				break;
 			}
@@ -648,7 +540,7 @@ NSString *defaultDataHint = nil;
 	
 	CFAttributedStringSetAttribute(aString, aThreadRange, kCTFontAttributeName, f);
 	CFAttributedStringSetAttribute(aString, aThreadRange, kCTParagraphStyleAttributeName, p);
-	CFAttributedStringSetAttribute(aString, aThreadRange, kCTForegroundColorAttributeName, _defaultGrayColor);
+	CFAttributedStringSetAttribute(aString, aThreadRange, kCTForegroundColorAttributeName, defaultGrayColor);
 }
 
 
@@ -667,7 +559,7 @@ NSString *defaultDataHint = nil;
 	
 	CFAttributedStringSetAttribute(aString, aTagRange, kCTFontAttributeName, tlf);
 	CFAttributedStringSetAttribute(aString, aTagRange, kCTParagraphStyleAttributeName, tlp);
-	CFAttributedStringSetAttribute(aString, aTagRange, kCTForegroundColorAttributeName, _defaultWhiteColor);
+	CFAttributedStringSetAttribute(aString, aTagRange, kCTForegroundColorAttributeName, defaultWhiteColor);
 }
 
 - (void)levelAttribute:(CFMutableAttributedStringRef)aString
@@ -685,7 +577,7 @@ NSString *defaultDataHint = nil;
 	
 	CFAttributedStringSetAttribute(aString, aLevelRange, kCTFontAttributeName, tlf);
 	CFAttributedStringSetAttribute(aString, aLevelRange, kCTParagraphStyleAttributeName, tlp);
-	CFAttributedStringSetAttribute(aString, aLevelRange, kCTForegroundColorAttributeName, _defaultWhiteColor);
+	CFAttributedStringSetAttribute(aString, aLevelRange, kCTForegroundColorAttributeName, defaultWhiteColor);
 }
 
 
@@ -703,7 +595,7 @@ NSString *defaultDataHint = nil;
 	CTParagraphStyleRef p = [[LoggerTextStyleManager sharedStyleManager] defaultFileAndFunctionStyle];
 	CFAttributedStringSetAttribute(aString, aStringRange, kCTFontAttributeName, f);
 	CFAttributedStringSetAttribute(aString, aStringRange, kCTParagraphStyleAttributeName, p);
-	CFAttributedStringSetAttribute(aString, aStringRange, kCTForegroundColorAttributeName, _defaultGrayColor);
+	CFAttributedStringSetAttribute(aString, aStringRange, kCTForegroundColorAttributeName, defaultGrayColor);
 	
 	// not working *confirmed* :(
 	//CFAttributedStringSetAttribute(aString, aStringRange, (CFStringRef)NSBackgroundColorAttributeName, _fileFuncBackgroundColor);
@@ -946,7 +838,7 @@ NSString *defaultDataHint = nil;
 	// turn antialiasing off
 	CGContextSetShouldAntialias(context, false);
 
-	CGContextSetFillColorWithColor(context, _defaultWhiteColor);
+	CGContextSetFillColorWithColor(context, defaultWhiteColor);
 	
 	//@@TODO:: this single call represent 2% of CPU time. find a way to replace it.
 	CGContextFillRect(context, cellFrame);

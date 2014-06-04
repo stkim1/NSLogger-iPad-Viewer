@@ -1,6 +1,6 @@
 /*
  *
- * Modified BSD license.
+ * BSD license follows (http://www.opensource.org/licenses/bsd-license.php)
  *
  * Based on
  * Copyright (c) 2010-2011 Florent Pillet <fpillet@gmail.com>
@@ -34,45 +34,12 @@
  */
 
 
-#import <UIKit/UIKit.h>
-#import "LoggerMessageData.h"
-#import "LoggerConstView.h"
-#import "UIColorRGBA.h"
-#import "time_converter.h"
-#import "LoggerUtils.h"
-#import <CoreText/CoreText.h>
-#import "LoggerTextStyleManager.h"
-#include "NullStringCheck.h"
+#import "BaseMessageCell.h"
 
 extern NSString * const kMessageCellReuseID;
-#define DEAFULT_BACKGROUND_GRAY_VALUE	0.98f
 
-@interface LoggerMessageCell : UITableViewCell
-{
-	UIView					*_messageView;		// a view which draws content of message
-	UITableView				*_hostTableView;	// a tableview hosting this cell
-	LoggerMessageData		*_messageData;
-	UIImage					*_imageData;
-}
-@property (nonatomic, assign) UITableView				*hostTableView;
-@property (nonatomic, retain) LoggerMessageData			*messageData;
-@property (nonatomic, retain) UIImage					*imageData;
-@property (nonatomic, retain) __attribute__((NSObject)) CFMutableArrayRef textFrameContainer;
-
-// initialize with predefined style and reuse identifier
--(id)initWithPreConfig;
-
-// this method actually draws message content. subclasses should draw their own
--(void)drawMessageView:(CGRect)cellFrame;
-
--(void)setupForIndexpath:(NSIndexPath *)anIndexPath
-			 messageData:(LoggerMessageData *)aMessageData;
-
-- (void)drawTimestampAndDeltaInRect:(CGRect)aDrawRect
-			   highlightedTextColor:(UIColor *)aHighlightedTextColor;
-
-- (void)drawMessageInRect:(CGRect)aDrawRect
-	 highlightedTextColor:(UIColor *)aHighlightedTextColor;
+@interface LoggerMessageCell : BaseMessageCell
+@property (nonatomic, retain) UIImage *imageData;
 
 -(void)setImagedata:(NSData *)anImageData forRect:(CGRect)aRect;
 

@@ -1,6 +1,6 @@
 /*
  *
- * Modified BSD license.
+ * BSD license follows (http://www.opensource.org/licenses/bsd-license.php)
  *
  * Based on source code copyright (c) 2010-2014 Florent Pillet,
  * Copyright (c) 2012-2014 Sung-Taek, Kim <stkim1@colorfulglue.com> All Rights
@@ -31,8 +31,9 @@
  */
 
 #import "LoggerMessageCell.h"
+#import "BaseMessageCell.h"
 
 extern NSString * const kClientInfoCellReuseID;
 
-@interface LoggerClientInfoCell : LoggerMessageCell
+@interface LoggerClientInfoCell : BaseMessageCell
 @end

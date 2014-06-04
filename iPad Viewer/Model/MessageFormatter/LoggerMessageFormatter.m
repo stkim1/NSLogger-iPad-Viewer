@@ -1,6 +1,6 @@
 /*
  *
- * Modified BSD license.
+ * BSD license follows (http://www.opensource.org/licenses/bsd-license.php)
  *
  * Based on
  * Copyright (c) 2010-2011 Florent Pillet <fpillet@gmail.com>

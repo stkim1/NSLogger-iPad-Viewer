@@ -2,7 +2,6 @@
  *
  * BSD license follows (http://www.opensource.org/licenses/bsd-license.php)
  *
- * Based on source code copyright (c) 2010-2012 Florent Pillet,
  * Copyright (c) 2012-2013 Sung-Taek, Kim <stkim1@colorfulglue.com> All Rights
  * Reserved.
  *
@@ -31,23 +30,43 @@
  */
 
 
-#import <Foundation/Foundation.h>
-#import "LoggerTextStyleManager.h"
-#import "LoggerConstModel.h"
+#import <UIKit/UIKit.h>
+#import <CoreText/CoreText.h>
+
+#import "LoggerMessageData.h"
 #import "LoggerConstView.h"
+#import "LoggerTextStyleManager.h"
 
-@class LoggerMessage;
+#import "UIColorRGBA.h"
+#import "time_converter.h"
+#import "LoggerUtils.h"
 
-@interface LoggerMessageSize : NSObject
-+ (CGFloat)minimumHeightForCellOnWidth:(CGFloat)aWidth;
+#include "NullStringCheck.h"
 
-+ (CGFloat)heightOfFileLineFunctionOnWidth:(CGFloat)aWidth;
+#define DEAFULT_BACKGROUND_GRAY_VALUE	0.98f
 
-+ (CGFloat)heightOfFileLineFunction:(LoggerMessage * const)aMessage
-									maxWidth:(CGFloat)aMaxWidth
-								   maxHeight:(CGFloat)aMaxHeight;
+extern CGColorRef defaultGrayColor;
+extern CGColorRef defaultWhiteColor;
 
-+ (CGSize)sizeOfMessage:(LoggerMessage * const)aMessage maxWidth:(CGFloat)aMaxWidth maxHeight:(CGFloat)aMaxHeight;
+@interface BaseMessageCell : UITableViewCell
+{
+    UIView					*_messageView;		// a view which draws content of message
+	UITableView				*_hostTableView;	// a tableview hosting this cell
+	LoggerMessageData		*_messageData;
+}
+@property (nonatomic, assign) UITableView				*hostTableView;
+@property (nonatomic, retain) LoggerMessageData			*messageData;
 
-+ (CGFloat)heightOfHint:(LoggerMessage * const)aMessage maxWidth:(CGFloat)aMaxWidth maxHeight:(CGFloat)aMaxHeight;
+// initialize with predefined style and reuse identifier
+- (instancetype)initWithIdentifier; //NS_DESIGNATED_INITIALIZER
+
+- (void)setupForIndexpath:(NSIndexPath *)anIndexPath
+              messageData:(LoggerMessageData *)aMessageData;
+
+// this method actually draws message content. subclasses should draw their own
+- (void)drawMessageView:(CGRect)cellFrame;
+
+- (void)drawMessageInRect:(CGRect)aDrawRect
+	 highlightedTextColor:(UIColor *)aHighlightedTextColor;
+
 @end
