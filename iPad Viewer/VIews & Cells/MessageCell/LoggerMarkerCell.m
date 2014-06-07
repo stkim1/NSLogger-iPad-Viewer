@@ -34,12 +34,12 @@
 #import "LoggerMarkerCell.h"
 
 NSString * const kMarkerCellReuseID = @"markerCell";
-extern UIFont *displayDefaultFont;
-extern UIFont *displayTagAndLevelFont;
-extern UIFont *displayMonospacedFont;
+
+@interface LoggerMarkerCell()
+@property (nonatomic, strong) __attribute__((NSObject)) CTFrameRef textFrame;
+@end
 
 @implementation LoggerMarkerCell
-
 -(id)initWithIdentifier
 {
 	return
@@ -48,11 +48,76 @@ extern UIFont *displayMonospacedFont;
 		 reuseIdentifier:kMarkerCellReuseID];
 }
 
+-(void)prepareForReuse
+{
+	[super prepareForReuse];
+    self.textFrame = nil;
+}
+
+-(void)dealloc
+{
+    self.textFrame = nil;
+    [super dealloc];
+}
 
 -(void)setupForIndexpath:(NSIndexPath *)anIndexPath
 			 messageData:(LoggerMessageData *)aMessageData
 {
-	self.messageData = aMessageData;
+	
+    NSString *str = [aMessageData textRepresentation];
+    
+    
+    CFMutableAttributedStringRef as = CFAttributedStringCreateMutable(kCFAllocatorDefault, [str length]);
+    CFAttributedStringBeginEditing(as);
+
+    // copy marker text
+    CFAttributedStringReplaceString(as, CFRangeMake(0, 0), (CFStringRef)str);
+    
+    //TODO:: get color, underline, bold, hightlight etc
+	CTFontRef f = [[LoggerTextStyleManager sharedStyleManager] defaultMonospacedFont];
+	CTParagraphStyleRef p = [[LoggerTextStyleManager sharedStyleManager] defaultMonospacedStyle];
+    CFRange rng = CFRangeMake(0,[str length]);
+
+    // center alignment
+    CTTextAlignment alignment = kCTTextAlignmentCenter;
+    CTParagraphStyleSetting mfs[] = {
+        {kCTParagraphStyleSpecifierAlignment,sizeof(CTTextAlignment),&alignment}
+    };
+    
+    CTParagraphStyleRef style = CTParagraphStyleCreate(mfs, sizeof(mfs) / sizeof(mfs[0]));
+
+    
+	//  Apply our font and line spacing attributes over the span
+	CFAttributedStringSetAttribute(as, rng, kCTFontAttributeName, f);
+	CFAttributedStringSetAttribute(as, rng, kCTParagraphStyleAttributeName, p);
+    CFAttributedStringSetAttribute(as, rng, kCTParagraphStyleAttributeName, style);
+    
+    
+    // done editing the attributed string
+    CFAttributedStringEndEditing(as);
+    
+
+    // Draw client info
+	CGRect r = CGRectMake(MSG_CELL_LEFT_PADDING,MSG_CELL_TOP_PADDING,
+						  MSG_CELL_PORTRAIT_WIDTH - MSG_CELL_LATERAL_PADDING,
+						  [[aMessageData portraitHeight] floatValue] - MSG_CELL_VERTICAL_PADDING);
+    
+    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString(as);
+    
+    CGRect tr = CGRectInset(r, 2, 2);
+	CGMutablePathRef path = CGPathCreateMutable();
+	CGPathAddRect(path, NULL, tr);
+	CTFrameRef frame = CTFramesetterCreateFrame(framesetter, rng, path, NULL);
+    
+
+    CFRelease(style);
+    CGPathRelease(path);
+    CFRelease(framesetter);
+    CFRelease(as);
+    
+    // save text frame;
+    self.textFrame = frame;
+    
 	[self setNeedsDisplay];
 }
 
@@ -94,21 +159,17 @@ extern UIFont *displayMonospacedFont;
 	CGContextStrokePath(context);
 	CGContextSetShouldAntialias(context, true);
 	
-	// Draw client info
-	CGRect r = CGRectMake(CGRectGetMinX(cellFrame) + MSG_CELL_LEFT_PADDING,
-						  CGRectGetMinY(cellFrame) + MSG_CELL_TOP_PADDING,
-						  CGRectGetWidth(cellFrame) - MSG_CELL_LATERAL_PADDING,
-						  CGRectGetHeight(cellFrame) - MSG_CELL_VERTICAL_PADDING);
-	
-	
-	// set black color for text
-	[[UIColor blackColor] set];
-	
-	[[self.messageData textRepresentation]
-	 drawInRect:r
-	 withFont:displayMonospacedFont
-	 lineBreakMode:NSLineBreakByWordWrapping
-	 alignment:NSTextAlignmentCenter];
+    
+    // draw text
+	CGContextSaveGState(context);
+	// flip context vertically
+	CGContextSetTextMatrix(context, CGAffineTransformIdentity);
+	CGContextTranslateCTM(context, 0, self.bounds.size.height);
+	CGContextScaleCTM(context, 1.0, -1.0);
+		
+    CTFrameDraw(self.textFrame, context);
+
+	CGContextRestoreGState(context);
 }
 
 @end
