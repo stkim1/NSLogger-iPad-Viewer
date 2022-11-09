@@ -1,38 +1,36 @@
-#NSLogger iPad Viewer
+# NSLogger iPad Viewer  
 
-### iPhone Client (13/04/27)
-<img width="320" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/iphone_13_04_27.png" />
+### iPhone Client (2013/04/27)  
+![](https://github.com/stkim1/NSLogger-iPad-Viewer/blob/master/ScreenShots/iphone_13_04_27.png?raw=true)  
 
-###iPad Viewer (13/05/10)
-<img width="576" src="https://raw.github.com/stkim1/NSLogger-iPad-Viewer/master/ScreenShots/ipad_13_05_09.png" />
+### iPad Viewer (2013/05/10)  
+![](https://github.com/stkim1/NSLogger-iPad-Viewer/blob/master/ScreenShots/ipad_13_05_09.png?raw=true)  
 
-## * Ver 0.4.1 is available on [the main repo](https://github.com/fpillet/NSLogger). (Aug. 3, 13) 
+_Ver 0.4.1 is available on [the main repo](https://github.com/fpillet/NSLogger). (2013/08/03)_  
 
-Derived from [Florent Pillet's NSLogger](https://github.com/fpillet/NSLogger), NSLogger iPad is an in-field logging tool to monitor your mobile application's behavior in unfabricated, real-world environments.
+Derived from [Florent Pillet's NSLogger](https://github.com/fpillet/NSLogger), NSLogger iPad is an in-field logging tool to monitor your mobile application's behavior in unfabricated, real-world environments.  
 
-You can utilize this project to monitor how your application behaves on cellular network, handles GPS data, and/or, treats frequent data exchange with backend outside of your office.
-
-
-##Minimum Requirements
-iOS 6.1 and upward<br/>
-iPad 2 or iPad mini gen 1<br/>
-<sup>*</sup>iCloud not supported.
+You can utilize this project to monitor how your application behaves on cellular network, handles GPS data, and/or, treats frequent data exchange with backend outside of your office.  
 
 
-## How to run demo
+## Minimum Requirements  
+- iOS 6.1 and upward  
+- iPad 2 or iPad mini gen 1  
+- _iCloud not supported_  
+
+
+## How to run demo  
 1. Run iPad Viewer on an iPad with WiFi off and Bluetooth on.  
-2. Run iOS client with Bluetooth on. (It's up to you to leave WiFi or cellular on).      
+2. Run iOS client with Bluetooth on. (It's up to you to leave WiFi or cellular on).  
 3. Start logging. Look at the Bluetooth mark on top right corner. :)  
 
-##TODO
-###Search
-Search is what makes NSLogger stand out, and my wish is to make the search feature as powerful as Desktop version.  
+## TODO  
+### Search  
+- Search is what makes NSLogger stand out, and my wish is to make the search feature as powerful as Desktop version.  
+- Unlike OSX environment, iOS does not provide something similar to BWToolKit so we have to come up with something new but easy to use.  
+- A proposal is made here that we are to drag and drop a searchable element into a basket of combinator, and to come up with a preset. Open up "Dragger" example. It's crude but I hope it explains the idea.  
 
-Unlike OSX environment, iOS does not provide something similar to BWToolKit so we have to come up with something new but easy to use.  
-
-A proposal is made here that we are to drag and drop a searchable element into a basket of combinator, and to come up with a preset. Open up "Dragger" example. It's crude but I hope it explains the idea.  
-
-###UI 
+### UI  
 1. Preference : Transport On/Off, Network Setting, Export log data  
 2. Multiple views to show connections to viewer  
 3. Search for thread, Tag, and/or etc.  
@@ -41,22 +39,19 @@ A proposal is made here that we are to drag and drop a searchable element into a
 6. Click to see detail  
 
 
-### CoreData model
-1. Split log entity for performance : data for format such as height vs. actual  data
-2. New entry for tag, function name
-3. Move reconnection count variable from LoggerConnection to LoggerClient entity
-4. Handle App lifecycle (active/inactive/background/terminate)
+### CoreData model  
+1. Split log entity for performance : data for format such as height vs. actual data  
+2. New entry for tag, function name  
+3. Move reconnection count variable from LoggerConnection to LoggerClient entity  
+4. Handle App lifecycle (active/inactive/background/terminate)  
 
 
-###Questions
-Throw 'em at [@stkim1](http://twitter.com/stkim1)
-
-####Meanwhile, if you're interested…
+#### Meanwhile, if you're interested…  
 1. [Caught at the scene
-](http://blog.colorfulglue.com/2012/12/caught-at-the-scene/)
-2. [NSLogger viewer architecture](http://blog.colorfulglue.com/2013/02/nslogger-viewer-architecture/)
+](http://blog.colorfulglue.com/2012/12/caught-at-the-scene/)  
+2. [NSLogger viewer architecture](http://blog.colorfulglue.com/2013/02/nslogger-viewer-architecture/)  
 
-## Bluetooth Connection
+## Bluetooth Connection  
 There are three Bluetooth frameworks and one API publicly opened in iOS  
 1. [CoreBluetooth](http://developer.apple.com/library/ios/#documentation/CoreBluetooth/Reference/CoreBluetooth_Framework/_index.html)  
 2. [External Accessary](http://developer.apple.com/library/ios/#documentation/ExternalAccessory/Reference/ExternalAccessoryFrameworkReference/_index.ht]ml)  
@@ -65,7 +60,7 @@ There are three Bluetooth frameworks and one API publicly opened in iOS
 
 The one that is most clutter-free and provides best possible use case is, so far in my opinion, the last one. It requires no additional framework, library, and does not ask user to choose bluetooth connection. It simply finds the nearest possible service on Bluetooth interface and makes use of it.  
 
-##License
+## License  
 <pre>
 Copyright (c) 2012-2014 Sung-Taek, Kim <stkim1@colorfulglue.com> All Rights Reserved.
 
@@ -102,5 +97,6 @@ Lucida Grande, Lucida Grande Copyright (c) 1997, 2000, Bigelow & Holmes Inc. U.S
 <a href="http://www.levien.com/type/myfonts/inconsolata.html">Inconsolata</a> Copyright 2006 Raph Levien. Released under the Apache 2 license.
 <a href="http://www.styleseven.com">Digital-7</a> Copyright (c) 2008, Sizenko Alexander, Style-7 All rights reserved.</pre>
 
-_VER. 0.4.1_<br/>
-_Updated : June 1, 2014_
+VER. 0.4.1  
+
+_Updated : 2022/11/09_
